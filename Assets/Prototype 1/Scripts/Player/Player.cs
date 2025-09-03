@@ -12,8 +12,7 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // Asegurarse de que hay un Rigidbody2D
-        if (rb == null)
+        if (rb == null) //obligar a existir un Rigidbody2D
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f; // Sin gravedad
@@ -23,29 +22,23 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // Input del jugador
         HandleInput();
     }
 
     void FixedUpdate()
     {
-        // Movimiento físico
         HandleMovement();
     }
 
     void HandleInput()
     {
-        // Input básico WASD o flechas
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
-
-        // Crear vector de movimiento 2D
         movement = new Vector2(moveHorizontal, moveVertical).normalized;
     }
 
     void HandleMovement()
     {
-        // Mover el rigidbody2D
         if (movement != Vector2.zero)
         {
             Vector2 moveVelocity = movement * moveSpeed * Time.fixedDeltaTime;
@@ -53,13 +46,13 @@ public class Player : MonoBehaviour
         }
     }
 
-    // Opcional: Para animaciones futuras
+    // para mis animaciones 
     public Vector2 GetMovementDirection()
     {
         return movement;
     }
 
-    // Opcional: Debug visual de la dirección del movimiento
+    
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;

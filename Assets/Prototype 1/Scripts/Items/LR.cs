@@ -3,8 +3,8 @@ using UnityEngine;
 public class LR : MonoBehaviour
 {
     [Header("Configuración de Rotación")]
-    public float rotationSpeed = 90f;    // Velocidad de rotación en grados por segundo
-    public bool clockwise = true;        // Dirección de rotación
+    public float rotationSpeed = 90f;    
+    public bool clockwise = true;        
 
     void Update()
     {

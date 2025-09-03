@@ -6,8 +6,8 @@ public class MPGE : MonoBehaviour
     [System.Serializable]
     public class ToggleableObjects
     {
-        public GameObject[] objectsToToggle; // Objetos que aparecerán/desaparecerán
-        public bool isActive = true; // Estado actual de los objetos
+        public GameObject[] objectsToToggle; 
+        public bool isActive = true; 
     }
 
     public ToggleableObjects toggleGroup;
@@ -122,7 +122,6 @@ public class MPGE : MonoBehaviour
     // Método para debug visual
     void OnDrawGizmosSelected()
     {
-        // Esfera de interacción
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionDistance);
 

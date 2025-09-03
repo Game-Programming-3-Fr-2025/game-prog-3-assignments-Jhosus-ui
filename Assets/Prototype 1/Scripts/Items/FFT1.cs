@@ -3,8 +3,8 @@ using System.Collections;
 
 public class FFT1 : MonoBehaviour
 {
-    public GameObject[] interactiveObjects; // Objetos que activan el efecto
-    public GameObject[] falseFloors;       // Suelos falsos a iluminar
+    public GameObject[] interactiveObjects; 
+    public GameObject[] falseFloors;       
     public KeyCode interactKey = KeyCode.E;
     public float interactionDistance = 2f;
 

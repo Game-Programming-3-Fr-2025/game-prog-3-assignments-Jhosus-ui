@@ -6,12 +6,12 @@ public class MEO : MonoBehaviour
     [System.Serializable]
     public class MovableObject
     {
-        public GameObject objectToMove;       // Objeto a mover
-        public Vector3 moveDirection;         // Dirección del movimiento
-        public int maxMoves = 3;              // Cantidad máxima de movimientos
-        public float moveDistance = 1f;       // Distancia por movimiento
-        public int currentMoves = 0;          // Movimientos actuales
-        public bool isLocked = false;         // Si ya llegó al máximo
+        public GameObject objectToMove;      
+        public Vector3 moveDirection;         
+        public int maxMoves = 3;              
+        public float moveDistance = 1f;       
+        public int currentMoves = 0;          
+        public bool isLocked = false;         
     }
 
     [Header("Configuración")]
@@ -20,7 +20,7 @@ public class MEO : MonoBehaviour
     public float interactionDistance = 2f;
 
     [Header("Recompensa")]
-    public GameObject itemToAppear;           // Item que aparece cuando todos terminan
+    public GameObject itemToAppear;          
     public bool rewardShown = false;
 
     private GameObject player;
@@ -38,7 +38,7 @@ public class MEO : MonoBehaviour
         CheckAllObjectsCompleted();
     }
 
-    void CheckForInteraction()
+    void CheckForInteraction()  //Seguir comprobando si no existe problema de area
     {
         if (player == null) return;
 
@@ -48,9 +48,9 @@ public class MEO : MonoBehaviour
             {
                 float distance = Vector2.Distance(player.transform.position, movable.objectToMove.transform.position);
 
-                if (distance <= interactionDistance && Input.GetKeyDown(interactKey))
+                if (distance <= interactionDistance && Input.GetKeyDown(interactKey)) //Opcion 1 de codigo mmm
                 {
-                    MoveObject(movable);
+                    MoveObject(movable); 
                 }
             }
         }
