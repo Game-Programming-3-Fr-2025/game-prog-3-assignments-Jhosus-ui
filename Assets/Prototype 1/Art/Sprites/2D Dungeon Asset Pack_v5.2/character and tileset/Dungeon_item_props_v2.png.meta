@@ -151,7 +151,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -165,7 +165,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -218,9 +218,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 48
-        width: 33
-        height: 25
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -239,10 +239,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_1
       rect:
         serializedVersion: 2
-        x: 36
-        y: 67
-        width: 8
-        height: 10
+        x: 16
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -261,10 +261,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_2
       rect:
         serializedVersion: 2
-        x: 47
-        y: 47
-        width: 145
-        height: 33
+        x: 32
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -283,10 +283,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_3
       rect:
         serializedVersion: 2
-        x: 33
-        y: 52
-        width: 14
-        height: 9
+        x: 48
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -305,10 +305,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 31
-        width: 17
-        height: 18
+        x: 64
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -327,10 +327,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_5
       rect:
         serializedVersion: 2
-        x: 17
-        y: 32
-        width: 14
-        height: 14
+        x: 80
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -349,10 +349,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_6
       rect:
         serializedVersion: 2
-        x: 32
-        y: 31
-        width: 17
-        height: 18
+        x: 96
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -371,10 +371,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_7
       rect:
         serializedVersion: 2
-        x: 49
-        y: 31
-        width: 15
-        height: 18
+        x: 112
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -393,10 +393,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_8
       rect:
         serializedVersion: 2
-        x: 66
-        y: 33
-        width: 12
-        height: 13
+        x: 128
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -415,10 +415,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_9
       rect:
         serializedVersion: 2
-        x: 82
-        y: 33
-        width: 12
-        height: 12
+        x: 144
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -437,10 +437,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_10
       rect:
         serializedVersion: 2
-        x: 97
-        y: 33
-        width: 14
-        height: 14
+        x: 160
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -459,10 +459,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_11
       rect:
         serializedVersion: 2
-        x: 113
-        y: 33
-        width: 14
-        height: 14
+        x: 176
+        y: 64
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -481,10 +481,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_12
       rect:
         serializedVersion: 2
-        x: 129
-        y: 32
-        width: 13
-        height: 15
+        x: 0
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -503,10 +503,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_13
       rect:
         serializedVersion: 2
-        x: 148
-        y: 33
-        width: 9
-        height: 14
+        x: 16
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -525,10 +525,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_14
       rect:
         serializedVersion: 2
-        x: 161
-        y: 34
-        width: 14
-        height: 13
+        x: 32
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -547,10 +547,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_15
       rect:
         serializedVersion: 2
-        x: 175
-        y: 31
-        width: 17
-        height: 17
+        x: 48
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -569,10 +569,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_16
       rect:
         serializedVersion: 2
-        x: 3
-        y: 19
-        width: 9
-        height: 10
+        x: 64
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -591,10 +591,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_17
       rect:
         serializedVersion: 2
-        x: 16
-        y: 16
+        x: 80
+        y: 48
         width: 16
-        height: 14
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -613,10 +613,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_18
       rect:
         serializedVersion: 2
-        x: 32
-        y: 16
-        width: 12
-        height: 8
+        x: 96
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -635,10 +635,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_19
       rect:
         serializedVersion: 2
-        x: 37
-        y: 21
-        width: 11
-        height: 10
+        x: 112
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -657,10 +657,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_20
       rect:
         serializedVersion: 2
-        x: 50
-        y: 18
-        width: 12
-        height: 12
+        x: 128
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -679,10 +679,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_21
       rect:
         serializedVersion: 2
-        x: 66
-        y: 16
-        width: 13
-        height: 15
+        x: 144
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -701,10 +701,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_22
       rect:
         serializedVersion: 2
-        x: 79
-        y: 15
-        width: 50
-        height: 18
+        x: 160
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -723,10 +723,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_23
       rect:
         serializedVersion: 2
-        x: 129
-        y: 16
-        width: 13
-        height: 15
+        x: 176
+        y: 48
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -745,10 +745,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_24
       rect:
         serializedVersion: 2
-        x: 148
-        y: 17
-        width: 9
-        height: 14
+        x: 0
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -767,10 +767,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_25
       rect:
         serializedVersion: 2
-        x: 160
-        y: 15
-        width: 32
-        height: 17
+        x: 16
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -789,10 +789,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_26
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 17
-        height: 17
+        x: 32
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -811,10 +811,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_27
       rect:
         serializedVersion: 2
-        x: 16
-        y: 0
+        x: 48
+        y: 32
         width: 16
-        height: 14
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -833,10 +833,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_28
       rect:
         serializedVersion: 2
-        x: 32
-        y: 1
-        width: 12
-        height: 8
+        x: 64
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -855,10 +855,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_29
       rect:
         serializedVersion: 2
-        x: 36
-        y: 7
-        width: 12
-        height: 8
+        x: 80
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -877,10 +877,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_30
       rect:
         serializedVersion: 2
-        x: 49
-        y: 1
-        width: 13
-        height: 13
+        x: 96
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -899,9 +899,9 @@ TextureImporter:
       name: Dungeon_item_props_v2_31
       rect:
         serializedVersion: 2
-        x: 65
-        y: 0
-        width: 14
+        x: 112
+        y: 32
+        width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -921,10 +921,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_32
       rect:
         serializedVersion: 2
-        x: 79
-        y: 0
-        width: 18
-        height: 15
+        x: 128
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -943,10 +943,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_33
       rect:
         serializedVersion: 2
-        x: 97
-        y: 1
-        width: 14
-        height: 13
+        x: 144
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -965,10 +965,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_34
       rect:
         serializedVersion: 2
-        x: 113
-        y: 0
-        width: 14
-        height: 15
+        x: 160
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -987,10 +987,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_35
       rect:
         serializedVersion: 2
-        x: 129
-        y: 2
-        width: 14
-        height: 11
+        x: 176
+        y: 32
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1009,10 +1009,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_36
       rect:
         serializedVersion: 2
-        x: 145
-        y: 2
-        width: 14
-        height: 11
+        x: 0
+        y: 16
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1031,10 +1031,10 @@ TextureImporter:
       name: Dungeon_item_props_v2_37
       rect:
         serializedVersion: 2
-        x: 162
-        y: 1
-        width: 11
-        height: 14
+        x: 16
+        y: 16
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1053,9 +1053,9 @@ TextureImporter:
       name: Dungeon_item_props_v2_38
       rect:
         serializedVersion: 2
-        x: 175
-        y: 0
-        width: 17
+        x: 32
+        y: 16
+        width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -1071,11 +1071,473 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_39
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70159e3b157d9144587c3e1e430c6cb3
+      internalID: -793944465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_40
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc19559ae420cbf468adc50b076ea272
+      internalID: 1940375465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_41
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a4f50d2bdfe73a46853ffa1d7059162
+      internalID: 1298036045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_42
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e61481e5182bd047b86256ac137c27a
+      internalID: -580373141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_43
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9dfdb27719aa2d469280b31561ae9c1
+      internalID: 1137731651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_44
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ab410ad1ca5764428248881425585fe
+      internalID: 2103902727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_45
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a656209fb28a1743a80742f278fef23
+      internalID: -281891838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_46
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8e5d88059f88a3347820fa697df298ac
+      internalID: -1176072731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_47
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94f6ba112e1e9474385df0e092e4054d
+      internalID: 467278049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_48
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8e56f0b0db723f42b175b180f1633b3
+      internalID: -1485655205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_49
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2bda98b9c6cdaf847bad5db333a08f27
+      internalID: -1726406538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_50
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d3f96d846af15b489ae4f1ee4db1d32
+      internalID: 304240731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_51
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c46f936ee45f8a46897bd6a9f2f17dd
+      internalID: -1957011113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_52
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3223f283f7b616d44b1003da3a18d447
+      internalID: -1608066337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_53
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00f8852fd0d4be842b3a7de84d6665c4
+      internalID: -1586682997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_54
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55535e88779d5cc4fa132813c7cd0011
+      internalID: -1984006607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_55
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 034e66d9b7c3d9e4d91e8212b422433d
+      internalID: -189700575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_56
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adeeb07a5e139464881057b036758078
+      internalID: -288007356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_57
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4ffc3623e2922743affc012bd4a2913
+      internalID: -1146578095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_58
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 142d33dd938a08d40833c0786fda4422
+      internalID: -614159006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_item_props_v2_59
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8013046c458a1564facdf96bf18676fc
+      internalID: -2031111464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c9e248cf80e179d4ea3693de367a24b1
     internalID: 0
     vertices: []
     indices: 
@@ -1118,8 +1580,29 @@ TextureImporter:
       Dungeon_item_props_v2_36: -3697417984154267517
       Dungeon_item_props_v2_37: -7832241366221171462
       Dungeon_item_props_v2_38: 43355093520823240
+      Dungeon_item_props_v2_39: -793944465
       Dungeon_item_props_v2_4: 6003391517590891112
+      Dungeon_item_props_v2_40: 1940375465
+      Dungeon_item_props_v2_41: 1298036045
+      Dungeon_item_props_v2_42: -580373141
+      Dungeon_item_props_v2_43: 1137731651
+      Dungeon_item_props_v2_44: 2103902727
+      Dungeon_item_props_v2_45: -281891838
+      Dungeon_item_props_v2_46: -1176072731
+      Dungeon_item_props_v2_47: 467278049
+      Dungeon_item_props_v2_48: -1485655205
+      Dungeon_item_props_v2_49: -1726406538
       Dungeon_item_props_v2_5: 4195522928774502550
+      Dungeon_item_props_v2_50: 304240731
+      Dungeon_item_props_v2_51: -1957011113
+      Dungeon_item_props_v2_52: -1608066337
+      Dungeon_item_props_v2_53: -1586682997
+      Dungeon_item_props_v2_54: -1984006607
+      Dungeon_item_props_v2_55: -189700575
+      Dungeon_item_props_v2_56: -288007356
+      Dungeon_item_props_v2_57: -1146578095
+      Dungeon_item_props_v2_58: -614159006
+      Dungeon_item_props_v2_59: -2031111464
       Dungeon_item_props_v2_6: -1700896211981756331
       Dungeon_item_props_v2_7: 2164575112477713699
       Dungeon_item_props_v2_8: 4762437916889987983
