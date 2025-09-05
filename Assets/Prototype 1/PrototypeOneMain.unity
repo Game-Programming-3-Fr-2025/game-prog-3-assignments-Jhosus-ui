@@ -3363,7 +3363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad614e73bd60ae46a6d9fee754f7b11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destinationPoint: {fileID: 0}
+  destinationPoint: {fileID: 512099433}
   activationDistance: 0.5
 --- !u!1 &261751441
 GameObject:
@@ -4074,6 +4074,7 @@ MonoBehaviour:
     - {fileID: 1230585524}
     - {fileID: 191636163}
     - {fileID: 1346416328}
+    - {fileID: 852178620}
     isActive: 1
   interactionKey: 101
   interactionDistance: 0.9
@@ -4090,6 +4091,7 @@ MonoBehaviour:
     - {fileID: 301031067}
     - {fileID: 287746264}
     - {fileID: 1446355325}
+    - {fileID: 236308502}
     isActive: 0
 --- !u!61 &310457152
 BoxCollider2D:
@@ -13668,8 +13670,8 @@ Transform:
   m_GameObject: {fileID: 428264311}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: -9.34, z: 0}
-  m_LocalScale: {x: 0.4808137, y: 0.4018161, z: 0.8408039}
+  m_LocalPosition: {x: 0.5, y: -9.4514, z: 0}
+  m_LocalScale: {x: 0.4808137, y: 0.2903925, z: 0.8408039}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -13749,7 +13751,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -15651,7 +15653,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a4c6a2ffbeb0c554ebd4827383dce97b, type: 3}
+  m_Resource: {fileID: 8300000, guid: 62fac0c0d2270594ebf0b1a57edb188d, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -18404,7 +18406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad614e73bd60ae46a6d9fee754f7b11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destinationPoint: {fileID: 0}
+  destinationPoint: {fileID: 197211684}
   activationDistance: 0.5
 --- !u!1 &806635566
 GameObject:
