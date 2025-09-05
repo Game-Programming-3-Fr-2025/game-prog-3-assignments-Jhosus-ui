@@ -46,7 +46,7 @@ public class FFT1 : MonoBehaviour
         }
     }
 
-    IEnumerator ActivateLightWave()
+    IEnumerator ActivateLightWave() //Efecto Activado 
     {
         canInteract = false;
 

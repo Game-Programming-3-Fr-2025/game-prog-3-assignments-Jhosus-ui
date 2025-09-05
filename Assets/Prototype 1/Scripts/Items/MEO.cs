@@ -60,15 +60,12 @@ public class MEO : MonoBehaviour
     {
         if (movable.currentMoves < movable.maxMoves)
         {
-            // Calcular nueva posición
             Vector3 newPosition = movable.objectToMove.transform.position +
                                  (movable.moveDirection.normalized * movable.moveDistance);
 
-            // Mover el objeto
             movable.objectToMove.transform.position = newPosition;
             movable.currentMoves++;
 
-            // Verificar si llegó al máximo
             if (movable.currentMoves >= movable.maxMoves)
             {
                 movable.isLocked = true;
@@ -103,10 +100,9 @@ public class MEO : MonoBehaviour
         itemToAppear.SetActive(true);
     }
 
-    // Debug visual con Gizmos
-    void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected() //Trazo de rutas y posiciones
     {
-        // Configuración de colores
+
         Gizmos.color = Color.yellow;
         Gizmos.color = Color.blue;
 
@@ -115,8 +111,6 @@ public class MEO : MonoBehaviour
             if (movable.objectToMove != null)
             {
                 Vector3 startPos = movable.objectToMove.transform.position;
-
-                // Dibujar ruta completa
                 for (int i = 0; i < movable.maxMoves; i++)
                 {
                     Vector3 segmentStart = startPos + (movable.moveDirection.normalized * movable.moveDistance * i);
@@ -126,8 +120,6 @@ public class MEO : MonoBehaviour
                     Gizmos.DrawLine(segmentStart, segmentEnd);
                     Gizmos.DrawWireCube(segmentEnd, Vector3.one * 0.3f);
                 }
-
-                // Dibujar esfera de interacción
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(startPos, interactionDistance);
             }

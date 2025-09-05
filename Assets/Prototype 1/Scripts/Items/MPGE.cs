@@ -26,8 +26,6 @@ public class MPGE : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         mainCamera = Camera.main;
-
-        // Inicializar el estado de los objetos
         InitializeObjects();
     }
 
@@ -38,13 +36,11 @@ public class MPGE : MonoBehaviour
 
     void InitializeObjects()
     {
-        // Inicializar grupo principal
         if (toggleGroup.objectsToToggle != null && toggleGroup.objectsToToggle.Length > 0)
         {
             SetObjectsState(toggleGroup.objectsToToggle, toggleGroup.isActive);
         }
 
-        // Inicializar grupo alternativo si está activado
         if (alternarObjetos && grupoAlternativo.objectsToToggle != null && grupoAlternativo.objectsToToggle.Length > 0)
         {
             SetObjectsState(grupoAlternativo.objectsToToggle, grupoAlternativo.isActive);
@@ -60,12 +56,9 @@ public class MPGE : MonoBehaviour
 
         canInteract = (distance <= interactionDistance && isLookingAtObject);
 
-        if (canInteract)
+        if (canInteract && Input.GetKeyDown(interactionKey))
         {
-            if (Input.GetKeyDown(interactionKey))
-            {
-                ToggleObjects();
-            }
+            ToggleObjects();
         }
     }
 
@@ -78,33 +71,26 @@ public class MPGE : MonoBehaviour
         if (playerFacing != Vector2.zero)
         {
             float dotProduct = Vector2.Dot(playerFacing, directionToObject);
-            return dotProduct > 0.5f; // Umbral de detección frontal
+            return dotProduct > 0.5f;
         }
 
-        return true; // Si no se mueve, permite interacción
+        return true;
     }
 
     void ToggleObjects()
     {
         if (alternarObjetos)
         {
-            // Modo alternar: invertir ambos grupos
             toggleGroup.isActive = !toggleGroup.isActive;
-            grupoAlternativo.isActive = !toggleGroup.isActive; // Estado opuesto
+            grupoAlternativo.isActive = !toggleGroup.isActive;
 
             SetObjectsState(toggleGroup.objectsToToggle, toggleGroup.isActive);
             SetObjectsState(grupoAlternativo.objectsToToggle, grupoAlternativo.isActive);
-
-            Debug.Log(gameObject.name + ": Grupo principal " + (toggleGroup.isActive ? "activado" : "desactivado") +
-                     ", Grupo alternativo " + (grupoAlternativo.isActive ? "activado" : "desactivado"));
         }
         else
         {
-            // Modo simple: solo toggle del grupo principal
             toggleGroup.isActive = !toggleGroup.isActive;
             SetObjectsState(toggleGroup.objectsToToggle, toggleGroup.isActive);
-
-            Debug.Log(gameObject.name + ": Objetos " + (toggleGroup.isActive ? "activados" : "desactivados"));
         }
     }
 
@@ -119,13 +105,11 @@ public class MPGE : MonoBehaviour
         }
     }
 
-    // Método para debug visual
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, interactionDistance);
 
-        // Líneas al grupo principal (rojo)
         if (toggleGroup.objectsToToggle != null)
         {
             Gizmos.color = Color.red;
@@ -138,7 +122,6 @@ public class MPGE : MonoBehaviour
             }
         }
 
-        // Líneas al grupo alternativo (verde) - solo si está activado
         if (alternarObjetos && grupoAlternativo.objectsToToggle != null)
         {
             Gizmos.color = Color.green;
@@ -150,16 +133,6 @@ public class MPGE : MonoBehaviour
                     Gizmos.DrawWireCube(obj.transform.position, Vector3.one * 0.5f);
                 }
             }
-        }
-    }
-
-    // Opcional: Mostrar mensaje cuando el jugador está cerca
-    void OnGUI()
-    {
-        if (canInteract)
-        {
-            GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 50, 200, 30),
-                     "Presiona " + interactionKey + " para interactuar");
         }
     }
 }
