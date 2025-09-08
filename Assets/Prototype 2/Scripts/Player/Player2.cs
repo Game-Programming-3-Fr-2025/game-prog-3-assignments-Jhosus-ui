@@ -22,10 +22,13 @@ public class Player2 : MonoBehaviour
     private float jumpTimeCounter;
     private float horizontalInput;
 
+    private PJumps jumpComponent;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         dashComponent = GetComponent<PDash>();
+        jumpComponent = GetComponent<PJumps>();
         if (animator == null) animator = GetComponent<Animator>();
 
         if (rb != null)
@@ -86,6 +89,11 @@ public class Player2 : MonoBehaviour
             else isJumping = false;
         }
         if (isGrounded) isJumping = false;
+    }
+
+    public bool CanJumpDuringDash()
+    {
+        return IsDashing() && jumpComponent != null && !jumpComponent.HasUsedAirJump();
     }
 
     void UpdateAnimations()

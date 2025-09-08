@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Hit
   - Ground
+  - Points
   layers:
   - Default
   - TransparentFX
