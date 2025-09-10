@@ -9,6 +9,8 @@ public class PJumps : MonoBehaviour
 
     [Header("Point Jump")]
     public float pointJumpForce = 18f;
+    private float pointBufferTime = 0.2f;
+    private float pointBufferTimer = 0f;
 
     private Rigidbody2D rb;
     private Player2 player;
@@ -37,9 +39,10 @@ public class PJumps : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (inPointTrigger)
+            if (inPointTrigger || pointBufferTimer > 0f)
             {
                 PerformPointJump();
+                pointBufferTimer = 0f;
             }
             else if (CanAirJump())
             {
@@ -93,6 +96,7 @@ public class PJumps : MonoBehaviour
         if (other.CompareTag("Points"))
         {
             inPointTrigger = false;
+            pointBufferTimer = pointBufferTime;
         }
     }
 
