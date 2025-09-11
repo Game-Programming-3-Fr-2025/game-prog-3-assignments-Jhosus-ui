@@ -2,29 +2,23 @@ using UnityEngine;
 
 public class FC2 : MonoBehaviour
 {
-    [Header("Target")]
-    public Transform player;
-
     [Header("Camera Settings")]
+    public Transform player;
     public float smoothSpeed = 0.125f;
-
-    [Header("Fall Settings")]
     public float fallDistance = 10f;
     public float lineLength = 10f;
-
-    [Header("Screen Shake")]
     public float shakeDuration = 0.2f;
     public float shakeMagnitude = 0.3f;
 
+    [Header("System Checkpoints")]
     private float currentHighestY;
     private float shakeTimer;
     private float currentShakeMagnitude;
-    private Camera cam;
     private Vector3 initialPlayerPosition;
+    private Teleport currentCheckpoint;
 
     void Start()
     {
-        cam = Camera.main;
         if (player == null)
             player = GameObject.FindGameObjectWithTag("Player").transform;
 
@@ -52,8 +46,6 @@ public class FC2 : MonoBehaviour
 
     void FollowPlayer()
     {
-        if (cam == null) return;
-
         Vector3 targetPosition = player.position;
         targetPosition.z = -10f;
 
@@ -66,7 +58,6 @@ public class FC2 : MonoBehaviour
             smoothedPosition += shakeOffset;
         }
 
-        smoothedPosition.z = -10f;
         transform.position = smoothedPosition;
     }
 
@@ -86,15 +77,25 @@ public class FC2 : MonoBehaviour
     {
         if (player.position.y < currentHighestY - fallDistance)
         {
-            ResetLevel();
+            ResetToCheckpoint();
         }
     }
 
-    void ResetLevel()
+    void ResetToCheckpoint()
     {
-        player.position = initialPlayerPosition;
-        currentHighestY = initialPlayerPosition.y;
-        transform.position = new Vector3(initialPlayerPosition.x, initialPlayerPosition.y, -10f);
+        if (currentCheckpoint != null)
+        {
+            player.position = currentCheckpoint.transform.position;
+            currentHighestY = currentCheckpoint.transform.position.y;
+            transform.position = new Vector3(currentCheckpoint.transform.position.x,
+                                            currentCheckpoint.transform.position.y, -10f);
+        }
+        else
+        {
+            player.position = initialPlayerPosition;
+            currentHighestY = initialPlayerPosition.y;
+            transform.position = new Vector3(initialPlayerPosition.x, initialPlayerPosition.y, -10f);
+        }
     }
 
     public void CameraShake()
@@ -103,11 +104,16 @@ public class FC2 : MonoBehaviour
         currentShakeMagnitude = shakeMagnitude;
     }
 
+    public void SetCheckpoint(Teleport checkpoint)
+    {
+        currentCheckpoint = checkpoint;
+    }
+
+
     void OnDrawGizmosSelected()
     {
         if (player != null)
         {
-            // Dibujar línea de muerte por caída
             float deathLineY = Application.isPlaying ? currentHighestY - fallDistance : player.position.y - fallDistance;
 
             Gizmos.color = Color.red;
@@ -115,11 +121,11 @@ public class FC2 : MonoBehaviour
             Vector3 lineEnd = new Vector3(player.position.x + lineLength / 2, deathLineY, 0);
             Gizmos.DrawLine(lineStart, lineEnd);
 
-            // Dibujar pequeñas líneas verticales en los extremos
             Gizmos.DrawLine(lineStart, lineStart + Vector3.up * 0.5f);
             Gizmos.DrawLine(lineEnd, lineEnd + Vector3.up * 0.5f);
         }
     }
+
     public void ResetFallLine()
     {
         currentHighestY = player.position.y;

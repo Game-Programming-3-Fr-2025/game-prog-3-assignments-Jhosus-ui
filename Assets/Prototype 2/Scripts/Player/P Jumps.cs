@@ -12,9 +12,14 @@ public class PJumps : MonoBehaviour
     private float pointBufferTime = 0.2f;
     private float pointBufferTimer = 0f;
 
+    [Header("Jump Sounds")]
+    public AudioClip airJumpSound; 
+    public AudioClip pointJumpSound; 
+
     private Rigidbody2D rb;
     private Player2 player;
     private PDash dashComponent;
+    private AudioSource audioSource;
 
     private bool hasUsedAirJump = false;
     private bool wasGrounded = true;
@@ -25,6 +30,10 @@ public class PJumps : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         player = GetComponent<Player2>();
         dashComponent = GetComponent<PDash>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Update()
@@ -33,6 +42,11 @@ public class PJumps : MonoBehaviour
 
         HandleAirJump();
         UpdateJumpReset();
+
+        if (pointBufferTimer > 0f)
+        {
+            pointBufferTimer -= Time.deltaTime;
+        }
     }
 
     void HandleAirJump()
@@ -60,12 +74,22 @@ public class PJumps : MonoBehaviour
     {
         hasUsedAirJump = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
+
+        if (airJumpSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(airJumpSound);
+        }
     }
 
     void PerformPointJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, pointJumpForce);
         if (isDoubleJumpUnlocked) hasUsedAirJump = false;
+
+        if (pointJumpSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(pointJumpSound);
+        }
     }
 
     void UpdateJumpReset()

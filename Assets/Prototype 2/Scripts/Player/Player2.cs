@@ -15,12 +15,16 @@ public class Player2 : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
 
+    [Header("Sound")]
+    public AudioClip jumpSound; 
+
     private PDash dashComponent;
     private Rigidbody2D rb;
     public bool isGrounded;
     private bool isJumping;
     private float jumpTimeCounter;
     private float horizontalInput;
+    private AudioSource audioSource;
 
     private PJumps jumpComponent;
 
@@ -30,6 +34,10 @@ public class Player2 : MonoBehaviour
         dashComponent = GetComponent<PDash>();
         jumpComponent = GetComponent<PJumps>();
         if (animator == null) animator = GetComponent<Animator>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
 
         if (rb != null)
         {
@@ -68,6 +76,10 @@ public class Player2 : MonoBehaviour
             isJumping = true;
             jumpTimeCounter = jumpTime;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            if (jumpSound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(jumpSound);
+            }
         }
 
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0)

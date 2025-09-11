@@ -12,12 +12,16 @@ public class PDamage : MonoBehaviour
     [Header("UI Reference")]
     public TextMeshProUGUI livesText;
 
+    [Header("Sound")]
+    public AudioClip damageSound;
+
     private int currentLives;
     private bool isInvulnerable;
     private float invulnerabilityTimer;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
     private FC2 cameraController;
+    private AudioSource audioSource;
 
     void Start()
     {
@@ -25,6 +29,11 @@ public class PDamage : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         cameraController = Camera.main.GetComponent<FC2>();
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
         UpdateLivesUI();
     }
 
@@ -48,18 +57,24 @@ public class PDamage : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Hit") && !isInvulnerable)
+        if (other.CompareTag("Hit") && !isInvulnerable)
         {
-            TakeDamage(collision.GetContact(0).normal);
+            Vector2 hitDirection = (transform.position - other.transform.position).normalized;
+            TakeDamage(hitDirection);
         }
     }
 
-    void TakeDamage(Vector2 hitNormal)
+    void TakeDamage(Vector2 hitDirection)
     {
         currentLives--;
         UpdateLivesUI();
+
+        if (damageSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(damageSound);
+        }
 
         if (currentLives <= 0)
         {
@@ -70,7 +85,7 @@ public class PDamage : MonoBehaviour
         isInvulnerable = true;
         invulnerabilityTimer = invulnerabilityTime;
 
-        ApplyKnockback(hitNormal);
+        ApplyKnockback(hitDirection);
 
         if (cameraController != null)
         {
@@ -78,12 +93,13 @@ public class PDamage : MonoBehaviour
         }
     }
 
-    void ApplyKnockback(Vector2 hitNormal)
+    void ApplyKnockback(Vector2 hitDirection)
     {
-        Vector2 knockbackDirection = new Vector2(-hitNormal.x, 0.5f).normalized;
+        Vector2 knockbackDirection = new Vector2(hitDirection.x, 0.5f).normalized;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
     }
+
     void GameOver()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

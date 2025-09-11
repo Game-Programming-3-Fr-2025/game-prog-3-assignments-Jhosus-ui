@@ -4,6 +4,7 @@ public class Teleport : MonoBehaviour
 {
     public Transform destination;
     public FC2 cameraController;
+    public bool isCheckpoint = false;
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -11,32 +12,31 @@ public class Teleport : MonoBehaviour
         {
             if (destination != null)
             {
-                // Teleportar al jugador
                 other.transform.position = destination.position;
+            }
 
-                // Reiniciar la línea de muerte si hay una cámara configurada
-                if (cameraController != null)
-                {
-                    // Necesitaríamos agregar un método público en FC2 para reiniciar la altura
-                    // Por ahora, simplemente forzamos un reinicio llamando al método ResetLevel
-                    // cameraController.ResetLevel(); // Descomenta si agregas este método a FC2
-                }
+            if (isCheckpoint && cameraController != null)
+            {
+                cameraController.SetCheckpoint(this);
             }
         }
     }
-
 
     void OnDrawGizmos()
     {
         if (destination != null)
         {
-            // Dibujar el punto de destino
-            Gizmos.color = Color.cyan;
+            Gizmos.color = isCheckpoint ? Color.green : Color.cyan;
             Gizmos.DrawWireCube(destination.position, new Vector3(1, 1, 0.1f));
 
-            // Dibujar una línea desde este objeto al destino
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, destination.position);
+        }
+
+        if (isCheckpoint)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(transform.position, new Vector3(1.2f, 1.2f, 0.1f));
         }
     }
 }
