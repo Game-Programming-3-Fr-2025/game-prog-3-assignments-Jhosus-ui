@@ -113,7 +113,7 @@ public class Player3 : MonoBehaviour
         while (tiempoRestante > 0)
         {
             tiempoRestante -= Time.deltaTime;
-            textoTiempoRecarga.text = $"Recargando... {tiempoRestante:.1}s";
+            textoTiempoRecarga.text = $"Recargando... {tiempoRestante:.0}s";
             yield return null;
         }
 
