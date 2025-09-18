@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 public class CheckPM : MonoBehaviour
 {
@@ -12,10 +11,8 @@ public class CheckPM : MonoBehaviour
     public List<Transform> spawnPoints = new List<Transform>();
 
     [Header("Generation Settings")]
-    [Range(1, 50)]
-    public int maxAldeanosConcurrentes = 25;
-    [Range(1, 100)]
-    public int maxAldeanosTotalesGenerados = 50;
+    [Range(1, 50)] public int maxAldeanosConcurrentes = 25;
+    [Range(1, 100)] public int maxAldeanosTotalesGenerados = 50;
 
     [Header("Timing Settings")]
     public float minSpawnInterval = 3f;
@@ -23,40 +20,20 @@ public class CheckPM : MonoBehaviour
     public float checkInterval = 1f;
 
     [Header("Infection Control")]
-    [Range(0f, 1f)]
-    public float baseInfectedChance = 0.15f;
-    [Range(1, 10)]
-    public int maxInfectedSpawn = 6;
-    [Range(1, 5)]
-    public int minInfectedRequired = 2;
+    [Range(0f, 1f)] public float baseInfectedChance = 0.15f;
+    [Range(1, 10)] public int maxInfectedSpawn = 6;
+    [Range(1, 5)] public int minInfectedRequired = 2;
 
     [Header("Immunity Control")]
-    [Range(0f, 1f)]
-    public float immuneChance = 0.30f;
-    [Range(0f, 1f)]
-    public float susceptibleChance = 0.70f;
-
-    [Header("Debug Info")]
-    [SerializeField] private int aldeanosConcurrentes = 0;
-    [SerializeField] private int aldeanosTotalesGenerados = 0;
-    [SerializeField] private int infectadosActuales = 0;
-    [SerializeField] private float nextSpawnTime = 0f;
+    [Range(0f, 1f)] public float immuneChance = 0.30f;
 
     private List<People> aldeanosActivos = new List<People>();
+    private int aldeanosTotalesGenerados = 0;
+    private float nextSpawnTime = 0f;
 
     void Start()
     {
-        if (spawnPoints.Count == 0)
-        {
-            Debug.LogWarning("No hay puntos de spawn asignados!");
-            return;
-        }
-
-        if (aldeanoPrefabs.Count == 0)
-        {
-            Debug.LogWarning("No hay prefabs de aldeanos asignados!");
-            return;
-        }
+        if (spawnPoints.Count == 0 || aldeanoPrefabs.Count == 0) return;
 
         SetNextSpawnTime();
         StartCoroutine(GenerationLoop());
@@ -66,9 +43,7 @@ public class CheckPM : MonoBehaviour
     void Update()
     {
         if (Time.time >= nextSpawnTime && CanSpawnAldeano())
-        {
             SpawnAldeano();
-        }
     }
 
     IEnumerator GenerationLoop()
@@ -77,7 +52,6 @@ public class CheckPM : MonoBehaviour
         {
             yield return new WaitForSeconds(checkInterval);
             CleanupAldeanosList();
-            UpdateCounters();
         }
     }
 
@@ -92,17 +66,15 @@ public class CheckPM : MonoBehaviour
 
     bool CanSpawnAldeano()
     {
-        if (aldeanosConcurrentes >= maxAldeanosConcurrentes) return false;
-        if (aldeanosTotalesGenerados >= maxAldeanosTotalesGenerados) return false;
-        if (spawnPoints.Count == 0) return false;
-        if (aldeanoPrefabs.Count == 0) return false;
-        return true;
+        return aldeanosActivos.Count < maxAldeanosConcurrentes &&
+               aldeanosTotalesGenerados < maxAldeanosTotalesGenerados &&
+               spawnPoints.Count > 0 &&
+               aldeanoPrefabs.Count > 0;
     }
 
     void SpawnAldeano()
     {
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-
         if (IsSpawnPointOccupied(spawnPoint))
         {
             SetNextSpawnTime();
@@ -116,7 +88,6 @@ public class CheckPM : MonoBehaviour
         if (peopleScript != null)
         {
             bool shouldBeInfected = DetermineInfectionStatus();
-
             if (shouldBeInfected)
             {
                 peopleScript.SetImmunity(false);
@@ -124,38 +95,27 @@ public class CheckPM : MonoBehaviour
             }
             else
             {
-                bool shouldBeImmune = Random.value <= immuneChance;
-                peopleScript.SetImmunity(shouldBeImmune);
+                peopleScript.SetImmunity(Random.value <= immuneChance);
             }
 
             aldeanosActivos.Add(peopleScript);
         }
 
-        aldeanosConcurrentes++;
         aldeanosTotalesGenerados++;
         SetNextSpawnTime();
     }
 
     bool DetermineInfectionStatus()
     {
-        if (infectadosActuales >= maxInfectedSpawn)
-        {
-            return false;
-        }
-
-        if (infectadosActuales < minInfectedRequired)
-        {
-            return Random.value <= (baseInfectedChance * 2f);
-        }
-
-        return Random.value <= baseInfectedChance;
+        int infectadosActuales = GetInfectadosActuales();
+        if (infectadosActuales >= maxInfectedSpawn) return false;
+        return Random.value <= (infectadosActuales < minInfectedRequired ? baseInfectedChance * 2f : baseInfectedChance);
     }
 
     IEnumerator MakeInfectedAfterDelay(People person, float delay)
     {
         yield return new WaitForSeconds(delay);
-
-        if (person != null && person.gameObject != null)
+        if (person != null)
         {
             person.infectionProgress = 100f;
             person.StartDirectInfection();
@@ -165,58 +125,24 @@ public class CheckPM : MonoBehaviour
     bool IsSpawnPointOccupied(Transform spawnPoint)
     {
         Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(spawnPoint.position, 1.5f);
-
         foreach (var obj in nearbyObjects)
-        {
             if (obj.CompareTag("Aldeano") || obj.CompareTag("Infected"))
-            {
                 return true;
-            }
-        }
-
         return false;
     }
 
-    void SetNextSpawnTime()
-    {
-        float randomInterval = Random.Range(minSpawnInterval, maxSpawnInterval);
-        nextSpawnTime = Time.time + randomInterval;
-    }
+    void SetNextSpawnTime() => nextSpawnTime = Time.time + Random.Range(minSpawnInterval, maxSpawnInterval);
 
-    void CleanupAldeanosList()
-    {
-        aldeanosActivos.RemoveAll(aldeano => aldeano == null || aldeano.gameObject == null);
-        aldeanosConcurrentes = aldeanosActivos.Count;
-    }
+    void CleanupAldeanosList() => aldeanosActivos.RemoveAll(aldeano => aldeano == null);
 
-    void UpdateCounters()
-    {
-        CleanupAldeanosList();
-        infectadosActuales = 0;
-
-        foreach (People aldeano in aldeanosActivos)
-        {
-            if (aldeano != null &&
-                (aldeano.currentState == People.PersonState.Infected ||
-                 aldeano.currentState == People.PersonState.Chasing ||
-                 aldeano.infectionProgress >= 75f))
-            {
-                infectadosActuales++;
-            }
-        }
-    }
+    void UpdateCounters() => CleanupAldeanosList();
 
     public void RemoveAldeano(People aldeano)
     {
         if (aldeanosActivos.Contains(aldeano))
         {
             aldeanosActivos.Remove(aldeano);
-            aldeanosConcurrentes--;
-
-            if (aldeano != null && aldeano.gameObject != null)
-            {
-                Destroy(aldeano.gameObject);
-            }
+            if (aldeano != null) Destroy(aldeano.gameObject);
         }
     }
 
@@ -237,7 +163,6 @@ public class CheckPM : MonoBehaviour
             aldeanosActivos.Add(peopleScript);
         }
 
-        aldeanosConcurrentes++;
         aldeanosTotalesGenerados++;
     }
 
@@ -257,28 +182,35 @@ public class CheckPM : MonoBehaviour
             aldeanosActivos.Add(peopleScript);
         }
 
-        aldeanosConcurrentes++;
         aldeanosTotalesGenerados++;
     }
 
-    public int GetAldeanosConcurrentes() => aldeanosConcurrentes;
+    public int GetAldeanosConcurrentes() => aldeanosActivos.Count;
     public int GetAldeanosTotalesGenerados() => aldeanosTotalesGenerados;
-    public int GetInfectadosActuales() => infectadosActuales;
+    public int GetInfectadosActuales()
+    {
+        int count = 0;
+        foreach (People aldeano in aldeanosActivos)
+            if (aldeano != null && (aldeano.currentState == People.PersonState.Infected ||
+                                   aldeano.currentState == People.PersonState.Chasing ||
+                                   aldeano.infectionProgress >= 75f))
+                count++;
+        return count;
+    }
     public bool HasReachedMaxGeneration() => aldeanosTotalesGenerados >= maxAldeanosTotalesGenerados;
 
     void OnDrawGizmosSelected()
     {
-        if (spawnPoints != null)
+        if (spawnPoints == null) return;
+
+        foreach (Transform spawnPoint in spawnPoints)
         {
-            foreach (Transform spawnPoint in spawnPoints)
+            if (spawnPoint != null)
             {
-                if (spawnPoint != null)
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawWireSphere(spawnPoint.position, 0.5f);
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawWireSphere(spawnPoint.position, 1.5f);
-                }
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(spawnPoint.position, 0.5f);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(spawnPoint.position, 1.5f);
             }
         }
     }

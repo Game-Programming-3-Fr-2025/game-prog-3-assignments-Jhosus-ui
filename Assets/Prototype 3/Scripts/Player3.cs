@@ -4,8 +4,7 @@ using System.Collections;
 
 public class Player3 : MonoBehaviour
 {
-    [Header("Movimiento")]
-    public float velocidad = 10f;
+    [Header("Movimiento")] public float velocidad = 10f;
 
     [Header("Disparo")]
     public int balasCartucho = 6;
@@ -44,8 +43,11 @@ public class Player3 : MonoBehaviour
         Mover();
         AplicarEfectosVisuales();
 
-        if (Input.GetKeyDown(KeyCode.Space) && puedeDisparar) Disparar();
-        if (Input.GetKeyDown(KeyCode.R) && !estaRecargando) StartCoroutine(Recargar());
+        if (Input.GetKeyDown(KeyCode.Space) && puedeDisparar)
+            Disparar();
+
+        if (Input.GetKeyDown(KeyCode.R) && !estaRecargando)
+            StartCoroutine(Recargar());
     }
 
     void Mover()
@@ -87,7 +89,22 @@ public class Player3 : MonoBehaviour
         {
             if (objetivo.CompareTag("Aldeano") || objetivo.CompareTag("Infected"))
             {
-                objetivo.GetComponent<DeatthAldean>()?.TakeDamage(1);
+                People person = objetivo.GetComponent<People>();
+                DeatthAldean death = objetivo.GetComponent<DeatthAldean>();
+
+                if (death != null)
+                {
+                    death.TakeDamage(1);
+
+                    if (person != null)
+                    {
+                        TPI tpi = FindObjectOfType<TPI>();
+                        if (tpi != null)
+                        {
+                            tpi.RegisterKill(person.currentState);
+                        }
+                    }
+                }
                 break;
             }
         }
@@ -113,12 +130,11 @@ public class Player3 : MonoBehaviour
         while (tiempoRestante > 0)
         {
             tiempoRestante -= Time.deltaTime;
-            textoTiempoRecarga.text = $"Reload... {tiempoRestante:.0}s";
+            if (textoTiempoRecarga) textoTiempoRecarga.text = $"Reload... {tiempoRestante:.0}s";
             yield return null;
         }
 
-        int necesarias = balasCartucho - balasActuales;
-        int recargar = Mathf.Min(necesarias, balasTotal);
+        int recargar = Mathf.Min(balasCartucho - balasActuales, balasTotal);
         balasActuales += recargar;
         balasTotal -= recargar;
 
@@ -147,7 +163,8 @@ public class Player3 : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (!puntoDisparo) return;
         Gizmos.color = Color.red;
-        if (puntoDisparo) Gizmos.DrawWireSphere(puntoDisparo.position, radioDeteccion);
+        Gizmos.DrawWireSphere(puntoDisparo.position, radioDeteccion);
     }
 }

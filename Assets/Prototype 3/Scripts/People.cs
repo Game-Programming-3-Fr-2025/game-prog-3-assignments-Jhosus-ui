@@ -31,17 +31,14 @@ public class People : MonoBehaviour
     [Header("Visual Settings")]
     public SpriteRenderer Head;
     public Color infectedColor = Color.green;
-    public GameObject coughEffect;
     public float shakeIntensity = 0.1f;
 
     private NavMeshAgent agent;
     private float timer;
-    private float infectionTimer;
     private SpriteRenderer spriteRenderer;
     private Color originalHeadColor;
     private Transform currentTarget;
     private float nextCoughTime;
-    private bool isInIntermittentPhase = false;
     private bool isRecovering = false;
     public float infectionProgress = 0f;
     [SerializeField] private bool willGetInfected = true;
@@ -63,8 +60,6 @@ public class People : MonoBehaviour
         agent.stoppingDistance = 0.1f;
         agent.updateRotation = false;
         agent.updateUpAxis = false;
-        agent.velocity = Vector3.zero;
-        transform.rotation = Quaternion.identity;
 
         timer = wanderTimer;
         SetRandomDestination();
@@ -81,29 +76,14 @@ public class People : MonoBehaviour
 
         switch (currentState)
         {
-            case PersonState.Normal:
-                HandleNormalState();
-                break;
-
-            case PersonState.IntermittentCough:
-                HandleIntermittentCoughState();
-                break;
-
-            case PersonState.Coughing:
-                agent.isStopped = true;
-                break;
-
-            case PersonState.Infected:
-                HandleInfectedState();
-                break;
-
-            case PersonState.Chasing:
-                HandleChasingState();
-                break;
+            case PersonState.Normal: HandleNormalState(); break;
+            case PersonState.IntermittentCough: HandleIntermittentCoughState(); break;
+            case PersonState.Coughing: agent.isStopped = true; break;
+            case PersonState.Infected: HandleInfectedState(); break;
+            case PersonState.Chasing: HandleChasingState(); break;
         }
 
         UpdateHeadColor();
-        HandleSpriteFlip();
         ForceZPosition();
     }
 
@@ -125,9 +105,7 @@ public class People : MonoBehaviour
         }
 
         if (Time.time >= nextCoughTime)
-        {
             StartIntermittentCough();
-        }
 
         UpdateInfectionProgress();
         CheckProximityDuringCough();
@@ -146,9 +124,7 @@ public class People : MonoBehaviour
     void HandleChasingState()
     {
         if (currentTarget != null)
-        {
             agent.SetDestination(currentTarget.position);
-        }
         else
         {
             SetRandomDestination();
@@ -166,19 +142,13 @@ public class People : MonoBehaviour
         {
             infectionProgress -= progressChange;
             if (infectionProgress <= 0f)
-            {
-                infectionProgress = 0f;
                 RecoverToNormal();
-            }
         }
         else
         {
             infectionProgress += progressChange;
             if (infectionProgress >= 100f)
-            {
-                infectionProgress = 100f;
                 OnBecomeInfected();
-            }
         }
 
         infectionProgress = Mathf.Clamp(infectionProgress, 0f, 100f);
@@ -203,17 +173,11 @@ public class People : MonoBehaviour
         else
         {
             if (normalizedProgress <= 0.33f)
-            {
                 Head.color = Color.Lerp(originalHeadColor, Color.yellow, normalizedProgress * 3f);
-            }
             else if (normalizedProgress <= 0.66f)
-            {
                 Head.color = Color.Lerp(Color.yellow, new Color(1f, 0.5f, 0f), (normalizedProgress - 0.33f) * 3f);
-            }
             else
-            {
                 Head.color = Color.Lerp(new Color(1f, 0.5f, 0f), Color.red, (normalizedProgress - 0.66f) * 3f);
-            }
         }
     }
 
@@ -221,9 +185,7 @@ public class People : MonoBehaviour
     {
         if (!willGetInfected) yield break;
 
-        float waitTime = Random.Range(minInfectionTime, maxInfectionTime);
-        yield return new WaitForSeconds(waitTime);
-
+        yield return new WaitForSeconds(Random.Range(minInfectionTime, maxInfectionTime));
         StartIntermittentPhase();
     }
 
@@ -232,7 +194,6 @@ public class People : MonoBehaviour
         if (currentState != PersonState.Normal) return;
 
         currentState = PersonState.IntermittentCough;
-        isInIntermittentPhase = true;
         infectionProgress = 10f;
         isRecovering = Random.value <= recoveryChance;
         SetNextCoughTime();
@@ -246,9 +207,7 @@ public class People : MonoBehaviour
     void StartIntermittentCough()
     {
         if (currentState == PersonState.IntermittentCough)
-        {
             StartCoroutine(IntermittentCoughRoutine());
-        }
     }
 
     IEnumerator IntermittentCoughRoutine()
@@ -256,13 +215,7 @@ public class People : MonoBehaviour
         PersonState previousState = currentState;
         currentState = PersonState.Coughing;
 
-        if (coughEffect != null)
-        {
-            Instantiate(coughEffect, transform.position, Quaternion.identity, transform);
-        }
-
         StartCoroutine(ShakeSprite(intermittentCoughDuration));
-
         yield return new WaitForSeconds(intermittentCoughDuration);
 
         if (previousState == PersonState.IntermittentCough)
@@ -285,9 +238,7 @@ public class People : MonoBehaviour
             {
                 People otherPerson = person.GetComponent<People>();
                 if (otherPerson != null && otherPerson.currentState == PersonState.Normal)
-                {
                     otherPerson.StartProximityInfection();
-                }
             }
         }
     }
@@ -295,32 +246,24 @@ public class People : MonoBehaviour
     public void StartProximityInfection()
     {
         if (currentState == PersonState.Normal)
-        {
             StartCoroutine(ProximityInfectionDelay());
-        }
     }
 
     IEnumerator ProximityInfectionDelay()
     {
         yield return new WaitForSeconds(proximityInfectionDelay);
-
         if (currentState == PersonState.Normal)
-        {
             StartIntermittentPhase();
-        }
     }
 
     void RecoverToNormal()
     {
         currentState = PersonState.Normal;
-        isInIntermittentPhase = false;
         isRecovering = false;
         agent.isStopped = false;
 
         if (willGetInfected)
-        {
             StartCoroutine(InfectionCountdown());
-        }
     }
 
     IEnumerator ShakeSprite(float duration)
@@ -345,7 +288,6 @@ public class People : MonoBehaviour
         currentState = PersonState.Infected;
         agent.speed = infectedSpeed;
         agent.isStopped = false;
-        isInIntermittentPhase = false;
         isRecovering = false;
         infectionProgress = 100f;
         gameObject.tag = "Infected";
@@ -360,9 +302,7 @@ public class People : MonoBehaviour
             if (person.CompareTag("Aldeano") && person.gameObject != this.gameObject)
             {
                 People otherPerson = person.GetComponent<People>();
-                if (otherPerson != null &&
-                    (otherPerson.currentState == PersonState.Normal ||
-                     otherPerson.currentState == PersonState.IntermittentCough))
+                if (otherPerson != null && (otherPerson.currentState == PersonState.Normal || otherPerson.currentState == PersonState.IntermittentCough))
                 {
                     otherPerson.StartDirectInfection();
                     currentState = PersonState.Chasing;
@@ -376,19 +316,14 @@ public class People : MonoBehaviour
     public void StartDirectInfection()
     {
         if (currentState == PersonState.Normal)
-        {
             StartIntermittentPhase();
-        }
         else if (currentState == PersonState.IntermittentCough && isRecovering)
-        {
             isRecovering = false;
-        }
     }
 
     IEnumerator StopChasingAfterTime()
     {
         yield return new WaitForSeconds(chaseDuration);
-
         if (currentState == PersonState.Chasing)
         {
             currentState = PersonState.Infected;
@@ -400,10 +335,7 @@ public class People : MonoBehaviour
     public void SetImmunity(bool immune)
     {
         willGetInfected = !immune;
-        if (immune)
-        {
-            infectionProgress = 0f;
-        }
+        if (immune) infectionProgress = 0f;
     }
 
     private void SetRandomDestination()
@@ -416,51 +348,10 @@ public class People : MonoBehaviour
         }
     }
 
-    private void HandleSpriteFlip()
-    {
-        if (agent.velocity != Vector3.zero && currentState != PersonState.Coughing)
-        {
-            if (agent.velocity.x > 0.1f)
-            {
-                spriteRenderer.flipX = false;
-            }
-            else if (agent.velocity.x < -0.1f)
-            {
-                spriteRenderer.flipX = true;
-            }
-        }
-    }
-
     private void ForceZPosition()
     {
         Vector3 currentPos = transform.position;
         if (currentPos.z != 0)
-        {
             transform.position = new Vector3(currentPos.x, currentPos.y, 0);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (agent != null && agent.hasPath)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, agent.destination);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(agent.destination, 0.2f);
-        }
-
-        Color gizmoColor = Color.yellow;
-        if (currentState == PersonState.IntermittentCough)
-        {
-            gizmoColor = isRecovering ? Color.cyan : Color.blue;
-        }
-        else if (currentState == PersonState.Infected || currentState == PersonState.Chasing)
-        {
-            gizmoColor = Color.red;
-        }
-
-        Gizmos.color = gizmoColor;
-        Gizmos.DrawWireSphere(transform.position, infectionRadius);
     }
 }
