@@ -8,6 +8,9 @@ TagManager:
   - Ground
   - Points
   - Checkpoint
+  - FF
+  - Aldeano
+  - Infected
   layers:
   - Default
   - TransparentFX
