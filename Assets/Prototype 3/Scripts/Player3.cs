@@ -18,6 +18,11 @@ public class Player3 : MonoBehaviour
     public float fuerzaOscilacion = 0.1f;
     public float fuerzaRetroceso = 0.3f;
 
+    [Header("Sonidos")]
+    public AudioClip sonidoDisparo;
+    public AudioClip sonidoRecarga;
+    public AudioSource audioSource;
+
     [Header("UI")]
     public TextMeshProUGUI textoCartucho;
     public TextMeshProUGUI textoTotal;
@@ -83,6 +88,8 @@ public class Player3 : MonoBehaviour
         balasActuales--;
         ActualizarUI();
         offsetVisual += (Vector3)Random.insideUnitCircle * fuerzaRetroceso;
+        if (audioSource && sonidoDisparo)
+            audioSource.PlayOneShot(sonidoDisparo);
 
         Collider2D[] objetivos = Physics2D.OverlapCircleAll(puntoDisparo.position, radioDeteccion);
         foreach (Collider2D objetivo in objetivos)
@@ -125,6 +132,10 @@ public class Player3 : MonoBehaviour
 
         estaRecargando = true;
         MostrarUIRecarga();
+
+        if (audioSource && sonidoRecarga)
+            audioSource.PlayOneShot(sonidoRecarga);
+
         float tiempoRestante = tiempoRecarga;
 
         while (tiempoRestante > 0)

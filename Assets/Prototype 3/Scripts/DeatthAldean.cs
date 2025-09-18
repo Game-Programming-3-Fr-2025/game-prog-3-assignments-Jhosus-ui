@@ -5,7 +5,6 @@ public class DeatthAldean : MonoBehaviour
     [Header("Health Settings")]
     public int minHealth = 1;
     public int maxHealth = 2;
-    public GameObject deathEffect;
 
     private int health;
     private bool isDead;
@@ -26,9 +25,7 @@ public class DeatthAldean : MonoBehaviour
     void Die()
     {
         if (isDead) return;
-        isDead = true;
-
-        if (deathEffect) Instantiate(deathEffect, transform.position, Quaternion.identity);
+        isDead = true;      
         Destroy(gameObject, 0.3f);
     }
 }

@@ -11,6 +11,8 @@ public class CheckPM : MonoBehaviour
     public List<Transform> spawnPoints = new List<Transform>();
 
     [Header("Generation Settings")]
+    [Range(1, 5)] public int minAldeanosPorLote = 1;
+    [Range(1, 10)] public int maxAldeanosPorLote = 5;
     [Range(1, 50)] public int maxAldeanosConcurrentes = 25;
     [Range(1, 100)] public int maxAldeanosTotalesGenerados = 50;
 
@@ -31,7 +33,7 @@ public class CheckPM : MonoBehaviour
     private int aldeanosTotalesGenerados = 0;
     private float nextSpawnTime = 0f;
 
-    void Start()
+    void Start() //Puntos importantes a llamar
     {
         if (spawnPoints.Count == 0 || aldeanoPrefabs.Count == 0) return;
 
@@ -64,7 +66,7 @@ public class CheckPM : MonoBehaviour
         }
     }
 
-    bool CanSpawnAldeano()
+    bool CanSpawnAldeano() //Quedarnos con esta persion o buscar algo mas simplificada
     {
         return aldeanosActivos.Count < maxAldeanosConcurrentes &&
                aldeanosTotalesGenerados < maxAldeanosTotalesGenerados &&
@@ -74,37 +76,39 @@ public class CheckPM : MonoBehaviour
 
     void SpawnAldeano()
     {
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
-        if (IsSpawnPointOccupied(spawnPoint))
+        int cantidadAGenerar = Random.Range(minAldeanosPorLote, maxAldeanosPorLote + 1);
+
+        for (int i = 0; i < cantidadAGenerar; i++)
         {
-            SetNextSpawnTime();
-            return;
-        }
+            if (!CanSpawnAldeano()) break;
 
-        GameObject selectedPrefab = aldeanoPrefabs[Random.Range(0, aldeanoPrefabs.Count)];
-        GameObject newAldeano = Instantiate(selectedPrefab, spawnPoint.position, spawnPoint.rotation);
-        People peopleScript = newAldeano.GetComponent<People>();
+            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+            if (IsSpawnPointOccupied(spawnPoint)) continue;
 
-        if (peopleScript != null)
-        {
-            bool shouldBeInfected = DetermineInfectionStatus();
-            if (shouldBeInfected)
+            GameObject selectedPrefab = aldeanoPrefabs[Random.Range(0, aldeanoPrefabs.Count)];
+            GameObject newAldeano = Instantiate(selectedPrefab, spawnPoint.position, spawnPoint.rotation);
+            People peopleScript = newAldeano.GetComponent<People>();
+
+            if (peopleScript != null)
             {
-                peopleScript.SetImmunity(false);
-                StartCoroutine(MakeInfectedAfterDelay(peopleScript, Random.Range(0.5f, 2f)));
-            }
-            else
-            {
-                peopleScript.SetImmunity(Random.value <= immuneChance);
-            }
+                bool shouldBeInfected = DetermineInfectionStatus();
+                if (shouldBeInfected)
+                {
+                    peopleScript.SetImmunity(false);
+                    StartCoroutine(MakeInfectedAfterDelay(peopleScript, Random.Range(0.5f, 2f)));
+                }
+                else
+                {
+                    peopleScript.SetImmunity(Random.value <= immuneChance);
+                }
 
-            aldeanosActivos.Add(peopleScript);
+                aldeanosActivos.Add(peopleScript);
+            }
+            aldeanosTotalesGenerados++;
         }
-
-        aldeanosTotalesGenerados++;
         SetNextSpawnTime();
     }
-
+    //Buscar algo mas logico y simple, no me convence de toda la logica
     bool DetermineInfectionStatus()
     {
         int infectadosActuales = GetInfectadosActuales();
@@ -122,7 +126,7 @@ public class CheckPM : MonoBehaviour
         }
     }
 
-    bool IsSpawnPointOccupied(Transform spawnPoint)
+    bool IsSpawnPointOccupied(Transform spawnPoint)  //Verifiquemos que no se anden generando mismo sitio
     {
         Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(spawnPoint.position, 1.5f);
         foreach (var obj in nearbyObjects)
@@ -137,7 +141,7 @@ public class CheckPM : MonoBehaviour
 
     void UpdateCounters() => CleanupAldeanosList();
 
-    public void RemoveAldeano(People aldeano)
+    public void RemoveAldeano(People aldeano)  //Seguir chequeando esta parte del codigo causa algo de problemas
     {
         if (aldeanosActivos.Contains(aldeano))
         {
@@ -184,9 +188,11 @@ public class CheckPM : MonoBehaviour
 
         aldeanosTotalesGenerados++;
     }
-
+    //Maneja aun mas la logica
     public int GetAldeanosConcurrentes() => aldeanosActivos.Count;
     public int GetAldeanosTotalesGenerados() => aldeanosTotalesGenerados;
+    public bool HasReachedMaxGeneration() => aldeanosTotalesGenerados >= maxAldeanosTotalesGenerados;
+
     public int GetInfectadosActuales()
     {
         int count = 0;
@@ -197,7 +203,6 @@ public class CheckPM : MonoBehaviour
                 count++;
         return count;
     }
-    public bool HasReachedMaxGeneration() => aldeanosTotalesGenerados >= maxAldeanosTotalesGenerados;
 
     void OnDrawGizmosSelected()
     {

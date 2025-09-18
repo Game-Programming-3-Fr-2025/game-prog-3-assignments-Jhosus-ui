@@ -9,7 +9,7 @@ public class MVA : MonoBehaviour
     public Color borderColor = Color.blue;
 
     private static MVA instance;
-    public static MVA Instance => instance ?? FindObjectOfType<MVA>();
+    public static MVA Instance => instance ?? FindObjectOfType<MVA>(); //este metodo no estan util, pero es conveniente
 
     void Start() => instance = this;
 

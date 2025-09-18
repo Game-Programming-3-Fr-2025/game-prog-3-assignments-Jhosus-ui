@@ -132,7 +132,8 @@ public class People : MonoBehaviour
         }
     }
 
-    void UpdateInfectionProgress()
+    void UpdateInfectionProgress() //Pensar si ajustaremos esta linea para determinar
+                                   //si el aldeano seguira con los tag mas adelante de infectado o aldeano
     {
         if (currentState != PersonState.IntermittentCough) return;
 
@@ -189,7 +190,7 @@ public class People : MonoBehaviour
         StartIntermittentPhase();
     }
 
-    void StartIntermittentPhase()
+    void StartIntermittentPhase() 
     {
         if (currentState != PersonState.Normal) return;
 
@@ -204,7 +205,7 @@ public class People : MonoBehaviour
         nextCoughTime = Time.time + Random.Range(minCoughInterval, maxCoughInterval);
     }
 
-    void StartIntermittentCough()
+    void StartIntermittentCough() //Etapa de analisis
     {
         if (currentState == PersonState.IntermittentCough)
             StartCoroutine(IntermittentCoughRoutine());
@@ -249,7 +250,7 @@ public class People : MonoBehaviour
             StartCoroutine(ProximityInfectionDelay());
     }
 
-    IEnumerator ProximityInfectionDelay()
+    IEnumerator ProximityInfectionDelay() //Establecer quizas otro metodo, juega mucho en contra
     {
         yield return new WaitForSeconds(proximityInfectionDelay);
         if (currentState == PersonState.Normal)
@@ -283,7 +284,7 @@ public class People : MonoBehaviour
         transform.position = originalPosition;
     }
 
-    void OnBecomeInfected()
+    void OnBecomeInfected() 
     {
         currentState = PersonState.Infected;
         agent.speed = infectedSpeed;
@@ -293,7 +294,8 @@ public class People : MonoBehaviour
         gameObject.tag = "Infected";
     }
 
-    void CheckForNearbyPeople()
+    void CheckForNearbyPeople() //util pero pero abra que mejorar la deteccion pa que no sea
+        //muy repetitiva
     {
         Collider2D[] nearbyPeople = Physics2D.OverlapCircleAll(transform.position, infectionRadius);
 
