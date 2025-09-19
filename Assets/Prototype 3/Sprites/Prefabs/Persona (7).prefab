@@ -103,22 +103,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3995932a3c36d194bb6e68f73e52a399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wanderTimer: 10
+  wanderTimer: 12
   movementSpeed: 1
   infectedSpeed: 1.2
   currentState: 0
   minInfectionTime: 25
   maxInfectionTime: 45
-  infectionRadius: 1.2
+  infectionRadius: 1.18
   infectionChance: 0.6
   coughDuration: 1.15
-  chaseDuration: 8
+  chaseDuration: 7
   minCoughInterval: 4
-  maxCoughInterval: 8
+  maxCoughInterval: 6
   intermittentCoughDuration: 1.3
-  proximityInfectionDelay: 8
+  proximityInfectionDelay: 12
   infectionProgressSpeed: 2.8
-  recoveryChance: 0.4
+  recoveryChance: 0.43
   Head: {fileID: 4058889402702652284}
   infectedColor: {r: 1, g: 0, b: 0.011044025, a: 1}
   shakeIntensity: 0.05

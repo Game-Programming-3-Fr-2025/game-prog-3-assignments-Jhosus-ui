@@ -90,7 +90,7 @@ public class CheckPM : MonoBehaviour
             People peopleScript = newAldeano.GetComponent<People>();
 
             if (peopleScript != null)
-            {
+            {                                   
                 bool shouldBeInfected = DetermineInfectionStatus();
                 if (shouldBeInfected)
                 {
@@ -120,8 +120,8 @@ public class CheckPM : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         if (person != null)
-        {
-            person.infectionProgress = 100f;
+        {         
+            person.infectionProgress = 100f; //Aseguramos que inicie infectado
             person.StartDirectInfection();
         }
     }
@@ -134,13 +134,9 @@ public class CheckPM : MonoBehaviour
                 return true;
         return false;
     }
-
     void SetNextSpawnTime() => nextSpawnTime = Time.time + Random.Range(minSpawnInterval, maxSpawnInterval);
-
     void CleanupAldeanosList() => aldeanosActivos.RemoveAll(aldeano => aldeano == null);
-
     void UpdateCounters() => CleanupAldeanosList();
-
     public void RemoveAldeano(People aldeano)  //Seguir chequeando esta parte del codigo causa algo de problemas
     {
         if (aldeanosActivos.Contains(aldeano))
@@ -151,7 +147,7 @@ public class CheckPM : MonoBehaviour
     }
 
     [ContextMenu("Force Spawn Infected")]
-    public void ForceSpawnInfected()
+    public void ForceSpawnInfected() 
     {
         if (!CanSpawnAldeano()) return;
 
@@ -188,7 +184,7 @@ public class CheckPM : MonoBehaviour
 
         aldeanosTotalesGenerados++;
     }
-    //Maneja aun mas la logica
+    //Determinamos la cantidad de aldeanos generados y activos
     public int GetAldeanosConcurrentes() => aldeanosActivos.Count;
     public int GetAldeanosTotalesGenerados() => aldeanosTotalesGenerados;
     public bool HasReachedMaxGeneration() => aldeanosTotalesGenerados >= maxAldeanosTotalesGenerados;

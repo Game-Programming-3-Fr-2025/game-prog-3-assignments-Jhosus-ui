@@ -115,7 +115,7 @@ public class TPI : MonoBehaviour
             resultText.text = $"GAME OVER";
             resultText.gameObject.SetActive(true);
         }
-        Invoke("RestartGame", 3f);
+        Invoke("RestartGame", 5f);
     }
 
     void Victory()
@@ -126,7 +126,7 @@ public class TPI : MonoBehaviour
             resultText.text = "WIN";
             resultText.gameObject.SetActive(true);
         }
-        Invoke("RestartGame", 3f);
+        Invoke("RestartGame", 5f);
     }
 
     void RestartGame()

@@ -46144,14 +46144,14 @@ MonoBehaviour:
   minAldeanosPorLote: 1
   maxAldeanosPorLote: 3
   maxAldeanosConcurrentes: 40
-  maxAldeanosTotalesGenerados: 60
+  maxAldeanosTotalesGenerados: 50
   minSpawnInterval: 5
   maxSpawnInterval: 8
-  checkInterval: 2
-  baseInfectedChance: 0.155
+  checkInterval: 3
+  baseInfectedChance: 0.15
   maxInfectedSpawn: 10
   minInfectedRequired: 3
-  immuneChance: 0.634
+  immuneChance: 0.63
 --- !u!114 &1106215740
 MonoBehaviour:
   m_ObjectHideFlags: 0
