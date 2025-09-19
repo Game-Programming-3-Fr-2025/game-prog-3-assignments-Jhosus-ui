@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class CheckPM : MonoBehaviour
 {
+    //This code was created based on many tutorials, so experimentation is more trial and error.
+
     [Header("Prefab References")]
     public List<GameObject> aldeanoPrefabs = new List<GameObject>();
 

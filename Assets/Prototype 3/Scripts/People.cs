@@ -4,6 +4,7 @@ using System.Collections;
 
 public class People : MonoBehaviour
 {
+    //This code was created based on many tutorials, so experimentation is more trial and error.
     public enum PersonState { Normal, IntermittentCough, Coughing, Infected, Chasing }
 
     [Header("Movement Settings")]
