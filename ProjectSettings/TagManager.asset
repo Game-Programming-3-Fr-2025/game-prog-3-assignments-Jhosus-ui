@@ -12,6 +12,7 @@ TagManager:
   - Aldeano
   - Infected
   - Enemy
+  - Chasis
   layers:
   - Default
   - TransparentFX
