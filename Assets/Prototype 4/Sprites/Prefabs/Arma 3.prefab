@@ -141,10 +141,10 @@ MonoBehaviour:
   pointFirePasivo: {fileID: 7475351330721119989}
   nombreBotonActivo: Skill 3
   activoDisponible: 0
-  rafagaCantidad: 3
-  tiempoEntreRafagas: 0.7
-  balasPorRafaga: 1
-  separacionVerticalBalas: 0.5
+  rafagaCantidad: 5
+  tiempoEntreRafagas: 0.2
+  balasPorRafaga: 2
+  separacionVerticalBalas: 0.4
   balaPrefabActiva: {fileID: 5859944464483778903, guid: f410ff8dee63f9d45a099e066a3d4cc2, type: 3}
   damageActivo: 40
   radioDanoActivo: 0.6

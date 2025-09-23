@@ -250,6 +250,7 @@ GameObject:
   m_Component:
   - component: {fileID: 57661991}
   - component: {fileID: 57661990}
+  - component: {fileID: 57661992}
   m_Layer: 0
   m_Name: Rueda_0
   m_TagString: Untagged
@@ -327,6 +328,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1063247270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &57661992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57661989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7686d3d438eda284eb36740aba79d34a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 90
+  clockwise: 0
 --- !u!1 &76787474
 GameObject:
   m_ObjectHideFlags: 0
@@ -3846,7 +3861,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiCanvas: {fileID: 897503215}
   weaponButtonsPrefab: {fileID: 3056153565354496620, guid: 6be72efe036f1f7459fc3dab760d0df3, type: 3}
-  weapon1Prefab: {fileID: 1180862391876726801, guid: 3fd9956bcd180a546be81fc9da0e74c5, type: 3}
+  weapon1Prefab: {fileID: 6093159196743949121, guid: 3fd9956bcd180a546be81fc9da0e74c5, type: 3}
   weapon2Prefab: {fileID: 8986177374730778366, guid: 7e1e943ca9fd51940b31ddae2ca52986, type: 3}
   weapon3Prefab: {fileID: 5214267354916403064, guid: 4c74e7089064ee8469cefd012da880dc, type: 3}
   buttonOffset: {x: 150, y: 105}
@@ -4137,6 +4152,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1262359480}
   - component: {fileID: 1262359479}
+  - component: {fileID: 1262359481}
   m_Layer: 0
   m_Name: Rueda_1
   m_TagString: Untagged
@@ -4214,6 +4230,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1063247270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1262359481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262359478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7686d3d438eda284eb36740aba79d34a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 90
+  clockwise: 0
 --- !u!1 &1269230253
 GameObject:
   m_ObjectHideFlags: 0
@@ -6750,7 +6780,7 @@ Transform:
   m_GameObject: {fileID: 1937495071}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.99, y: -2.14, z: 951.5371}
+  m_LocalPosition: {x: -2.99, y: -2.09, z: 951.5371}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6781,8 +6811,8 @@ Transform:
   m_GameObject: {fileID: 1989134180}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.468, y: -3.129, z: 0.081316}
-  m_LocalScale: {x: 0.92929, y: 0.92929, z: 0.92929}
+  m_LocalPosition: {x: -3.468, y: -2.93, z: 0.081316}
+  m_LocalScale: {x: 0.7978698, y: 0.7978698, z: 0.7978698}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1905516134}
