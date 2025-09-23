@@ -27,7 +27,7 @@ public class Guns : MonoBehaviour
     public Vector2 buttonOffset = new Vector2(0, 50);
 
     private GameManager gameManager;
-    private List<ModuleSlot> moduleSlots = new List<ModuleSlot>();
+    public List<ModuleSlot> moduleSlots = new List<ModuleSlot>();
 
     void Start()
     {

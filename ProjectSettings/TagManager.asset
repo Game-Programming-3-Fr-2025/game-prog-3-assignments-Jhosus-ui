@@ -13,6 +13,7 @@ TagManager:
   - Infected
   - Enemy
   - Chasis
+  - Point
   layers:
   - Default
   - TransparentFX
