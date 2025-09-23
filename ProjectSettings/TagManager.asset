@@ -11,6 +11,7 @@ TagManager:
   - FF
   - Aldeano
   - Infected
+  - Enemy
   layers:
   - Default
   - TransparentFX
