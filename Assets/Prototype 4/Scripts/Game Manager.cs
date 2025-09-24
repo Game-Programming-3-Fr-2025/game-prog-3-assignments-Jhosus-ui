@@ -111,6 +111,41 @@ public class GameManager : MonoBehaviour
         return 0;
     }
 
+    public void EliminarModulo(GameObject moduloEliminar)
+    {
+        if (moduloEliminar == null) return;
+
+        // Encontrar índice del módulo a eliminar
+        int indiceEliminar = -1;
+        for (int i = 0; i < gridParent.childCount; i++)
+        {
+            if (gridParent.GetChild(i).gameObject == moduloEliminar)
+            {
+                indiceEliminar = i;
+                break;
+            }
+        }
+
+        if (indiceEliminar == -1) return;
+
+        // Eliminar módulo
+        Destroy(moduloEliminar);
+        currentModuleCount--;
+
+        // Bajar módulos superiores
+        for (int i = indiceEliminar; i < gridParent.childCount; i++)
+        {
+            Transform modulo = gridParent.GetChild(i);
+            int nuevoIndice = GetCellIndexFromYPosition(modulo.localPosition.y) - 1;
+            if (nuevoIndice >= 0)
+            {
+                PositionObjectInGrid(modulo.gameObject, nuevoIndice);
+            }
+        }
+
+        Debug.Log($"Módulo eliminado. Total: {currentModuleCount}/{maxModules}");
+    }
+
     private void OnDrawGizmos()
     {
         if (gridParent == null) return;
