@@ -171,12 +171,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be13a7da98465b48947679740922609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidaMinima: 30
-  vidaMaxima: 50
-  velocidad: 2
-  damageAlContacto: 10
-  playerTag: Player
-  mostrarGizmos: 1
+  velocidad: 1
+  vida: 30
 --- !u!50 &-3144384912337954001
 Rigidbody2D:
   serializedVersion: 5

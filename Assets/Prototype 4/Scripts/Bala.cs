@@ -7,24 +7,27 @@ public class Bala : MonoBehaviour
     public float tiempoVida = 3f;
 
     private Vector2 direccion;
-    private float damage;
+    private int damage; // CAMBIAR a int
     private float radioDano;
     private bool esCortaDistancia;
+
+    void Start()
+    {
+        gameObject.tag = "Bullet";
+        Destroy(gameObject, tiempoVida);
+    }
 
     public void SetConfiguracion(Vector2 dir, float dmg, float radio, bool cortaDistancia)
     {
         direccion = dir;
-        damage = dmg;
+        damage = (int)dmg; // Convertir a int
         radioDano = radio;
         esCortaDistancia = cortaDistancia;
-
-        // Auto-destrucción después del tiempo de vida
         Destroy(gameObject, tiempoVida);
     }
 
     void Update()
     {
-        // Movimiento de la bala
         transform.Translate(direccion * velocidad * Time.deltaTime);
     }
 
@@ -32,7 +35,11 @@ public class Bala : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            AplicarDanoArea();
+            Enemy3 enemy = other.GetComponent<Enemy3>();
+            if (enemy != null)
+            {
+                enemy.RecibirDanio(damage); // Ahora damage es int
+            }
             Destroy(gameObject);
         }
     }
@@ -40,15 +47,15 @@ public class Bala : MonoBehaviour
     private void AplicarDanoArea()
     {
         Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDano);
-
         foreach (Collider2D enemigo in enemigos)
         {
             if (enemigo.CompareTag("Enemy"))
             {
-                // Aquí aplicas el daño al enemigo
-                Debug.Log($"Daño aplicado: {damage} a {enemigo.name}");
-
-                // Ejemplo: enemigo.GetComponent<EnemyHealth>().TakeDamage(damage);
+                Enemy3 enemy = enemigo.GetComponent<Enemy3>();
+                if (enemy != null)
+                {
+                    enemy.RecibirDanio(damage);
+                }
             }
         }
     }
