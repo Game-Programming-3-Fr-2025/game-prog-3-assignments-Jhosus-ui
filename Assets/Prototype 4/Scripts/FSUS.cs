@@ -14,12 +14,16 @@ public class FSUS : MonoBehaviour
     public GameObject balaPrefabPasiva;
     public float damagePasivo = 10f;
     public float radioDanoPasivo = 1f;
+
+    // CAMBIO CRÍTICO: Buscar point automáticamente en este mismo objeto
+    [Header("Point Fire Pasivo")]
+    [Tooltip("Si está vacío, creará un point automáticamente")]
     public Transform pointFirePasivo;
 
     [Header("=== ESTADO ACTIVO ===")]
     [Header("Configuración UI")]
-    public string nombreBotonActivo = "BotonHabilidadActiva"; // NOMBRE PERSONALIZABLE
-    [System.NonSerialized] public Button buttonSpriteActivo; // Ahora se busca por nombre
+    public string nombreBotonActivo = "BotonHabilidadActiva";
+    [System.NonSerialized] public Button buttonSpriteActivo;
     public bool activoDisponible = false;
 
     [Header("Configuración Ataque Activo")]
@@ -30,7 +34,7 @@ public class FSUS : MonoBehaviour
     public GameObject balaPrefabActiva;
     public float damageActivo = 25f;
     public float radioDanoActivo = 2f;
-    public string nombrePointFire = "Point"; // Buscar por nombre
+    public string nombrePointFire = "Point";
 
     [Header("Tiempos Activo")]
     public float duracionModoActivo = 5f;
@@ -48,8 +52,8 @@ public class FSUS : MonoBehaviour
 
     void Start()
     {
-        // BUSCAR REFERENCIAS AUTOMÁTICAMENTE
         BuscarReferencias();
+        ConfigurarPointsFire();
 
         if (buttonSpriteActivo != null)
         {
@@ -58,54 +62,69 @@ public class FSUS : MonoBehaviour
         }
 
         VerificarArmasEquipadas();
+        Debug.Log($"FSUS iniciado en {gameObject.name} - Point Pasivo: {pointFirePasivo != null}");
     }
 
-    // BUSCAR TODAS LAS REFERENCIAS NECESARIAS
     private void BuscarReferencias()
     {
         gameManager = FindObjectOfType<GameManager>();
         gunsSystem = FindObjectOfType<Guns>();
-
-        // Buscar Point Fire Activo por nombre
-        pointFireActivo = BuscarObjetoPorNombre(nombrePointFire);
-
-        // Buscar Botón UI por nombre
         buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo);
     }
 
-    // BUSCAR OBJETO POR NOMBRE EN LA ESCENA
+    // MÉTODO CRÍTICO: Configurar points de disparo
+    private void ConfigurarPointsFire()
+    {
+        // Point Fire Pasivo: Si no está asignado, buscar en hijos o crear uno
+        if (pointFirePasivo == null)
+        {
+            // Buscar en hijos primero
+            pointFirePasivo = transform.Find("PointFirePasivo");
+
+            if (pointFirePasivo == null)
+            {
+                // Crear automáticamente
+                GameObject newPoint = new GameObject("PointFirePasivo");
+                newPoint.transform.SetParent(transform);
+                newPoint.transform.localPosition = new Vector3(0.5f, 0, 0); // Adelante del arma
+                pointFirePasivo = newPoint.transform;
+                Debug.Log($"Point Fire Pasivo creado automáticamente en {gameObject.name}");
+            }
+        }
+
+        // Point Fire Activo
+        pointFireActivo = BuscarObjetoPorNombre(nombrePointFire);
+        if (pointFireActivo == null)
+        {
+            // Usar el mismo point que el pasivo si no encuentra el activo
+            pointFireActivo = pointFirePasivo;
+            Debug.Log($"Usando Point Fire Pasivo para modo activo en {gameObject.name}");
+        }
+    }
+
     private Transform BuscarObjetoPorNombre(string nombre)
     {
         GameObject obj = GameObject.Find(nombre);
         if (obj != null)
         {
-            Debug.Log($"Point encontrado: {obj.name}");
             return obj.transform;
         }
-
-        Debug.LogWarning($"No se encontró objeto: {nombre}");
         return null;
     }
 
-    // BUSCAR BOTÓN UI POR NOMBRE EN LA ESCENA
     private Button BuscarBotonPorNombre(string nombre)
     {
         Button[] todosBotones = FindObjectsOfType<Button>(true);
-
         foreach (Button boton in todosBotones)
         {
             if (boton.name == nombre)
             {
-                Debug.Log($"Botón encontrado: {boton.name}");
                 return boton;
             }
         }
-
-        Debug.LogWarning($"No se encontró botón: {nombre}");
         return null;
     }
 
-    // TODO EL RESTO DEL CÓDIGO PERMANECE EXACTAMENTE IGUAL
     void Update()
     {
         VerificarArmasEquipadas();
@@ -115,7 +134,8 @@ public class FSUS : MonoBehaviour
             buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo;
         }
 
-        if (!modoActivo && Time.time >= nextFireTime)
+        // DISPARO PASIVO - Verificación mejorada
+        if (!modoActivo && Time.time >= nextFireTime && EstaArmaEquipada())
         {
             DisparoPasivo();
             nextFireTime = Time.time + 1f / fireRate;
@@ -132,9 +152,34 @@ public class FSUS : MonoBehaviour
         }
     }
 
+    // MÉTODO CRÍTICO: Verificar si esta arma específica está equipada
+    private bool EstaArmaEquipada()
+    {
+        if (gunsSystem == null) return false;
+
+        // Verificar si este script pertenece a un arma equipada
+        foreach (var slot in gunsSystem.moduleSlots)
+        {
+            if (slot.hasWeapon && slot.weaponInstance != null)
+            {
+                // Verificar si este script está en el arma equipada
+                FSUS armaScript = slot.weaponInstance.GetComponent<FSUS>();
+                if (armaScript == this)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void DisparoPasivo()
     {
-        if (balaPrefabPasiva == null || pointFirePasivo == null) return;
+        if (balaPrefabPasiva == null || pointFirePasivo == null)
+        {
+            Debug.LogWarning($"Falta bala prefab o point fire en {gameObject.name}");
+            return;
+        }
 
         GameObject enemigoCercano = BuscarEnemigoCercano();
 
@@ -147,6 +192,7 @@ public class FSUS : MonoBehaviour
             if (balaScript != null)
             {
                 balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, isShortRange);
+                Debug.Log($"{gameObject.name} disparó a {enemigoCercano.name}");
             }
         }
     }
@@ -159,6 +205,8 @@ public class FSUS : MonoBehaviour
 
         foreach (GameObject enemigo in enemigos)
         {
+            if (enemigo == null) continue;
+
             float distancia = Vector2.Distance(transform.position, enemigo.transform.position);
             if (distancia <= range && distancia < distanciaMasCercana)
             {
@@ -181,6 +229,8 @@ public class FSUS : MonoBehaviour
         {
             buttonSpriteActivo.interactable = false;
         }
+
+        Debug.Log($"Modo activo iniciado en {gameObject.name}");
     }
 
     private void DesactivarModoActivo()
@@ -188,6 +238,7 @@ public class FSUS : MonoBehaviour
         modoActivo = false;
         enCooldown = true;
         nextCooldownTime = Time.time + cooldownModoActivo;
+        Debug.Log($"Modo activo finalizado en {gameObject.name}");
     }
 
     private IEnumerator DispararRafagas()
@@ -254,8 +305,9 @@ public class FSUS : MonoBehaviour
 
         if (pointFirePasivo != null)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(pointFirePasivo.position, radioDanoPasivo);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(pointFirePasivo.position, 0.2f);
+            Gizmos.DrawLine(transform.position, pointFirePasivo.position);
         }
 
         if (pointFireActivo != null)
@@ -266,5 +318,22 @@ public class FSUS : MonoBehaviour
 
         Gizmos.color = isShortRange ? Color.red : Color.blue;
         Gizmos.DrawIcon(transform.position + Vector3.up * 0.5f, isShortRange ? "ShortRange" : "LongRange");
+    }
+
+    // Métodos de debugging
+    [ContextMenu("Test Disparo Pasivo")]
+    public void TestDisparoPasivo()
+    {
+        DisparoPasivo();
+    }
+
+    [ContextMenu("Verificar Estado Arma")]
+    public void VerificarEstadoArma()
+    {
+        Debug.Log($"=== {gameObject.name} ===");
+        Debug.Log($"Arma equipada: {EstaArmaEquipada()}");
+        Debug.Log($"Point Fire Pasivo: {pointFirePasivo != null}");
+        Debug.Log($"Bala Prefab: {balaPrefabPasiva != null}");
+        Debug.Log($"Enemigos cercanos: {BuscarEnemigoCercano() != null}");
     }
 }

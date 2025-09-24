@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 1
-  vida: 30
+  vida: 40
 --- !u!50 &-3144384912337954001
 Rigidbody2D:
   serializedVersion: 5

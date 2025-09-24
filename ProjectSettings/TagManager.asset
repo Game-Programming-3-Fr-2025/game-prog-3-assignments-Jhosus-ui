@@ -14,6 +14,7 @@ TagManager:
   - Enemy
   - Chasis
   - Point
+  - Bullet
   layers:
   - Default
   - TransparentFX
