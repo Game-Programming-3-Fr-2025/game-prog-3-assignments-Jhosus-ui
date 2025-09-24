@@ -295,8 +295,9 @@ MonoBehaviour:
   fireRate: 0.7
   range: 0.8
   balaPrefabPasiva: {fileID: 0}
-  damagePasivo: 10
-  radioDanoPasivo: 1
+  damagePasivo: 15
+  radioDanoPasivo: 0.7
+  intervaloDanoCorto: 0.5
   pointFirePasivo: {fileID: 0}
   nombreBotonActivo: Skill 1
   activoDisponible: 0

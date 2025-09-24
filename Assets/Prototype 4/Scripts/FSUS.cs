@@ -14,10 +14,10 @@ public class FSUS : MonoBehaviour
     public GameObject balaPrefabPasiva;
     public float damagePasivo = 10f;
     public float radioDanoPasivo = 1f;
+    public float intervaloDanoCorto = 1f; // Cada cuánto aplica daño (solo corto alcance)
 
-    // CAMBIO CRÍTICO: Buscar point automáticamente en este mismo objeto
     [Header("Point Fire Pasivo")]
-    [Tooltip("Si está vacío, creará un point automáticamente")]
+    [Tooltip("Solo necesario para armas de largo alcance")]
     public Transform pointFirePasivo;
 
     [Header("=== ESTADO ACTIVO ===")]
@@ -41,6 +41,7 @@ public class FSUS : MonoBehaviour
     public float cooldownModoActivo = 10f;
 
     private float nextFireTime = 0f;
+    private float nextDanoCortoTime = 0f; // Timer para daño de corto alcance
     private bool modoActivo = false;
     private float tiempoFinActivo = 0f;
     private float nextCooldownTime = 0f;
@@ -62,7 +63,7 @@ public class FSUS : MonoBehaviour
         }
 
         VerificarArmasEquipadas();
-        Debug.Log($"FSUS iniciado en {gameObject.name} - Point Pasivo: {pointFirePasivo != null}");
+        Debug.Log($"FSUS iniciado - Tipo: {(isShortRange ? "CORTO ALCANCE" : "LARGO ALCANCE")}");
     }
 
     private void BuscarReferencias()
@@ -72,44 +73,29 @@ public class FSUS : MonoBehaviour
         buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo);
     }
 
-    // MÉTODO CRÍTICO: Configurar points de disparo
     private void ConfigurarPointsFire()
     {
-        // Point Fire Pasivo: Si no está asignado, buscar en hijos o crear uno
-        if (pointFirePasivo == null)
+        // Solo configurar point fire si es arma de largo alcance
+        if (!isShortRange && pointFirePasivo == null)
         {
-            // Buscar en hijos primero
             pointFirePasivo = transform.Find("PointFirePasivo");
-
             if (pointFirePasivo == null)
             {
-                // Crear automáticamente
                 GameObject newPoint = new GameObject("PointFirePasivo");
                 newPoint.transform.SetParent(transform);
-                newPoint.transform.localPosition = new Vector3(0.5f, 0, 0); // Adelante del arma
+                newPoint.transform.localPosition = new Vector3(0.5f, 0, 0);
                 pointFirePasivo = newPoint.transform;
-                Debug.Log($"Point Fire Pasivo creado automáticamente en {gameObject.name}");
             }
         }
 
-        // Point Fire Activo
         pointFireActivo = BuscarObjetoPorNombre(nombrePointFire);
-        if (pointFireActivo == null)
-        {
-            // Usar el mismo point que el pasivo si no encuentra el activo
-            pointFireActivo = pointFirePasivo;
-            Debug.Log($"Usando Point Fire Pasivo para modo activo en {gameObject.name}");
-        }
+        if (pointFireActivo == null) pointFireActivo = pointFirePasivo;
     }
 
     private Transform BuscarObjetoPorNombre(string nombre)
     {
         GameObject obj = GameObject.Find(nombre);
-        if (obj != null)
-        {
-            return obj.transform;
-        }
-        return null;
+        return obj != null ? obj.transform : null;
     }
 
     private Button BuscarBotonPorNombre(string nombre)
@@ -117,10 +103,7 @@ public class FSUS : MonoBehaviour
         Button[] todosBotones = FindObjectsOfType<Button>(true);
         foreach (Button boton in todosBotones)
         {
-            if (boton.name == nombre)
-            {
-                return boton;
-            }
+            if (boton.name == nombre) return boton;
         }
         return null;
     }
@@ -134,11 +117,26 @@ public class FSUS : MonoBehaviour
             buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo;
         }
 
-        // DISPARO PASIVO - Verificación mejorada
-        if (!modoActivo && Time.time >= nextFireTime && EstaArmaEquipada())
+        if (!modoActivo && EstaArmaEquipada())
         {
-            DisparoPasivo();
-            nextFireTime = Time.time + 1f / fireRate;
+            if (isShortRange)
+            {
+                // ARMA CORTO ALCANCE: Daño por área cada X segundos
+                if (Time.time >= nextDanoCortoTime)
+                {
+                    AplicarDanoAreaCorto();
+                    nextDanoCortoTime = Time.time + intervaloDanoCorto;
+                }
+            }
+            else
+            {
+                // ARMA LARGO ALCANCE: Disparar balas
+                if (Time.time >= nextFireTime)
+                {
+                    DisparoPasivo();
+                    nextFireTime = Time.time + 1f / fireRate;
+                }
+            }
         }
 
         if (modoActivo && Time.time >= tiempoFinActivo)
@@ -152,37 +150,37 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    // MÉTODO CRÍTICO: Verificar si esta arma específica está equipada
-    private bool EstaArmaEquipada()
+    // MÉTODO NUEVO: Daño por área para armas cortas
+    private void AplicarDanoAreaCorto()
     {
-        if (gunsSystem == null) return false;
+        Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDanoPasivo);
+        int enemigosAfectados = 0;
 
-        // Verificar si este script pertenece a un arma equipada
-        foreach (var slot in gunsSystem.moduleSlots)
+        foreach (Collider2D colision in enemigos)
         {
-            if (slot.hasWeapon && slot.weaponInstance != null)
+            if (colision.CompareTag("Enemy"))
             {
-                // Verificar si este script está en el arma equipada
-                FSUS armaScript = slot.weaponInstance.GetComponent<FSUS>();
-                if (armaScript == this)
+                Enemy3 enemy = colision.GetComponent<Enemy3>();
+                if (enemy != null)
                 {
-                    return true;
+                    enemy.RecibirDanio((int)damagePasivo);
+                    enemigosAfectados++;
                 }
             }
         }
-        return false;
+
+        if (enemigosAfectados > 0)
+        {
+            Debug.Log($"{gameObject.name} aplicó daño de área a {enemigosAfectados} enemigos");
+        }
     }
 
+    // MÉTODO ORIGINAL: Disparo para armas largas
     private void DisparoPasivo()
     {
-        if (balaPrefabPasiva == null || pointFirePasivo == null)
-        {
-            Debug.LogWarning($"Falta bala prefab o point fire en {gameObject.name}");
-            return;
-        }
+        if (balaPrefabPasiva == null || pointFirePasivo == null) return;
 
         GameObject enemigoCercano = BuscarEnemigoCercano();
-
         if (enemigoCercano != null)
         {
             Vector2 direccion = (enemigoCercano.transform.position - pointFirePasivo.position).normalized;
@@ -191,8 +189,7 @@ public class FSUS : MonoBehaviour
             Bala balaScript = nuevaBala.GetComponent<Bala>();
             if (balaScript != null)
             {
-                balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, isShortRange);
-                Debug.Log($"{gameObject.name} disparó a {enemigoCercano.name}");
+                balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, false);
             }
         }
     }
@@ -217,6 +214,22 @@ public class FSUS : MonoBehaviour
         return enemigoMasCercano;
     }
 
+    private bool EstaArmaEquipada()
+    {
+        if (gunsSystem == null) return false;
+
+        foreach (var slot in gunsSystem.moduleSlots)
+        {
+            if (slot.hasWeapon && slot.weaponInstance != null)
+            {
+                FSUS armaScript = slot.weaponInstance.GetComponent<FSUS>();
+                if (armaScript == this) return true;
+            }
+        }
+        return false;
+    }
+
+    // Los métodos de MODO ACTIVO se mantienen igual
     public void ActivarModoActivo()
     {
         if (enCooldown || modoActivo || !activoDisponible) return;
@@ -229,8 +242,6 @@ public class FSUS : MonoBehaviour
         {
             buttonSpriteActivo.interactable = false;
         }
-
-        Debug.Log($"Modo activo iniciado en {gameObject.name}");
     }
 
     private void DesactivarModoActivo()
@@ -238,7 +249,6 @@ public class FSUS : MonoBehaviour
         modoActivo = false;
         enCooldown = true;
         nextCooldownTime = Time.time + cooldownModoActivo;
-        Debug.Log($"Modo activo finalizado en {gameObject.name}");
     }
 
     private IEnumerator DispararRafagas()
@@ -260,7 +270,6 @@ public class FSUS : MonoBehaviour
             posicionDisparo.y += (i - (balasPorRafaga - 1) / 2f) * separacionVerticalBalas;
 
             Vector2 direccion = transform.right;
-
             GameObject nuevaBala = Instantiate(balaPrefabActiva, posicionDisparo, Quaternion.identity);
 
             Bala balaScript = nuevaBala.GetComponent<Bala>();
@@ -278,12 +287,8 @@ public class FSUS : MonoBehaviour
             int armasEquipadas = 0;
             foreach (var slot in gunsSystem.moduleSlots)
             {
-                if (slot.hasWeapon)
-                {
-                    armasEquipadas++;
-                }
+                if (slot.hasWeapon) armasEquipadas++;
             }
-
             activoDisponible = armasEquipadas > 0;
 
             if (buttonSpriteActivo != null)
@@ -293,47 +298,31 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    public void ActualizarDisponibilidad()
-    {
-        VerificarArmasEquipadas();
-    }
-
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, range);
-
-        if (pointFirePasivo != null)
+        // Gizmo para área de daño (corto alcance)
+        if (isShortRange)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(pointFirePasivo.position, 0.2f);
-            Gizmos.DrawLine(transform.position, pointFirePasivo.position);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, radioDanoPasivo);
+        }
+        else
+        {
+            // Gizmo para rango de disparo (largo alcance)
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, range);
+
+            if (pointFirePasivo != null)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(pointFirePasivo.position, 0.2f);
+            }
         }
 
         if (pointFireActivo != null)
         {
             Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(pointFireActivo.position, radioDanoActivo);
+            Gizmos.DrawWireSphere(pointFireActivo.position, 0.3f);
         }
-
-        Gizmos.color = isShortRange ? Color.red : Color.blue;
-        Gizmos.DrawIcon(transform.position + Vector3.up * 0.5f, isShortRange ? "ShortRange" : "LongRange");
-    }
-
-    // Métodos de debugging
-    [ContextMenu("Test Disparo Pasivo")]
-    public void TestDisparoPasivo()
-    {
-        DisparoPasivo();
-    }
-
-    [ContextMenu("Verificar Estado Arma")]
-    public void VerificarEstadoArma()
-    {
-        Debug.Log($"=== {gameObject.name} ===");
-        Debug.Log($"Arma equipada: {EstaArmaEquipada()}");
-        Debug.Log($"Point Fire Pasivo: {pointFirePasivo != null}");
-        Debug.Log($"Bala Prefab: {balaPrefabPasiva != null}");
-        Debug.Log($"Enemigos cercanos: {BuscarEnemigoCercano() != null}");
     }
 }

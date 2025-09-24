@@ -15,6 +15,7 @@ TagManager:
   - Chasis
   - Point
   - Bullet
+  - Modulo
   layers:
   - Default
   - TransparentFX

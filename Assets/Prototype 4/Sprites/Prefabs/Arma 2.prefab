@@ -137,7 +137,8 @@ MonoBehaviour:
   range: 6
   balaPrefabPasiva: {fileID: 5859944464483778903, guid: 919705b23395c7447aaf9d004a22fd35, type: 3}
   damagePasivo: 10
-  radioDanoPasivo: 0.1
+  radioDanoPasivo: 0
+  intervaloDanoCorto: 0
   pointFirePasivo: {fileID: 2371759727554729669}
   nombreBotonActivo: Skill 2
   activoDisponible: 0
