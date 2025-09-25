@@ -1,5 +1,7 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,8 +23,16 @@ public class GameManager : MonoBehaviour
     private int currentModuleCount = 1;
     private float[] gridYPositions;
 
+
+    [Header("Money")]
+    public TextMeshProUGUI addModuleCostText; // Texto costo
+    public int moduleBaseCost = 50;
+    public int moduleCostIncrement = 15;
+    private int currentModuleCost { get { return moduleBaseCost + ((currentModuleCount - 1) * moduleCostIncrement); } }
     void Start()
     {
+        addModuleButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying);
+
         if (!ValidateReferences()) return;
 
         CalculateGridPositions();
@@ -34,7 +44,14 @@ public class GameManager : MonoBehaviour
         }
 
         PositionObjectInGrid(chasis, 0);
-        Debug.Log($"GameManager inicializado. Módulos actuales: {currentModuleCount}");
+        Debug.Log($"GameManager inicializado. Mï¿½dulos actuales: {currentModuleCount}");
+    }
+
+    void Update()
+    {
+        addModuleButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying);
+        if (addModuleCostText) addModuleCostText.text = currentModuleCost.ToString();
+        addModuleCostText.gameObject.SetActive(!MoneyManager.Instance.isPlaying);
     }
 
     private bool ValidateReferences()
@@ -58,20 +75,22 @@ public class GameManager : MonoBehaviour
 
     public void AddModule()
     {
-        if (currentModuleCount >= maxModules)
+        if (currentModuleCount >= maxModules) return;
+
+        int cost = currentModuleCost;
+        if (MoneyManager.Instance.SpendMoney(cost))
         {
-            Debug.Log("Máximo de módulos alcanzado: " + maxModules);
-            return;
+
+            GameObject newModule = Instantiate(modulePrefab, gridParent);
+            if (newModule == null) return;
+
+            ShiftExistingModulesUp();
+            PositionObjectInGrid(newModule, 0);
+            currentModuleCount++;
+
+            Debug.Log($"Mï¿½dulo agregado. Total: {currentModuleCount}/{maxModules}");
+
         }
-
-        GameObject newModule = Instantiate(modulePrefab, gridParent);
-        if (newModule == null) return;
-
-        ShiftExistingModulesUp();
-        PositionObjectInGrid(newModule, 0);
-        currentModuleCount++;
-
-        Debug.Log($"Módulo agregado. Total: {currentModuleCount}/{maxModules}");
     }
 
     private void PositionObjectInGrid(GameObject obj, int cellIndex)
@@ -111,14 +130,14 @@ public class GameManager : MonoBehaviour
         return 0;
     }
 
-    // PROBLEMA 2 SOLUCIONADO: Método de eliminación completamente reescrito
+    // PROBLEMA 2 SOLUCIONADO: Mï¿½todo de eliminaciï¿½n completamente reescrito
     public void EliminarModulo(GameObject moduloEliminar)
     {
         if (moduloEliminar == null) return;
 
-        Debug.Log($"Eliminando módulo: {moduloEliminar.name}");
+        Debug.Log($"Eliminando mï¿½dulo: {moduloEliminar.name}");
 
-        // Obtener lista de todos los módulos ANTES de eliminar
+        // Obtener lista de todos los mï¿½dulos ANTES de eliminar
         var modulosAntesDeEliminar = new System.Collections.Generic.List<Transform>();
         for (int i = 0; i < gridParent.childCount; i++)
         {
@@ -129,11 +148,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Eliminar el módulo
+        // Eliminar el mï¿½dulo
         currentModuleCount--;
         Destroy(moduloEliminar);
 
-        // Esperar un frame para que se complete la destrucción
+        // Esperar un frame para que se complete la destrucciï¿½n
         StartCoroutine(ReposicionarModulosCorrutina(modulosAntesDeEliminar));
     }
 
@@ -141,7 +160,7 @@ public class GameManager : MonoBehaviour
     {
         yield return null; // Esperar un frame
 
-        // Ordenar módulos por posición Y (de abajo hacia arriba)
+        // Ordenar mï¿½dulos por posiciï¿½n Y (de abajo hacia arriba)
         modulos.Sort((a, b) => a.localPosition.y.CompareTo(b.localPosition.y));
 
         // Reposicionar todos desde la celda 0
@@ -154,7 +173,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"Reposicionamiento completo. Módulos totales: {currentModuleCount}");
+        Debug.Log($"Reposicionamiento completo. Mï¿½dulos totales: {currentModuleCount}");
     }
 
     private void OnDrawGizmos()
@@ -177,7 +196,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    [ContextMenu("Test Reposicionar Módulos")]
+    [ContextMenu("Test Reposicionar Mï¿½dulos")]
     public void TestReposicionarModulos()
     {
         var modulos = new System.Collections.Generic.List<Transform>();

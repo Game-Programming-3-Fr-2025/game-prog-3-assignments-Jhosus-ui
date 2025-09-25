@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8728051940342736360}
   - component: {fileID: -3144384912337954001}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: Enemy 1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.019857, y: -1.09759, z: 0}
-  m_LocalScale: {x: 0.4078, y: 0.3985, z: 1}
+  m_LocalScale: {x: 0.9520907, y: 0.93037796, z: 2.3347}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -8704524280614070974, guid: 54c508c3e9bc0ce41b3c12b5d5110e80, type: 3}
-  m_Color: {r: 0.71107256, g: 0.9029649, b: 0.50015974, a: 1}
+  m_Color: {r: 0.7264151, g: 0.46190292, b: 0.25013348, a: 1}
   m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
@@ -171,12 +171,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be13a7da98465b48947679740922609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadMin: 0.05
-  velocidadMax: 0.8
-  vida: 50
-  danioPorAtaque: 5
-  intervaloAtaque: 2
-  fuerzaSalto: 3.2
+  velocidadMin: 0.02
+  velocidadMax: 0.5
+  vida: 250
+  danioPorAtaque: 15
+  intervaloAtaque: 5
+  fuerzaSalto: 0.5
 --- !u!50 &-3144384912337954001
 Rigidbody2D:
   serializedVersion: 5

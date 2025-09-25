@@ -1,6 +1,7 @@
+ï»¿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class Guns : MonoBehaviour
 {
@@ -23,20 +24,29 @@ public class Guns : MonoBehaviour
     public GameObject weapon2Prefab;
     public GameObject weapon3Prefab;
 
+    [Header("Weapon Money")]
+    public int weapon1Cost = 20;
+    public int weapon2Cost = 30;
+    public int weapon3Cost = 40;
+
     [Header("Settings")]
     public Vector2 buttonOffset = new Vector2(0, 50);
 
     private GameManager gameManager;
     public List<ModuleSlot> moduleSlots = new List<ModuleSlot>();
+    private int minCost; // Nuevo: Costo mÃ­nimo de las armas
 
     void Start()
     {
+        // Calcular minCost al inicio
+        minCost = Mathf.Min(weapon1Cost, weapon2Cost, weapon3Cost);
+
         if (!ValidateReferences()) return;
 
         gameManager = FindObjectOfType<GameManager>();
         if (gameManager == null)
         {
-            Debug.LogError("No se encontró GameManager");
+            Debug.LogError("No se encontrÃ³ GameManager");
             return;
         }
 
@@ -68,10 +78,10 @@ public class Guns : MonoBehaviour
         {
             Transform module = gameManager.gridParent.GetChild(i);
 
-            // VERIFICACIÓN DEL CHASIS - No crear slot si tiene tag "Chasis"
+            // VERIFICACIÃ“N DEL CHASIS - No crear slot si tiene tag "Chasis"
             if (module.CompareTag("Chasis"))
             {
-                continue; // Saltar este módulo
+                continue; // Saltar este mÃ³dulo
             }
 
             if (FindSlotForModule(module) == null)
@@ -88,7 +98,7 @@ public class Guns : MonoBehaviour
         ModuleSlot newSlot = new ModuleSlot();
         newSlot.assignedModule = module;
 
-        // Crear punto en el centro del módulo
+        // Crear punto en el centro del mÃ³dulo
         GameObject slotPoint = new GameObject($"SlotPoint_{module.name}");
         slotPoint.transform.SetParent(module);
         slotPoint.transform.localPosition = Vector3.zero;
@@ -98,7 +108,7 @@ public class Guns : MonoBehaviour
         CreateButtonsUIForSlot(newSlot);
         moduleSlots.Add(newSlot);
 
-        Debug.Log($"Slot creado para módulo: {module.name}");
+        Debug.Log($"Slot creado para mÃ³dulo: {module.name}");
     }
 
     private void CreateButtonsUIForSlot(ModuleSlot slot)
@@ -110,9 +120,17 @@ public class Guns : MonoBehaviour
         Button[] buttons = buttonsPanel.GetComponentsInChildren<Button>();
         if (buttons.Length >= 3)
         {
-            buttons[0].onClick.AddListener(() => EquipWeapon(slot, weapon1Prefab));
-            buttons[1].onClick.AddListener(() => EquipWeapon(slot, weapon2Prefab));
-            buttons[2].onClick.AddListener(() => EquipWeapon(slot, weapon3Prefab));
+            buttons[0].onClick.AddListener(() => EquipWeapon(slot, weapon1Prefab, weapon1Cost));
+            buttons[1].onClick.AddListener(() => EquipWeapon(slot, weapon2Prefab, weapon2Cost));
+            buttons[2].onClick.AddListener(() => EquipWeapon(slot, weapon3Prefab, weapon3Cost));
+        }
+
+        TextMeshProUGUI[] costTexts = buttonsPanel.GetComponentsInChildren<TextMeshProUGUI>();
+        if (costTexts.Length >= 3)
+        {
+            costTexts[0].text = weapon1Cost.ToString();
+            costTexts[1].text = weapon2Cost.ToString();
+            costTexts[2].text = weapon3Cost.ToString();
         }
     }
 
@@ -135,22 +153,29 @@ public class Guns : MonoBehaviour
 
             slot.weaponButtonsUI.GetComponent<RectTransform>().localPosition = localPosition;
 
-            // Mostrar botones solo si no tiene arma
-            slot.weaponButtonsUI.SetActive(!slot.hasWeapon);
+            // Mostrar botones solo si no tiene arma, en lobby, y dinero suficiente
+            slot.weaponButtonsUI.SetActive(!slot.hasWeapon && !MoneyManager.Instance.isPlaying && MoneyManager.Instance.money >= minCost);
         }
     }
 
-    private void EquipWeapon(ModuleSlot slot, GameObject weaponPrefab)
+    private void EquipWeapon(ModuleSlot slot, GameObject weaponPrefab, int cost)
     {
-        if (slot?.hasWeapon == true || weaponPrefab == null) return;
+        if (slot.hasWeapon || weaponPrefab == null) return;
 
-        GameObject newWeapon = Instantiate(weaponPrefab, slot.slotPoint);
-        newWeapon.transform.localPosition = Vector3.zero;
+        if (MoneyManager.Instance.SpendMoney(cost))
+        {
+            GameObject newWeapon = Instantiate(weaponPrefab, slot.slotPoint);
+            newWeapon.transform.localPosition = Vector3.zero;
 
-        slot.hasWeapon = true;
-        slot.weaponInstance = newWeapon;
+            slot.hasWeapon = true;
+            slot.weaponInstance = newWeapon;
 
-        Debug.Log($"Arma {weaponPrefab.name} equipada en {slot.assignedModule.name}");
+            Debug.Log($"Arma {weaponPrefab.name} equipada en {slot.assignedModule.name} por {cost}");
+        }
+        else
+        {
+            Debug.Log($"No hay suficiente dinero para equipar {weaponPrefab.name} (Costo: {cost})");
+        }
     }
 
     public void RemoveWeapon(ModuleSlot slot)
@@ -215,11 +240,11 @@ public class Guns : MonoBehaviour
     [ContextMenu("Log All Slots")]
     public void LogAllSlots()
     {
-        Debug.Log("=== SLOTS DE MÓDULOS ===");
+        Debug.Log("=== SLOTS DE MÃ“DULOS ===");
         foreach (ModuleSlot slot in moduleSlots)
         {
             string weaponName = slot.hasWeapon ? slot.weaponInstance.name : "Sin arma";
-            Debug.Log($"Módulo: {slot.assignedModule.name} - Arma: {weaponName}");
+            Debug.Log($"MÃ³dulo: {slot.assignedModule.name} - Arma: {weaponName}");
         }
     }
 

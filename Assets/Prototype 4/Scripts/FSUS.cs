@@ -1,6 +1,7 @@
+Ôªøusing System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class FSUS : MonoBehaviour
 {
@@ -8,25 +9,25 @@ public class FSUS : MonoBehaviour
     [Tooltip("Marcar para corta distancia, desmarcar para larga distancia")]
     public bool isShortRange = true;
 
-    [Header("ConfiguraciÛn Pasiva")]
+    [Header("Configuraci√≥n Pasiva")]
     public float fireRate = 1f;
     public float range = 5f;
     public GameObject balaPrefabPasiva;
     public float damagePasivo = 10f;
     public float radioDanoPasivo = 1f;
-    public float intervaloDanoCorto = 1f; // Cada cu·nto aplica daÒo (solo corto alcance)
+    public float intervaloDanoCorto = 1f; // Cada cu√°nto aplica da√±o (solo corto alcance)
 
     [Header("Point Fire Pasivo")]
     [Tooltip("Solo necesario para armas de largo alcance")]
     public Transform pointFirePasivo;
 
     [Header("=== ESTADO ACTIVO ===")]
-    [Header("ConfiguraciÛn UI")]
+    [Header("Configuraci√≥n UI")]
     public string nombreBotonActivo = "BotonHabilidadActiva";
     [System.NonSerialized] public Button buttonSpriteActivo;
     public bool activoDisponible = false;
 
-    [Header("ConfiguraciÛn Ataque Activo")]
+    [Header("Configuraci√≥n Ataque Activo")]
     public int rafagaCantidad = 3;
     public float tiempoEntreRafagas = 0.2f;
     public int balasPorRafaga = 3;
@@ -40,8 +41,20 @@ public class FSUS : MonoBehaviour
     public float duracionModoActivo = 5f;
     public float cooldownModoActivo = 10f;
 
+    [Header("Mejoras armas")]
+    public string upgradeButtonName = "UpgradeButton"; // Nombre √∫nico del bot√≥n de mejora
+    public string upgradeCostTextName = "UpgradeCostText"; // Nombre √∫nico del texto de costo
+    private Button upgradeButton; // Ahora privado, se buscar√° por nombre
+    private TextMeshProUGUI upgradeCostText; // Ahora privado, se buscar√° por nombre
+    public int upgradeLevel = 0;
+    public int maxUpgradeLevel = 4;
+    public float damageIncreasePerLevel = 5f;
+    public int upgradeBaseCost = 20;
+    public int upgradeIncrement = 10;
+    public int energyCost = 1; // Para activo
+
     private float nextFireTime = 0f;
-    private float nextDanoCortoTime = 0f; // Timer para daÒo de corto alcance
+    private float nextDanoCortoTime = 0f; // Timer para da√±o de corto alcance
     private bool modoActivo = false;
     private float tiempoFinActivo = 0f;
     private float nextCooldownTime = 0f;
@@ -55,6 +68,13 @@ public class FSUS : MonoBehaviour
     {
         BuscarReferencias();
         ConfigurarPointsFire();
+
+        // Configurar bot√≥n de mejora si se encontr√≥
+        if (upgradeButton != null)
+        {
+            upgradeButton.onClick.AddListener(UpgradeWeapon);
+            upgradeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
+        }
 
         if (buttonSpriteActivo != null)
         {
@@ -71,6 +91,20 @@ public class FSUS : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
         gunsSystem = FindObjectOfType<Guns>();
         buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo);
+
+        // Buscar bot√≥n de mejora y texto de costo por nombre
+        upgradeButton = BuscarBotonPorNombre(upgradeButtonName);
+        upgradeCostText = BuscarTextoPorNombre(upgradeCostTextName);
+    }
+
+    private TextMeshProUGUI BuscarTextoPorNombre(string nombre)
+    {
+        TextMeshProUGUI[] todosTextos = FindObjectsOfType<TextMeshProUGUI>(true);
+        foreach (TextMeshProUGUI texto in todosTextos)
+        {
+            if (texto.name == nombre) return texto;
+        }
+        return null;
     }
 
     private void ConfigurarPointsFire()
@@ -110,6 +144,18 @@ public class FSUS : MonoBehaviour
 
     void Update()
     {
+        // Actualizar visibilidad del bot√≥n de mejora
+        if (upgradeButton != null)
+        {
+            upgradeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
+        }
+
+        // Actualizar texto de costo
+        if (upgradeCostText != null)
+        {
+            upgradeCostText.text = GetUpgradeCost().ToString();
+        }
+
         VerificarArmasEquipadas();
 
         if (buttonSpriteActivo != null)
@@ -121,7 +167,7 @@ public class FSUS : MonoBehaviour
         {
             if (isShortRange)
             {
-                // ARMA CORTO ALCANCE: DaÒo por ·rea cada X segundos
+                // ARMA CORTO ALCANCE: Da√±o por √°rea cada X segundos
                 if (Time.time >= nextDanoCortoTime)
                 {
                     AplicarDanoAreaCorto();
@@ -150,7 +196,7 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    // M…TODO NUEVO: DaÒo por ·rea para armas cortas
+    // M√âTODO NUEVO: Da√±o por √°rea para armas cortas
     private void AplicarDanoAreaCorto()
     {
         Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDanoPasivo);
@@ -171,11 +217,11 @@ public class FSUS : MonoBehaviour
 
         if (enemigosAfectados > 0)
         {
-            Debug.Log($"{gameObject.name} aplicÛ daÒo de ·rea a {enemigosAfectados} enemigos");
+            Debug.Log($"{gameObject.name} aplic√≥ da√±o de √°rea a {enemigosAfectados} enemigos");
         }
     }
 
-    // M…TODO ORIGINAL: Disparo para armas largas
+    // M√âTODO ORIGINAL: Disparo para armas largas
     private void DisparoPasivo()
     {
         if (balaPrefabPasiva == null || pointFirePasivo == null) return;
@@ -229,12 +275,13 @@ public class FSUS : MonoBehaviour
         return false;
     }
 
-    // Los mÈtodos de MODO ACTIVO se mantienen igual
+    // Los m√©todos de MODO ACTIVO se mantienen igual
     public void ActivarModoActivo()
     {
-        if (enCooldown || modoActivo || !activoDisponible) return;
+        if (modoActivo || !activoDisponible) return;
+        if (MoneyManager.Instance.SpendEnergy(energyCost))
 
-        modoActivo = true;
+            modoActivo = true;
         tiempoFinActivo = Time.time + duracionModoActivo;
         StartCoroutine(DispararRafagas());
 
@@ -298,9 +345,25 @@ public class FSUS : MonoBehaviour
         }
     }
 
+    private void UpgradeWeapon()
+    {
+        int cost = GetUpgradeCost();
+        if (MoneyManager.Instance.SpendMoney(cost) && upgradeLevel < maxUpgradeLevel)
+        {
+            upgradeLevel++;
+            damagePasivo += damageIncreasePerLevel;
+            damageActivo += damageIncreasePerLevel;
+        }
+    }
+
+    private int GetUpgradeCost()
+    {
+        return upgradeBaseCost + (upgradeLevel * upgradeIncrement);
+    }
+
     private void OnDrawGizmosSelected()
     {
-        // Gizmo para ·rea de daÒo (corto alcance)
+        // Gizmo para √°rea de da√±o (corto alcance)
         if (isShortRange)
         {
             Gizmos.color = Color.red;

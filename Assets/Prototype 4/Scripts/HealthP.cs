@@ -1,9 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class HealthP : MonoBehaviour
 {
-    [Header("Configuración de Salud")]
+    [Header("ConfiguraciÃ³n de Salud")]
     public int saludMaxima = 100;
     public int saludActual;
     public bool esChasis = false;
@@ -14,14 +15,32 @@ public class HealthP : MonoBehaviour
     [Header("Debug")]
     public bool mostrarLogsDamage = true;
 
+    [Header("Mejoras")]
+    public string upgradeLifeButtonName = "UpgradeLifeButton";
+    public string upgradeLifeCostTextName = "UpgradeLifeCostText";
+    private Button upgradeLifeButton;
+    private TextMeshProUGUI upgradeLifeCostText;
+    public int upgradeLevel = 0;
+    public int maxUpgradeLevel = 4;
+    public int healthIncreasePerLevel = 20;
+    public int upgradeBaseCost = 30;
+    public int upgradeIncrement = 10;
+
     private GameManager gameManager;
 
     void Start()
     {
+        BuscarReferenciasMejoras();
+
+        if (upgradeLifeButton != null)
+        {
+            upgradeLifeButton.onClick.AddListener(UpgradeLife);
+            upgradeLifeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
+        }
+
         saludActual = saludMaxima;
         gameManager = FindObjectOfType<GameManager>();
 
-        // Asignar tags automáticamente
         if (esChasis && !gameObject.CompareTag("Chasis"))
         {
             gameObject.tag = "Chasis";
@@ -34,7 +53,72 @@ public class HealthP : MonoBehaviour
         ConfigurarTextoSalud();
         ActualizarUI();
 
-        Debug.Log($"HealthP inicializado: {gameObject.name} - Tag: {gameObject.tag} - Salud: {saludActual}");
+        Debug.Log($"HealthP inicializado: {gameObject.name} - Tag: {gameObject.tag} - Salud: {saludActual}/{saludMaxima}");
+    }
+
+    void Update()
+    {
+        if (upgradeLifeButton != null)
+        {
+            upgradeLifeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
+        }
+
+        if (upgradeLifeCostText != null)
+        {
+            upgradeLifeCostText.text = GetUpgradeCost().ToString();
+        }
+    }
+
+    private void BuscarReferenciasMejoras()
+    {
+        upgradeLifeButton = BuscarBotonPorNombre(upgradeLifeButtonName);
+        upgradeLifeCostText = BuscarTextoPorNombre(upgradeLifeCostTextName);
+    }
+
+    private Button BuscarBotonPorNombre(string nombre)
+    {
+        Button[] todosBotones = FindObjectsOfType<Button>(true);
+        foreach (Button boton in todosBotones)
+        {
+            if (boton.name == nombre) return boton;
+        }
+        return null;
+    }
+
+    private TextMeshProUGUI BuscarTextoPorNombre(string nombre)
+    {
+        TextMeshProUGUI[] todosTextos = FindObjectsOfType<TextMeshProUGUI>(true);
+        foreach (TextMeshProUGUI texto in todosTextos)
+        {
+            if (texto.name == nombre) return texto;
+        }
+        return null;
+    }
+
+    private void UpgradeLife()
+    {
+        int cost = GetUpgradeCost();
+        if (MoneyManager.Instance.SpendMoney(cost) && upgradeLevel < maxUpgradeLevel)
+        {
+            upgradeLevel++;
+            saludMaxima += healthIncreasePerLevel;
+            saludActual = saludMaxima; // Ahora tambiÃ©n cura completamente al mejorar
+            ActualizarUI();
+            Debug.Log($"Vida mejorada! Nuevo mÃ¡ximo: {saludMaxima}, Vida actual: {saludActual}");
+        }
+    }
+
+    private int GetUpgradeCost()
+    {
+        return upgradeBaseCost + (upgradeLevel * upgradeIncrement);
+    }
+
+    // NUEVO MÃ‰TODO: Restablece la vida al mÃ¡ximo (incluyendo mejoras)
+    public void RestablecerVida()
+    {
+        saludActual = saludMaxima;
+        ActualizarUI();
+        Debug.Log($"{gameObject.name} - Vida restablecida: {saludActual}/{saludMaxima}");
     }
 
     private void ConfigurarTextoSalud()
@@ -70,7 +154,7 @@ public class HealthP : MonoBehaviour
 
         if (mostrarLogsDamage)
         {
-            Debug.Log($"{gameObject.name} recibió {cantidad} daño. Salud: {saludActual}/{saludMaxima}");
+            Debug.Log($"{gameObject.name} recibiÃ³ {cantidad} daÃ±o. Salud: {saludActual}/{saludMaxima}");
         }
 
         if (saludActual <= 0)
@@ -86,13 +170,16 @@ public class HealthP : MonoBehaviour
     {
         if (esChasis)
         {
-            Debug.Log("CHASIS DESTRUIDO - GAME OVER");
-            Time.timeScale = 0; // Pausar juego
+            Debug.Log("CHASIS DESTRUIDO - REINICIANDO A LOBBY");
+
+            if (MoneyManager.Instance != null)
+            {
+                MoneyManager.Instance.ResetToLobby();
+            }
         }
         else
         {
-            Debug.Log($"Módulo {gameObject.name} destruido");
-            // CRÍTICO: Llamar a GameManager ANTES de destruir
+            Debug.Log($"MÃ³dulo {gameObject.name} destruido");
             if (gameManager != null)
             {
                 gameManager.EliminarModulo(this.gameObject);

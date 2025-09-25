@@ -311,3 +311,11 @@ MonoBehaviour:
   nombrePointFire: Point
   duracionModoActivo: 5
   cooldownModoActivo: 10
+  upgradeButtonName: AM1
+  upgradeCostTextName: TM1
+  upgradeLevel: 0
+  maxUpgradeLevel: 4
+  damageIncreasePerLevel: 5
+  upgradeBaseCost: 20
+  upgradeIncrement: 10
+  energyCost: 1

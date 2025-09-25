@@ -282,6 +282,14 @@ MonoBehaviour:
   saludActual: 0
   esChasis: 0
   textoSalud3D: {fileID: 6684892798702103371}
+  mostrarLogsDamage: 1
+  upgradeLifeButtonName: AV1
+  upgradeLifeCostTextName: TAV1
+  upgradeLevel: 0
+  maxUpgradeLevel: 4
+  healthIncreasePerLevel: 20
+  upgradeBaseCost: 30
+  upgradeIncrement: 15
 --- !u!61 &7956733536263118483
 BoxCollider2D:
   m_ObjectHideFlags: 0

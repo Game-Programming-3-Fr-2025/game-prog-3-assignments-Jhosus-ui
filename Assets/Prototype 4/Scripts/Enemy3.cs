@@ -1,5 +1,3 @@
-// ==================== ENEMY3.CS CORREGIDO ====================
-
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -7,7 +5,12 @@ using UnityEngine;
 public class Enemy3 : MonoBehaviour
 {
     [Header("Configuración")]
-    public float velocidad = 2f;
+    [Tooltip("Velocidad mínima aleatoria")]
+    public float velocidadMin = 1.5f;
+    [Tooltip("Velocidad máxima aleatoria")]
+    public float velocidadMax = 3f;
+    private float velocidad; // Velocidad aleatoria asignada
+
     public int vida = 30;
     public int danioPorAtaque = 10;
     public float intervaloAtaque = 1f;
@@ -20,17 +23,24 @@ public class Enemy3 : MonoBehaviour
     private Rigidbody2D rb;
     private float posicionXFija;
 
+    public delegate void OnDeath();
+    public event OnDeath onDeath;
+    private EnemySpawner spawner;
+
     void Start()
     {
         gameObject.tag = "Enemy";
         rb = GetComponent<Rigidbody2D>();
+        spawner = FindObjectOfType<EnemySpawner>();
+        // Asignar velocidad aleatoria al crear el enemigo
+        AsignarVelocidadAleatoria();
     }
 
     void Update()
     {
         if (!atacando)
         {
-            // Movimiento normal hacia la izquierda
+            // Movimiento normal hacia la izquierda con velocidad aleatoria
             transform.Translate(Vector3.left * velocidad * Time.deltaTime);
         }
         else
@@ -75,6 +85,13 @@ public class Enemy3 : MonoBehaviour
         }
     }
 
+    // Método para asignar velocidad aleatoria
+    private void AsignarVelocidadAleatoria()
+    {
+        velocidad = Random.Range(velocidadMin, velocidadMax);
+        Debug.Log($"{gameObject.name} velocidad asignada: {velocidad:F2} (rango: {velocidadMin}-{velocidadMax})");
+    }
+
     public void RecibirDanio(int cantidad)
     {
         vida -= cantidad;
@@ -82,7 +99,15 @@ public class Enemy3 : MonoBehaviour
 
         if (vida <= 0)
         {
-            Debug.Log($"{gameObject.name} murió");
+            MoneyManager.Instance.AddMoney(MoneyManager.Instance.moneyRewardPerEnemy);
+            onDeath?.Invoke(); // Para bosses
+
+            // NUEVO: Notificar al spawner que este enemigo murió
+            if (spawner != null)
+            {
+                spawner.RemoverEnemigo(gameObject);
+            }
+
             Destroy(gameObject);
         }
     }
