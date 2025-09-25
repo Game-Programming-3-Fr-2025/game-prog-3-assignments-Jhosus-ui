@@ -1,7 +1,12 @@
+// ==================== ENEMY3.CS CORREGIDO ====================
+
+using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 public class Enemy3 : MonoBehaviour
 {
+    [Header("Configuración")]
     public float velocidad = 2f;
     public int vida = 30;
     public int danioPorAtaque = 10;
@@ -11,8 +16,9 @@ public class Enemy3 : MonoBehaviour
     private bool atacando = false;
     private HealthP objetivoActual;
     private float siguienteAtaqueTime = 0f;
+    private float siguienteSaltoTime = 0f;
     private Rigidbody2D rb;
-    private Vector3 posicionOriginal; // Para mantener la posición después de detenerse
+    private float posicionXFija;
 
     void Start()
     {
@@ -29,13 +35,22 @@ public class Enemy3 : MonoBehaviour
         }
         else
         {
-            // Mantener la posición donde se detuvo
-            transform.position = new Vector3(posicionOriginal.x, transform.position.y, transform.position.z);
-
-            // Realizar salto y ataque cada intervalo
-            if (Time.time >= siguienteAtaqueTime && objetivoActual != null)
+            // CRÍTICO: Verificar si el objetivo sigue existiendo
+            if (objetivoActual == null || objetivoActual.gameObject == null)
             {
-                SaltarYAtacar();
+                DetenerAtaque();
+                return;
+            }
+
+            // Mantener posición X fija durante ataque
+            Vector3 pos = transform.position;
+            pos.x = posicionXFija;
+            transform.position = pos;
+
+            // Aplicar daño en intervalos controlados
+            if (Time.time >= siguienteAtaqueTime)
+            {
+                RealizarAtaque();
                 siguienteAtaqueTime = Time.time + intervaloAtaque;
             }
         }
@@ -43,94 +58,107 @@ public class Enemy3 : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Si está atacando, aplicar fuerza de salto periódicamente
-        if (atacando && Time.time % 0.5f < 0.1f) // Salto cada ~0.5 segundos
+        if (atacando)
         {
-            AplicarFuerzaSalto();
+            // Salto controlado por timer
+            if (Time.time >= siguienteSaltoTime)
+            {
+                AplicarSalto();
+                siguienteSaltoTime = Time.time + 0.5f; // Salto cada 0.5 segundos
+            }
+
+            // Mantener velocidad horizontal en 0
+            if (rb != null)
+            {
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            }
         }
     }
 
     public void RecibirDanio(int cantidad)
     {
         vida -= cantidad;
+        Debug.Log($"{gameObject.name} recibió {cantidad} daño. Vida: {vida}");
+
         if (vida <= 0)
         {
+            Debug.Log($"{gameObject.name} murió");
             Destroy(gameObject);
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        // PROBLEMA 1 SOLUCIONADO: Verificar que no esté ya atacando otro objetivo
         if ((other.CompareTag("Chasis") || other.CompareTag("Modulo")) && !atacando)
         {
-            // Detener movimiento y comenzar ataque
-            atacando = true;
-            posicionOriginal = transform.position; // Guardar posición donde se detuvo
-            objetivoActual = other.GetComponent<HealthP>();
-
-            if (objetivoActual != null)
+            HealthP health = other.GetComponent<HealthP>();
+            if (health != null)
             {
-                Debug.Log($"{gameObject.name} comenzó a atacar a {other.gameObject.name}");
-                // Primer ataque inmediato
-                SaltarYAtacar();
-                siguienteAtaqueTime = Time.time + intervaloAtaque;
+                IniciarAtaque(health);
             }
         }
 
         if (other.CompareTag("Bullet"))
         {
             Bala bala = other.GetComponent<Bala>();
+            int danio = 10; // Daño por defecto
+
             if (bala != null)
             {
-                RecibirDanio(10);
-                Destroy(other.gameObject);
+                danio = bala.GetDamage();
             }
+
+            RecibirDanio(danio);
+            Destroy(other.gameObject);
         }
     }
 
-    private void SaltarYAtacar()
+    private void IniciarAtaque(HealthP objetivo)
     {
-        if (objetivoActual == null)
-        {
-            atacando = false;
-            return;
-        }
+        atacando = true;
+        objetivoActual = objetivo;
+        posicionXFija = transform.position.x;
 
-        // Aplicar daño
+        // Configurar timers con valores iniciales controlados
+        siguienteAtaqueTime = Time.time + 0.5f; // Primer ataque en 0.5 segundos
+        siguienteSaltoTime = Time.time + 0.1f; // Primer salto casi inmediato
+
+        Debug.Log($"{gameObject.name} inició ataque contra {objetivo.gameObject.name}");
+    }
+
+    private void RealizarAtaque()
+    {
+        if (objetivoActual == null) return;
+
         objetivoActual.RecibirDanio(danioPorAtaque);
-
-        Debug.Log($"{gameObject.name} atacó a {objetivoActual.gameObject.name} (Salto)");
+        Debug.Log($"{gameObject.name} atacó por {danioPorAtaque} daño");
     }
 
-    private void AplicarFuerzaSalto()
+    private void DetenerAtaque()
     {
-        if (rb != null)
+        atacando = false;
+        objetivoActual = null;
+        Debug.Log($"{gameObject.name} detuvo el ataque - objetivo destruido");
+    }
+
+    private void AplicarSalto()
+    {
+        if (rb != null && Mathf.Abs(rb.linearVelocity.y) < 1f) // Solo saltar si no está ya saltando
         {
-            // Fuerza de salto hacia arriba
             rb.AddForce(Vector2.up * fuerzaSalto, ForceMode2D.Impulse);
         }
     }
 
-    // Si el objetivo se destruye mientras atacamos
-    private void OnTriggerExit2D(Collider2D other)
+    void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Chasis") || other.CompareTag("Modulo"))
+        if ((other.CompareTag("Chasis") || other.CompareTag("Modulo")) && atacando)
         {
-            if (other.GetComponent<HealthP>() == objetivoActual)
+            HealthP health = other.GetComponent<HealthP>();
+            if (health == objetivoActual)
             {
-                atacando = false;
-                objetivoActual = null;
+                DetenerAtaque();
             }
-        }
-    }
-
-    // Para evitar que se mueva horizontalmente mientras ataca
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (atacando && (collision.gameObject.CompareTag("Chasis") || collision.gameObject.CompareTag("Modulo")))
-        {
-            // Mantener posición X fija
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
     }
 }

@@ -111,39 +111,50 @@ public class GameManager : MonoBehaviour
         return 0;
     }
 
+    // PROBLEMA 2 SOLUCIONADO: Método de eliminación completamente reescrito
     public void EliminarModulo(GameObject moduloEliminar)
     {
         if (moduloEliminar == null) return;
 
-        // Encontrar índice del módulo a eliminar
-        int indiceEliminar = -1;
+        Debug.Log($"Eliminando módulo: {moduloEliminar.name}");
+
+        // Obtener lista de todos los módulos ANTES de eliminar
+        var modulosAntesDeEliminar = new System.Collections.Generic.List<Transform>();
         for (int i = 0; i < gridParent.childCount; i++)
         {
-            if (gridParent.GetChild(i).gameObject == moduloEliminar)
+            Transform child = gridParent.GetChild(i);
+            if (child.gameObject != moduloEliminar) // Excluir el que vamos a eliminar
             {
-                indiceEliminar = i;
-                break;
+                modulosAntesDeEliminar.Add(child);
             }
         }
 
-        if (indiceEliminar == -1) return;
-
-        // Eliminar módulo
-        Destroy(moduloEliminar);
+        // Eliminar el módulo
         currentModuleCount--;
+        Destroy(moduloEliminar);
 
-        // Bajar módulos superiores
-        for (int i = indiceEliminar; i < gridParent.childCount; i++)
+        // Esperar un frame para que se complete la destrucción
+        StartCoroutine(ReposicionarModulosCorrutina(modulosAntesDeEliminar));
+    }
+
+    private System.Collections.IEnumerator ReposicionarModulosCorrutina(System.Collections.Generic.List<Transform> modulos)
+    {
+        yield return null; // Esperar un frame
+
+        // Ordenar módulos por posición Y (de abajo hacia arriba)
+        modulos.Sort((a, b) => a.localPosition.y.CompareTo(b.localPosition.y));
+
+        // Reposicionar todos desde la celda 0
+        for (int i = 0; i < modulos.Count; i++)
         {
-            Transform modulo = gridParent.GetChild(i);
-            int nuevoIndice = GetCellIndexFromYPosition(modulo.localPosition.y) - 1;
-            if (nuevoIndice >= 0)
+            if (modulos[i] != null)
             {
-                PositionObjectInGrid(modulo.gameObject, nuevoIndice);
+                PositionObjectInGrid(modulos[i].gameObject, i);
+                Debug.Log($"Reposicionado {modulos[i].name} a celda {i}");
             }
         }
 
-        Debug.Log($"Módulo eliminado. Total: {currentModuleCount}/{maxModules}");
+        Debug.Log($"Reposicionamiento completo. Módulos totales: {currentModuleCount}");
     }
 
     private void OnDrawGizmos()
@@ -164,5 +175,16 @@ public class GameManager : MonoBehaviour
                          $"Celda {i + 1}\nY: {gridYPositions[i]:F1}");
 #endif
         }
+    }
+
+    [ContextMenu("Test Reposicionar Módulos")]
+    public void TestReposicionarModulos()
+    {
+        var modulos = new System.Collections.Generic.List<Transform>();
+        for (int i = 0; i < gridParent.childCount; i++)
+        {
+            modulos.Add(gridParent.GetChild(i));
+        }
+        StartCoroutine(ReposicionarModulosCorrutina(modulos));
     }
 }

@@ -1729,6 +1729,7 @@ GameObject:
   - component: {fileID: 396528367}
   - component: {fileID: 396528366}
   - component: {fileID: 396528368}
+  - component: {fileID: 396528369}
   m_Layer: 0
   m_Name: Gun
   m_TagString: Untagged
@@ -1829,6 +1830,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &396528369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396528365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e309d6a98718694eaab2af65c325112, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireRate: 1
+  range: 5.4
+  damage: 5
+  balaPrefab: {fileID: 5859944464483778903, guid: 919705b23395c7447aaf9d004a22fd35, type: 3}
+  pointFire: {fileID: 1592470439}
+  mostrarDebug: 0
 --- !u!1 &457223744
 GameObject:
   m_ObjectHideFlags: 0
@@ -7154,6 +7173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1989134181}
   - component: {fileID: 1989134182}
+  - component: {fileID: 1989134183}
   m_Layer: 0
   m_Name: Chasis
   m_TagString: Chasis
@@ -7197,6 +7217,53 @@ MonoBehaviour:
   saludActual: 0
   esChasis: 1
   textoSalud3D: {fileID: 1960720440}
+  mostrarLogsDamage: 1
+--- !u!61 &1989134183
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1989134180}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.11352521, y: -0.28026646}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2.234591, y: 1.5605327}
+  m_EdgeRadius: 0
 --- !u!1 &2003069045
 GameObject:
   m_ObjectHideFlags: 0

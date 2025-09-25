@@ -9,7 +9,10 @@ public class HealthP : MonoBehaviour
     public bool esChasis = false;
 
     [Header("Referencias 3D")]
-    public TextMeshPro textoSalud3D; // TextMeshPro para objetos 3D
+    public TextMeshPro textoSalud3D;
+
+    [Header("Debug")]
+    public bool mostrarLogsDamage = true;
 
     private GameManager gameManager;
 
@@ -18,38 +21,57 @@ public class HealthP : MonoBehaviour
         saludActual = saludMaxima;
         gameManager = FindObjectOfType<GameManager>();
 
-        // Buscar TextMeshPro en hijos si no está asignado
+        // Asignar tags automáticamente
+        if (esChasis && !gameObject.CompareTag("Chasis"))
+        {
+            gameObject.tag = "Chasis";
+        }
+        else if (!esChasis && !gameObject.CompareTag("Modulo"))
+        {
+            gameObject.tag = "Modulo";
+        }
+
+        ConfigurarTextoSalud();
+        ActualizarUI();
+
+        Debug.Log($"HealthP inicializado: {gameObject.name} - Tag: {gameObject.tag} - Salud: {saludActual}");
+    }
+
+    private void ConfigurarTextoSalud()
+    {
         if (textoSalud3D == null)
         {
             textoSalud3D = GetComponentInChildren<TextMeshPro>();
         }
 
-        // Si aún no existe, crear uno automáticamente
         if (textoSalud3D == null)
         {
             CrearTextoSaludAutomatico();
         }
-
-        ActualizarUI();
     }
 
     private void CrearTextoSaludAutomatico()
     {
         GameObject textoObj = new GameObject("TextoSalud");
         textoObj.transform.SetParent(transform);
-        textoObj.transform.localPosition = new Vector3(0, 0.8f, 0); // Encima del objeto
+        textoObj.transform.localPosition = new Vector3(0, 0.8f, 0);
         textoObj.transform.localRotation = Quaternion.identity;
 
         textoSalud3D = textoObj.AddComponent<TextMeshPro>();
         textoSalud3D.text = $"{saludActual}/{saludMaxima}";
         textoSalud3D.fontSize = 2;
         textoSalud3D.alignment = TextAlignmentOptions.Center;
-        textoSalud3D.sortingOrder = 10; // Para que se vea por encima de otros sprites
+        textoSalud3D.sortingOrder = 10;
     }
 
     public void RecibirDanio(int cantidad)
     {
         saludActual -= cantidad;
+
+        if (mostrarLogsDamage)
+        {
+            Debug.Log($"{gameObject.name} recibió {cantidad} daño. Salud: {saludActual}/{saludMaxima}");
+        }
 
         if (saludActual <= 0)
         {
@@ -64,20 +86,22 @@ public class HealthP : MonoBehaviour
     {
         if (esChasis)
         {
-            // Game Over
             Debug.Log("CHASIS DESTRUIDO - GAME OVER");
-            // Aquí puedes llamar a una función de GameManager para game over
+            Time.timeScale = 0; // Pausar juego
         }
         else
         {
-            // Destruir módulo y bajar los de arriba
+            Debug.Log($"Módulo {gameObject.name} destruido");
+            // CRÍTICO: Llamar a GameManager ANTES de destruir
             if (gameManager != null)
             {
                 gameManager.EliminarModulo(this.gameObject);
             }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-
-        Destroy(gameObject);
     }
 
     private void ActualizarUI()
@@ -86,17 +110,16 @@ public class HealthP : MonoBehaviour
         {
             textoSalud3D.text = $"{saludActual}/{saludMaxima}";
 
-            // Cambiar color según la salud (opcional)
-            if (saludActual < saludMaxima * 0.3f)
+            float porcentaje = (float)saludActual / saludMaxima;
+            if (porcentaje < 0.3f)
                 textoSalud3D.color = Color.red;
-            else if (saludActual < saludMaxima * 0.6f)
+            else if (porcentaje < 0.6f)
                 textoSalud3D.color = Color.yellow;
             else
                 textoSalud3D.color = Color.green;
         }
     }
 
-    // Para debugging
     private void OnDrawGizmosSelected()
     {
         if (esChasis)
