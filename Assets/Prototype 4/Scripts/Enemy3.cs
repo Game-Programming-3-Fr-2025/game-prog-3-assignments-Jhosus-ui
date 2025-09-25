@@ -27,6 +27,10 @@ public class Enemy3 : MonoBehaviour
     public event OnDeath onDeath;
     private EnemySpawner spawner;
 
+    public void SetSpawner(EnemySpawner enemySpawner)
+    {
+        spawner = enemySpawner;
+    }
     void Start()
     {
         gameObject.tag = "Enemy";

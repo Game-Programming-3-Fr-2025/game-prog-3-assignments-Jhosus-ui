@@ -42,19 +42,19 @@ public class FSUS : MonoBehaviour
     public float cooldownModoActivo = 10f;
 
     [Header("Mejoras armas")]
-    public string upgradeButtonName = "UpgradeButton"; // Nombre único del botón de mejora
-    public string upgradeCostTextName = "UpgradeCostText"; // Nombre único del texto de costo
-    private Button upgradeButton; // Ahora privado, se buscará por nombre
-    private TextMeshProUGUI upgradeCostText; // Ahora privado, se buscará por nombre
+    public string upgradeButtonName = "UpgradeButton";
+    public string upgradeCostTextName = "UpgradeCostText";
+    private Button upgradeButton;
+    private TextMeshProUGUI upgradeCostText;
     public int upgradeLevel = 0;
     public int maxUpgradeLevel = 4;
     public float damageIncreasePerLevel = 5f;
     public int upgradeBaseCost = 20;
     public int upgradeIncrement = 10;
-    public int energyCost = 1; // Para activo
+    public int energyCost = 1;
 
     private float nextFireTime = 0f;
-    private float nextDanoCortoTime = 0f; // Timer para daño de corto alcance
+    private float nextDanoCortoTime = 0f;
     private bool modoActivo = false;
     private float tiempoFinActivo = 0f;
     private float nextCooldownTime = 0f;
@@ -69,20 +69,18 @@ public class FSUS : MonoBehaviour
         BuscarReferencias();
         ConfigurarPointsFire();
 
-        // Configurar botón de mejora si se encontró
         if (upgradeButton != null)
         {
             upgradeButton.onClick.AddListener(UpgradeWeapon);
-            upgradeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
         }
 
         if (buttonSpriteActivo != null)
         {
             buttonSpriteActivo.onClick.AddListener(ActivarModoActivo);
-            buttonSpriteActivo.gameObject.SetActive(false);
         }
 
-        VerificarArmasEquipadas();
+        // Actualizar estado inicial de la UI
+        ActualizarUI();
         Debug.Log($"FSUS iniciado - Tipo: {(isShortRange ? "CORTO ALCANCE" : "LARGO ALCANCE")}");
     }
 
@@ -91,25 +89,30 @@ public class FSUS : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
         gunsSystem = FindObjectOfType<Guns>();
         buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo);
-
-        // Buscar botón de mejora y texto de costo por nombre
         upgradeButton = BuscarBotonPorNombre(upgradeButtonName);
         upgradeCostText = BuscarTextoPorNombre(upgradeCostTextName);
+
+        Debug.Log($"Referencias buscadas - Botón activo: {buttonSpriteActivo != null}, Botón mejora: {upgradeButton != null}, Texto costo: {upgradeCostText != null}");
     }
 
     private TextMeshProUGUI BuscarTextoPorNombre(string nombre)
     {
-        TextMeshProUGUI[] todosTextos = FindObjectsOfType<TextMeshProUGUI>(true);
+        // Búsqueda más robusta en toda la escena
+        TextMeshProUGUI[] todosTextos = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
         foreach (TextMeshProUGUI texto in todosTextos)
         {
-            if (texto.name == nombre) return texto;
+            if (texto.name == nombre && texto.isActiveAndEnabled)
+            {
+                Debug.Log($"Texto encontrado: {texto.name} en objeto {texto.transform.parent.name}");
+                return texto;
+            }
         }
+        Debug.LogWarning($"No se encontró el texto: {nombre}");
         return null;
     }
 
     private void ConfigurarPointsFire()
     {
-        // Solo configurar point fire si es arma de largo alcance
         if (!isShortRange && pointFirePasivo == null)
         {
             pointFirePasivo = transform.Find("PointFirePasivo");
@@ -134,7 +137,7 @@ public class FSUS : MonoBehaviour
 
     private Button BuscarBotonPorNombre(string nombre)
     {
-        Button[] todosBotones = FindObjectsOfType<Button>(true);
+        Button[] todosBotones = Resources.FindObjectsOfTypeAll<Button>();
         foreach (Button boton in todosBotones)
         {
             if (boton.name == nombre) return boton;
@@ -144,26 +147,13 @@ public class FSUS : MonoBehaviour
 
     void Update()
     {
-        // Actualizar visibilidad del botón de mejora
-        if (upgradeButton != null)
-        {
-            upgradeButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying && upgradeLevel < maxUpgradeLevel);
-        }
-
-        // Actualizar texto de costo
-        if (upgradeCostText != null)
-        {
-            upgradeCostText.text = GetUpgradeCost().ToString();
-        }
+        // Actualizar UI en cada frame para mantener consistencia
+        ActualizarUI();
 
         VerificarArmasEquipadas();
 
-        if (buttonSpriteActivo != null)
-        {
-            buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo;
-        }
-
-        if (!modoActivo && EstaArmaEquipada())
+        // Funcionamiento pasivo cuando no está en modo activo
+        if (!modoActivo && EstaArmaEquipada() && MoneyManager.Instance.isPlaying)
         {
             if (isShortRange)
             {
@@ -196,7 +186,41 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    // MÉTODO NUEVO: Daño por área para armas cortas
+    // NUEVO MÉTODO: Actualizar toda la UI consistentemente
+    private void ActualizarUI()
+    {
+        bool estaEquipada = EstaArmaEquipada();
+        bool enJuego = MoneyManager.Instance.isPlaying;
+
+        // REGLA CLARA:
+        // - Mejoras: visibles solo cuando esta arma está equipada Y NO estamos en juego
+        // - Ataque activo: visible solo cuando esta arma está equipada Y estamos en juego
+
+        // Actualizar botón de mejora
+        if (upgradeButton != null)
+        {
+            upgradeButton.gameObject.SetActive(estaEquipada && !enJuego && upgradeLevel < maxUpgradeLevel);
+        }
+
+        // Actualizar texto de costo de mejora
+        if (upgradeCostText != null)
+        {
+            upgradeCostText.gameObject.SetActive(estaEquipada && !enJuego && upgradeLevel < maxUpgradeLevel);
+            if (upgradeCostText.gameObject.activeInHierarchy)
+            {
+                upgradeCostText.text = GetUpgradeCost().ToString();
+            }
+        }
+
+        // Actualizar botón activo
+        if (buttonSpriteActivo != null)
+        {
+            buttonSpriteActivo.gameObject.SetActive(estaEquipada && enJuego);
+            buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo && MoneyManager.Instance.energy >= energyCost;
+        }
+    }
+
+    // CORREGIDO: Daño por área para armas cortas con mejoras aplicadas
     private void AplicarDanoAreaCorto()
     {
         Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDanoPasivo);
@@ -209,7 +233,9 @@ public class FSUS : MonoBehaviour
                 Enemy3 enemy = colision.GetComponent<Enemy3>();
                 if (enemy != null)
                 {
-                    enemy.RecibirDanio((int)damagePasivo);
+                    // APLICAR MEJORAS AL DAÑO PASIVO
+                    float danoFinal = damagePasivo + (upgradeLevel * damageIncreasePerLevel);
+                    enemy.RecibirDanio((int)danoFinal);
                     enemigosAfectados++;
                 }
             }
@@ -217,11 +243,11 @@ public class FSUS : MonoBehaviour
 
         if (enemigosAfectados > 0)
         {
-            Debug.Log($"{gameObject.name} aplicó daño de área a {enemigosAfectados} enemigos");
+            Debug.Log($"{gameObject.name} aplicó daño de área a {enemigosAfectados} enemigos con daño: {damagePasivo + (upgradeLevel * damageIncreasePerLevel)}");
         }
     }
 
-    // MÉTODO ORIGINAL: Disparo para armas largas
+    // CORREGIDO: Disparo pasivo con mejoras aplicadas
     private void DisparoPasivo()
     {
         if (balaPrefabPasiva == null || pointFirePasivo == null) return;
@@ -235,7 +261,9 @@ public class FSUS : MonoBehaviour
             Bala balaScript = nuevaBala.GetComponent<Bala>();
             if (balaScript != null)
             {
-                balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, false);
+                // APLICAR MEJORAS AL DAÑO PASIVO
+                float danoFinal = damagePasivo + (upgradeLevel * damageIncreasePerLevel);
+                balaScript.SetConfiguracion(direccion, danoFinal, radioDanoPasivo, false);
             }
         }
     }
@@ -260,34 +288,92 @@ public class FSUS : MonoBehaviour
         return enemigoMasCercano;
     }
 
+    // CORREGIDO: Verificación más precisa de si esta arma está equipada
     private bool EstaArmaEquipada()
     {
-        if (gunsSystem == null) return false;
+        if (gunsSystem == null)
+        {
+            gunsSystem = FindObjectOfType<Guns>();
+            if (gunsSystem == null) return false;
+        }
 
         foreach (var slot in gunsSystem.moduleSlots)
         {
             if (slot.hasWeapon && slot.weaponInstance != null)
             {
                 FSUS armaScript = slot.weaponInstance.GetComponent<FSUS>();
-                if (armaScript == this) return true;
+                // Comparación más robusta
+                if (armaScript != null && armaScript == this)
+                {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    // Los métodos de MODO ACTIVO se mantienen igual
+    // CORREGIDO: Modo activo con mejoras aplicadas y funciona para corto alcance
     public void ActivarModoActivo()
     {
-        if (modoActivo || !activoDisponible) return;
+        if (modoActivo || !activoDisponible || enCooldown) return;
+
         if (MoneyManager.Instance.SpendEnergy(energyCost))
-
-            modoActivo = true;
-        tiempoFinActivo = Time.time + duracionModoActivo;
-        StartCoroutine(DispararRafagas());
-
-        if (buttonSpriteActivo != null)
         {
-            buttonSpriteActivo.interactable = false;
+            modoActivo = true;
+            tiempoFinActivo = Time.time + duracionModoActivo;
+
+            if (isShortRange)
+            {
+                // NUEVO: Modo activo para armas de corto alcance
+                StartCoroutine(ModoActivoCortoAlcance());
+            }
+            else
+            {
+                // Modo activo original para largo alcance
+                StartCoroutine(DispararRafagas());
+            }
+
+            if (buttonSpriteActivo != null)
+            {
+                buttonSpriteActivo.interactable = false;
+            }
+
+            Debug.Log($"Modo activo iniciado: {(isShortRange ? "CORTO ALCANCE" : "LARGO ALCANCE")}");
+        }
+    }
+
+    // NUEVO: Corrutina para modo activo de corto alcance
+    private IEnumerator ModoActivoCortoAlcance()
+    {
+        float tiempoEntreAtaques = 0.3f; // Ataques más frecuentes en modo activo
+
+        while (modoActivo && Time.time < tiempoFinActivo)
+        {
+            // Aplicar daño de área más potente y frecuente
+            Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDanoActivo);
+            int enemigosAfectados = 0;
+
+            foreach (Collider2D colision in enemigos)
+            {
+                if (colision.CompareTag("Enemy"))
+                {
+                    Enemy3 enemy = colision.GetComponent<Enemy3>();
+                    if (enemy != null)
+                    {
+                        // APLICAR MEJORAS AL DAÑO ACTIVO
+                        float danoFinal = damageActivo + (upgradeLevel * damageIncreasePerLevel);
+                        enemy.RecibirDanio((int)danoFinal);
+                        enemigosAfectados++;
+                    }
+                }
+            }
+
+            if (enemigosAfectados > 0)
+            {
+                Debug.Log($"Modo activo corto alcance: {enemigosAfectados} enemigos dañados con {damageActivo + (upgradeLevel * damageIncreasePerLevel)} de daño");
+            }
+
+            yield return new WaitForSeconds(tiempoEntreAtaques);
         }
     }
 
@@ -296,8 +382,10 @@ public class FSUS : MonoBehaviour
         modoActivo = false;
         enCooldown = true;
         nextCooldownTime = Time.time + cooldownModoActivo;
+        Debug.Log("Modo activo desactivado - Entrando en cooldown");
     }
 
+    // CORREGIDO: Rafagas con mejoras aplicadas
     private IEnumerator DispararRafagas()
     {
         for (int i = 0; i < rafagaCantidad; i++)
@@ -322,7 +410,9 @@ public class FSUS : MonoBehaviour
             Bala balaScript = nuevaBala.GetComponent<Bala>();
             if (balaScript != null)
             {
-                balaScript.SetConfiguracion(direccion, damageActivo, radioDanoActivo, false);
+                // APLICAR MEJORAS AL DAÑO ACTIVO
+                float danoFinal = damageActivo + (upgradeLevel * damageIncreasePerLevel);
+                balaScript.SetConfiguracion(direccion, danoFinal, radioDanoActivo, false);
             }
         }
     }
@@ -338,21 +428,23 @@ public class FSUS : MonoBehaviour
             }
             activoDisponible = armasEquipadas > 0;
 
-            if (buttonSpriteActivo != null)
-            {
-                buttonSpriteActivo.gameObject.SetActive(activoDisponible);
-            }
+            // Forzar actualización de UI cuando cambia el estado
+            ActualizarUI();
         }
     }
 
+    // CORREGIDO: Mejoras ahora afectan TANTO modo pasivo COMO activo
     private void UpgradeWeapon()
     {
         int cost = GetUpgradeCost();
         if (MoneyManager.Instance.SpendMoney(cost) && upgradeLevel < maxUpgradeLevel)
         {
             upgradeLevel++;
-            damagePasivo += damageIncreasePerLevel;
-            damageActivo += damageIncreasePerLevel;
+            // Las mejoras se aplican dinámicamente en los cálculos de daño
+            Debug.Log($"Arma mejorada! Nivel {upgradeLevel} - Daño pasivo: {damagePasivo + (upgradeLevel * damageIncreasePerLevel)} - Daño activo: {damageActivo + (upgradeLevel * damageIncreasePerLevel)}");
+
+            // Actualizar UI después de mejorar
+            ActualizarUI();
         }
     }
 
@@ -368,6 +460,10 @@ public class FSUS : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, radioDanoPasivo);
+
+            // Gizmo para área activa (más grande)
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(transform.position, radioDanoActivo);
         }
         else
         {

@@ -318,4 +318,4 @@ MonoBehaviour:
   damageIncreasePerLevel: 5
   upgradeBaseCost: 20
   upgradeIncrement: 10
-  energyCost: 1
+  energyCost: 4
