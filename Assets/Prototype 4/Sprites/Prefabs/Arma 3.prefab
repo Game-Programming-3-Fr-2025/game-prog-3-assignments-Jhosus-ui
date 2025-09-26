@@ -103,22 +103,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isShortRange: 0
-  fireRate: 3
+  fireRate: 7
   range: 8.4
-  balaPrefabPasiva: {fileID: 5859944464483778903, guid: f410ff8dee63f9d45a099e066a3d4cc2, type: 3}
   damagePasivo: 25
   radioDanoPasivo: 0
   intervaloDanoCorto: 0
+  balaPrefabPasiva: {fileID: 5859944464483778903, guid: f410ff8dee63f9d45a099e066a3d4cc2, type: 3}
   pointFirePasivo: {fileID: 2610535347236459841}
   nombreBotonActivo: Skill 3
   activoDisponible: 0
   rafagaCantidad: 5
-  tiempoEntreRafagas: 0.2
   balasPorRafaga: 2
+  tiempoEntreRafagas: 0.2
   separacionVerticalBalas: 0.4
-  balaPrefabActiva: {fileID: 5859944464483778903, guid: f410ff8dee63f9d45a099e066a3d4cc2, type: 3}
-  damageActivo: 50
+  damageActivo: 45
   radioDanoActivo: 0.6
+  balaPrefabActiva: {fileID: 5859944464483778903, guid: f410ff8dee63f9d45a099e066a3d4cc2, type: 3}
   nombrePointFire: Point
   duracionModoActivo: 5
   cooldownModoActivo: 10
@@ -126,10 +126,10 @@ MonoBehaviour:
   upgradeCostText: {fileID: 25499572619976072}
   upgradeLevel: 0
   maxUpgradeLevel: 4
-  damageIncreasePerLevel: 8
-  upgradeBaseCost: 20
-  upgradeIncrement: 17
+  upgradeBaseCost: 80
+  upgradeIncrement: 39
   energyCost: 11
+  damageIncreasePerLevel: 8
 --- !u!1 &2059849348604039906
 GameObject:
   m_ObjectHideFlags: 0

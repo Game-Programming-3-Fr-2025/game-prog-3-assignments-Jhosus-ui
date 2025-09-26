@@ -4,11 +4,9 @@ using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public GameObject bossPrefab;
+    public GameObject enemyPrefab, bossPrefab;
     public float spawnInterval = 3f;
-    public int minEnemies = 1;
-    public int maxEnemies = 5;
+    public int minEnemies = 1, maxEnemies = 5;
 
     private int activeBosses = 0;
     private List<GameObject> enemigosActivos = new List<GameObject>();
@@ -16,43 +14,28 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
-        // Registrar eventos
-        MoneyManager.Instance.onResetToLobby += ReiniciarSpawner;
-
-        // NUEVO: Registrar evento para cuando el juego comienza
-        IniciarSpawning();
-    }
-
-    private void OnDestroy()
-    {
-        // Desregistrar eventos para evitar memory leaks
-        if (MoneyManager.Instance != null)
-        {
-            MoneyManager.Instance.onResetToLobby -= ReiniciarSpawner;
-        }
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby += ReiniciarSpawner; // Registrar eventos
+        IniciarSpawning(); // Registrar evento para cuando el juego comienza
     }
 
     void Update()
     {
-        // NUEVO: Verificar si el juego está activo y el spawner no está corriendo
-        if (MoneyManager.Instance.isPlaying && spawningCoroutine == null)
+        if (MoneyManager.Instance.isPlaying && spawningCoroutine == null) // Verificar si el juego está activo y el spawner no está corriendo
         {
             Debug.Log("Juego activado - Reiniciando spawning de enemigos");
             IniciarSpawning();
         }
-        else if (!MoneyManager.Instance.isPlaying && spawningCoroutine != null)
-        {
-            // Detener spawning si el juego se pausa
-            DetenerSpawning();
-        }
+        else if (!MoneyManager.Instance.isPlaying && spawningCoroutine != null) DetenerSpawning(); // Detener spawning si el juego se pausa
+    }
+
+    private void OnDestroy() // Desregistrar eventos para evitar memory leaks
+    {
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby -= ReiniciarSpawner;
     }
 
     private void IniciarSpawning()
     {
-        if (spawningCoroutine != null)
-        {
-            StopCoroutine(spawningCoroutine);
-        }
+        if (spawningCoroutine != null) StopCoroutine(spawningCoroutine);
         spawningCoroutine = StartCoroutine(SpawnEnemies());
         Debug.Log("Spawning de enemigos INICIADO");
     }
@@ -71,21 +54,15 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            // IMPORTANTE: Verificar isPlaying en cada iteración
-            if (MoneyManager.Instance.isPlaying && !MoneyManager.Instance.isPausedForBoss)
+            if (MoneyManager.Instance.isPlaying && !MoneyManager.Instance.isPausedForBoss) // Verificar isPlaying en cada iteración
             {
                 int num = Random.Range(minEnemies, maxEnemies + 1);
                 for (int i = 0; i < num; i++)
                 {
                     GameObject nuevoEnemigo = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
                     enemigosActivos.Add(nuevoEnemigo);
-
-                    // Configurar referencia al spawner en el enemigo
-                    Enemy3 enemyScript = nuevoEnemigo.GetComponent<Enemy3>();
-                    if (enemyScript != null)
-                    {
-                        enemyScript.SetSpawner(this);
-                    }
+                    Enemy3 enemyScript = nuevoEnemigo.GetComponent<Enemy3>(); // Configurar referencia al spawner en el enemigo
+                    if (enemyScript != null) enemyScript.SetSpawner(this);
                 }
                 Debug.Log($"Spawned {num} enemigos");
             }
@@ -96,15 +73,12 @@ public class EnemySpawner : MonoBehaviour
     public void SpawnBosses(int count)
     {
         if (!MoneyManager.Instance.isPlaying) return;
-
         activeBosses += count;
         for (int i = 0; i < count; i++)
         {
             GameObject boss = Instantiate(bossPrefab, transform.position, Quaternion.identity);
             enemigosActivos.Add(boss);
-
-            // Configurar referencia al spawner en el boss
-            Enemy3 bossScript = boss.GetComponent<Enemy3>();
+            Enemy3 bossScript = boss.GetComponent<Enemy3>(); // Configurar referencia al spawner en el boss
             if (bossScript != null)
             {
                 bossScript.SetSpawner(this);
@@ -127,23 +101,15 @@ public class EnemySpawner : MonoBehaviour
     public void ReiniciarSpawner()
     {
         Debug.Log("Reiniciando spawner de enemigos...");
-
-        // 1. Detener la corrutina de spawning
-        DetenerSpawning();
-
-        // 2. Eliminar todos los enemigos activos
-        LimpiarEnemigos();
-
-        // 3. Reiniciar contadores
-        activeBosses = 0;
-
+        DetenerSpawning(); // Detener la corrutina de spawning
+        LimpiarEnemigos(); // Eliminar todos los enemigos activos
+        activeBosses = 0; // Reiniciar contadores
         Debug.Log("Spawner reiniciado completamente");
     }
 
     private void LimpiarEnemigos()
     {
         int enemigosEliminados = 0;
-
         for (int i = enemigosActivos.Count - 1; i >= 0; i--)
         {
             if (enemigosActivos[i] != null)
@@ -152,16 +118,12 @@ public class EnemySpawner : MonoBehaviour
                 enemigosEliminados++;
             }
         }
-
         enemigosActivos.Clear();
         Debug.Log($"Enemigos eliminados: {enemigosEliminados}");
     }
 
     public void RemoverEnemigo(GameObject enemigo)
     {
-        if (enemigosActivos.Contains(enemigo))
-        {
-            enemigosActivos.Remove(enemigo);
-        }
+        if (enemigosActivos.Contains(enemigo)) enemigosActivos.Remove(enemigo);
     }
 }

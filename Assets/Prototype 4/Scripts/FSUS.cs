@@ -10,14 +10,8 @@ public class FSUS : MonoBehaviour
     public bool isShortRange = true;
 
     [Header("Configuración Pasiva")]
-    public float fireRate = 1f;
-    public float range = 5f;
+    public float fireRate = 1f, range = 5f, damagePasivo = 10f, radioDanoPasivo = 1f, intervaloDanoCorto = 1f;
     public GameObject balaPrefabPasiva;
-    public float damagePasivo = 10f;
-    public float radioDanoPasivo = 1f;
-    public float intervaloDanoCorto = 1f;
-
-    [Header("Point Fire Pasivo")]
     public Transform pointFirePasivo;
 
     [Header("=== ESTADO ACTIVO ===")]
@@ -27,38 +21,24 @@ public class FSUS : MonoBehaviour
     public bool activoDisponible = false;
 
     [Header("Configuración Ataque Activo")]
-    public int rafagaCantidad = 3;
-    public float tiempoEntreRafagas = 0.2f;
-    public int balasPorRafaga = 3;
-    public float separacionVerticalBalas = 0.5f;
+    public int rafagaCantidad = 3, balasPorRafaga = 3;
+    public float tiempoEntreRafagas = 0.2f, separacionVerticalBalas = 0.5f, damageActivo = 25f, radioDanoActivo = 2f;
     public GameObject balaPrefabActiva;
-    public float damageActivo = 25f;
-    public float radioDanoActivo = 2f;
     public string nombrePointFire = "Point";
 
     [Header("Tiempos Activo")]
-    public float duracionModoActivo = 5f;
-    public float cooldownModoActivo = 10f;
+    public float duracionModoActivo = 5f, cooldownModoActivo = 10f;
 
     [Header("Mejoras armas")]
     public string upgradeButtonName = "UpgradeButton"; // Buscar por nombre
     private Button upgradeButton;
     public TextMeshPro upgradeCostText; // Arrastrar objeto con TextMeshPro (3D)
-    public int upgradeLevel = 0;
-    public int maxUpgradeLevel = 4;
+    public int upgradeLevel = 0, maxUpgradeLevel = 4, upgradeBaseCost = 20, upgradeIncrement = 10, energyCost = 1;
     public float damageIncreasePerLevel = 5f;
-    public int upgradeBaseCost = 20;
-    public int upgradeIncrement = 10;
-    public int energyCost = 1;
 
-    private float nextFireTime = 0f;
-    private float nextDanoCortoTime = 0f;
-    private bool modoActivo = false;
-    private float tiempoFinActivo = 0f;
-    private float nextCooldownTime = 0f;
-    private bool enCooldown = false;
+    private float nextFireTime = 0f, nextDanoCortoTime = 0f, tiempoFinActivo = 0f, nextCooldownTime = 0f;
+    private bool modoActivo = false, enCooldown = false;
     private Transform pointFireActivo;
-
     private GameManager gameManager;
     private Guns gunsSystem;
 
@@ -66,77 +46,49 @@ public class FSUS : MonoBehaviour
     {
         BuscarReferencias();
         ConfigurarPointsFire();
-
-        // Configurar botón de mejora si se encontró
-        if (upgradeButton != null)
+        if (upgradeButton != null) // Configurar botón de mejora si se encontró
         {
             upgradeButton.onClick.AddListener(UpgradeWeapon);
             ActualizarUIUpgrade();
         }
-
         if (buttonSpriteActivo != null)
         {
             buttonSpriteActivo.onClick.AddListener(ActivarModoActivo);
             buttonSpriteActivo.gameObject.SetActive(false);
         }
-
-        // Suscribirse al evento de reset
-        if (MoneyManager.Instance != null)
-        {
-            MoneyManager.Instance.onResetToLobby += OnResetToLobby;
-        }
-
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby += OnResetToLobby; // Suscribirse al evento de reset
         VerificarArmasEquipadas();
         Debug.Log($"FSUS iniciado - Tipo: {(isShortRange ? "CORTO ALCANCE" : "LARGO ALCANCE")}");
     }
 
     void OnDestroy()
     {
-        if (MoneyManager.Instance != null)
-        {
-            MoneyManager.Instance.onResetToLobby -= OnResetToLobby;
-        }
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby -= OnResetToLobby;
     }
 
     private void BuscarReferencias()
     {
         gameManager = FindObjectOfType<GameManager>();
         gunsSystem = FindObjectOfType<Guns>();
-
-        // Buscar botones por nombre
-        if (buttonSpriteActivo == null)
-            buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo);
-
-        if (upgradeButton == null)
-            upgradeButton = BuscarBotonPorNombre(upgradeButtonName);
+        if (buttonSpriteActivo == null) buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo); // Buscar botones por nombre
+        if (upgradeButton == null) upgradeButton = BuscarBotonPorNombre(upgradeButtonName);
     }
 
     private Button BuscarBotonPorNombre(string nombre)
     {
         Button[] todosBotones = FindObjectsOfType<Button>(true);
         foreach (Button boton in todosBotones)
-        {
             if (boton.name == nombre) return boton;
-        }
         return null;
     }
 
     void Update()
     {
-        if (MoneyManager.Instance != null && !MoneyManager.Instance.isPlaying)
-        {
-            return;
-        }
+        if (MoneyManager.Instance != null && !MoneyManager.Instance.isPlaying) return;
 
-        // Actualizar UI
         ActualizarUIUpgrade();
-
         VerificarArmasEquipadas();
-
-        if (buttonSpriteActivo != null)
-        {
-            buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo;
-        }
+        if (buttonSpriteActivo != null) buttonSpriteActivo.interactable = activoDisponible && !enCooldown && !modoActivo;
 
         if (!modoActivo && EstaArmaEquipada())
         {
@@ -148,40 +100,27 @@ public class FSUS : MonoBehaviour
                     nextDanoCortoTime = Time.time + intervaloDanoCorto;
                 }
             }
-            else
+            else if (Time.time >= nextFireTime)
             {
-                if (Time.time >= nextFireTime)
-                {
-                    DisparoPasivo();
-                    nextFireTime = Time.time + 1f / fireRate;
-                }
+                DisparoPasivo();
+                nextFireTime = Time.time + 1f / fireRate;
             }
         }
 
-        if (modoActivo && Time.time >= tiempoFinActivo)
-        {
-            DesactivarModoActivo();
-        }
-
-        if (enCooldown && Time.time >= nextCooldownTime)
-        {
-            enCooldown = false;
-        }
+        if (modoActivo && Time.time >= tiempoFinActivo) DesactivarModoActivo();
+        if (enCooldown && Time.time >= nextCooldownTime) enCooldown = false;
     }
 
     private void ActualizarUIUpgrade()
     {
-        // Actualizar visibilidad del botón de mejora
-        if (upgradeButton != null && MoneyManager.Instance != null)
+        if (upgradeButton != null && MoneyManager.Instance != null) // Actualizar visibilidad del botón de mejora
         {
             bool puedeMejorar = upgradeLevel < maxUpgradeLevel;
             bool enLobby = !MoneyManager.Instance.isPlaying;
             upgradeButton.gameObject.SetActive(puedeMejorar && enLobby);
             upgradeButton.interactable = puedeMejorar && enLobby;
         }
-
-        // Actualizar texto de costo (solo si está asignado)
-        if (upgradeCostText != null)
+        if (upgradeCostText != null) // Actualizar texto de costo (solo si está asignado)
         {
             upgradeCostText.text = GetUpgradeCost().ToString();
             upgradeCostText.gameObject.SetActive(upgradeLevel < maxUpgradeLevel);
@@ -192,7 +131,6 @@ public class FSUS : MonoBehaviour
     {
         Collider2D[] enemigos = Physics2D.OverlapCircleAll(transform.position, radioDanoPasivo);
         int enemigosAfectados = 0;
-
         foreach (Collider2D colision in enemigos)
         {
             if (colision.CompareTag("Enemy"))
@@ -205,28 +143,19 @@ public class FSUS : MonoBehaviour
                 }
             }
         }
-
-        if (enemigosAfectados > 0)
-        {
-            Debug.Log($"{gameObject.name} aplicó daño de área a {enemigosAfectados} enemigos");
-        }
+        if (enemigosAfectados > 0) Debug.Log($"{gameObject.name} aplicó daño de área a {enemigosAfectados} enemigos");
     }
 
     private void DisparoPasivo()
     {
         if (balaPrefabPasiva == null || pointFirePasivo == null) return;
-
         GameObject enemigoCercano = BuscarEnemigoCercano();
         if (enemigoCercano != null)
         {
             Vector2 direccion = (enemigoCercano.transform.position - pointFirePasivo.position).normalized;
             GameObject nuevaBala = Instantiate(balaPrefabPasiva, pointFirePasivo.position, Quaternion.identity);
-
             Bala balaScript = nuevaBala.GetComponent<Bala>();
-            if (balaScript != null)
-            {
-                balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, false);
-            }
+            if (balaScript != null) balaScript.SetConfiguracion(direccion, damagePasivo, radioDanoPasivo, false);
         }
     }
 
@@ -235,11 +164,9 @@ public class FSUS : MonoBehaviour
         GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
         GameObject enemigoMasCercano = null;
         float distanciaMasCercana = Mathf.Infinity;
-
         foreach (GameObject enemigo in enemigos)
         {
             if (enemigo == null) continue;
-
             float distancia = Vector2.Distance(transform.position, enemigo.transform.position);
             if (distancia <= range && distancia < distanciaMasCercana)
             {
@@ -253,32 +180,24 @@ public class FSUS : MonoBehaviour
     private bool EstaArmaEquipada()
     {
         if (gunsSystem == null) return false;
-
         foreach (var slot in gunsSystem.moduleSlots)
-        {
             if (slot.hasWeapon && slot.weaponInstance != null)
             {
                 FSUS armaScript = slot.weaponInstance.GetComponent<FSUS>();
                 if (armaScript == this) return true;
             }
-        }
         return false;
     }
 
     public void ActivarModoActivo()
     {
         if (modoActivo || !activoDisponible || MoneyManager.Instance == null) return;
-
         if (MoneyManager.Instance.SpendEnergy(energyCost))
         {
             modoActivo = true;
             tiempoFinActivo = Time.time + duracionModoActivo;
             StartCoroutine(DispararRafagas());
-
-            if (buttonSpriteActivo != null)
-            {
-                buttonSpriteActivo.interactable = false;
-            }
+            if (buttonSpriteActivo != null) buttonSpriteActivo.interactable = false;
         }
     }
 
@@ -301,20 +220,14 @@ public class FSUS : MonoBehaviour
     private void DispararRafaga()
     {
         if (balaPrefabActiva == null || pointFireActivo == null) return;
-
         for (int i = 0; i < balasPorRafaga; i++)
         {
             Vector3 posicionDisparo = pointFireActivo.position;
             posicionDisparo.y += (i - (balasPorRafaga - 1) / 2f) * separacionVerticalBalas;
-
             Vector2 direccion = transform.right;
             GameObject nuevaBala = Instantiate(balaPrefabActiva, posicionDisparo, Quaternion.identity);
-
             Bala balaScript = nuevaBala.GetComponent<Bala>();
-            if (balaScript != null)
-            {
-                balaScript.SetConfiguracion(direccion, damageActivo, radioDanoActivo, false);
-            }
+            if (balaScript != null) balaScript.SetConfiguracion(direccion, damageActivo, radioDanoActivo, false);
         }
     }
 
@@ -324,15 +237,9 @@ public class FSUS : MonoBehaviour
         {
             int armasEquipadas = 0;
             foreach (var slot in gunsSystem.moduleSlots)
-            {
                 if (slot.hasWeapon) armasEquipadas++;
-            }
             activoDisponible = armasEquipadas > 0;
-
-            if (buttonSpriteActivo != null)
-            {
-                buttonSpriteActivo.gameObject.SetActive(activoDisponible);
-            }
+            if (buttonSpriteActivo != null) buttonSpriteActivo.gameObject.SetActive(activoDisponible);
         }
     }
 
@@ -348,10 +255,7 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    private int GetUpgradeCost()
-    {
-        return upgradeBaseCost + (upgradeLevel * upgradeIncrement);
-    }
+    private int GetUpgradeCost() => upgradeBaseCost + (upgradeLevel * upgradeIncrement);
 
     private void OnResetToLobby()
     {
@@ -360,12 +264,7 @@ public class FSUS : MonoBehaviour
         nextFireTime = 0f;
         nextDanoCortoTime = 0f;
         StopAllCoroutines();
-
-        if (buttonSpriteActivo != null)
-        {
-            buttonSpriteActivo.interactable = true;
-        }
-
+        if (buttonSpriteActivo != null) buttonSpriteActivo.interactable = true;
         ActualizarUIUpgrade();
         Debug.Log($"FSUS resetado - modoActivo: {modoActivo}, enCooldown: {enCooldown}");
     }
@@ -383,7 +282,6 @@ public class FSUS : MonoBehaviour
                 pointFirePasivo = newPoint.transform;
             }
         }
-
         pointFireActivo = BuscarObjetoPorNombre(nombrePointFire);
         if (pointFireActivo == null) pointFireActivo = pointFirePasivo;
     }
@@ -391,7 +289,7 @@ public class FSUS : MonoBehaviour
     private Transform BuscarObjetoPorNombre(string nombre)
     {
         GameObject obj = GameObject.Find(nombre);
-        return obj != null ? obj.transform : null;
+        return obj?.transform;
     }
 
     private void OnDrawGizmosSelected()
@@ -405,14 +303,12 @@ public class FSUS : MonoBehaviour
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, range);
-
             if (pointFirePasivo != null)
             {
                 Gizmos.color = Color.green;
                 Gizmos.DrawWireSphere(pointFirePasivo.position, 0.2f);
             }
         }
-
         if (pointFireActivo != null)
         {
             Gizmos.color = Color.magenta;

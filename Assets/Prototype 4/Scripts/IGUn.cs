@@ -3,11 +3,9 @@ using UnityEngine;
 public class IGUn : MonoBehaviour
 {
     [Header("Configuración Disparo")]
-    public float fireRate = 1f;          // Disparos por segundo
-    public float range = 5f;             // Rango de detección
-    public float damage = 10f;           // Daño por bala
-    public GameObject balaPrefab;        // Prefab de la bala
-    public Transform pointFire;          // Punto de origen del disparo
+    public float fireRate = 1f, range = 5f, damage = 10f; // Disparos por segundo, Rango de detección, Daño por bala
+    public GameObject balaPrefab; // Prefab de la bala
+    public Transform pointFire; // Punto de origen del disparo
 
     [Header("Debug")]
     public bool mostrarDebug = false;
@@ -16,21 +14,18 @@ public class IGUn : MonoBehaviour
 
     void Start()
     {
-        // Crear pointFire automáticamente si no existe
-        if (pointFire == null)
+        if (pointFire == null) // Crear pointFire automáticamente si no existe
         {
             pointFire = new GameObject("PointFire").transform;
             pointFire.SetParent(transform);
             pointFire.localPosition = new Vector3(0.5f, 0, 0);
         }
-
         Debug.Log("IGUn inicializado - Disparo automático activado");
     }
 
     void Update()
     {
-        // Disparar automáticamente cada intervalo
-        if (Time.time >= nextFireTime)
+        if (Time.time >= nextFireTime) // Disparar automáticamente cada intervalo
         {
             Disparar();
             nextFireTime = Time.time + 1f / fireRate;
@@ -41,27 +36,14 @@ public class IGUn : MonoBehaviour
     {
         if (balaPrefab == null || pointFire == null) return;
 
-        // Buscar enemigo más cercano
-        GameObject enemigo = BuscarEnemigoCercano();
+        GameObject enemigo = BuscarEnemigoCercano(); // Buscar enemigo más cercano
         if (enemigo != null)
         {
-            // Calcular dirección hacia el enemigo
-            Vector2 direccion = (enemigo.transform.position - pointFire.position).normalized;
-
-            // Crear bala
-            GameObject bala = Instantiate(balaPrefab, pointFire.position, Quaternion.identity);
-
-            // Configurar bala
-            Bala balaScript = bala.GetComponent<Bala>();
-            if (balaScript != null)
-            {
-                balaScript.SetConfiguracion(direccion, damage, 0f, false);
-            }
-
-            if (mostrarDebug)
-            {
-                Debug.Log($"IGUn disparó a: {enemigo.name}");
-            }
+            Vector2 direccion = (enemigo.transform.position - pointFire.position).normalized; // Calcular dirección hacia el enemigo
+            GameObject bala = Instantiate(balaPrefab, pointFire.position, Quaternion.identity); // Crear bala
+            Bala balaScript = bala.GetComponent<Bala>(); // Configurar bala
+            if (balaScript != null) balaScript.SetConfiguracion(direccion, damage, 0f, false);
+            if (mostrarDebug) Debug.Log($"IGUn disparó a: {enemigo.name}");
         }
     }
 
@@ -74,7 +56,6 @@ public class IGUn : MonoBehaviour
         foreach (GameObject enemigo in enemigos)
         {
             if (enemigo == null) continue;
-
             float distancia = Vector2.Distance(transform.position, enemigo.transform.position);
             if (distancia <= range && distancia < distanciaMinima)
             {
@@ -82,18 +63,14 @@ public class IGUn : MonoBehaviour
                 enemigoCercano = enemigo;
             }
         }
-
         return enemigoCercano;
     }
 
     private void OnDrawGizmosSelected()
     {
-        // Mostrar rango de disparo
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.yellow; // Mostrar rango de disparo
         Gizmos.DrawWireSphere(transform.position, range);
-
-        // Mostrar punto de disparo
-        if (pointFire != null)
+        if (pointFire != null) // Mostrar punto de disparo
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(pointFire.position, 0.1f);

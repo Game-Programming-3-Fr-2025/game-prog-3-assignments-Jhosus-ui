@@ -8,43 +8,27 @@ public class MoneyManager : MonoBehaviour
     public static MoneyManager Instance { get; private set; }
 
     [Header("UI References")]
-    public TextMeshProUGUI moneyText;
-    public TextMeshProUGUI energyText;
-    public TextMeshProUGUI timerText;
-    public TextMeshProUGUI progressText;
-    public Button startButton;
-    public Button upgradeEnergyButton;
-    public TextMeshProUGUI upgradeEnergyCostText;
+    public TextMeshProUGUI moneyText, energyText, timerText, progressText, upgradeEnergyCostText;
+    public Button startButton, upgradeEnergyButton;
 
     [Header("Dinero")]
-    public int money = 0;
-    public int moneyRewardPerEnemy = 10;
+    public int money = 0, moneyRewardPerEnemy = 10;
 
     [Header("Energy")]
-    public int energy = 0;
-    public float energyTimerBase = 10f;
-    private float currentTimer;
-    private float energyTimerCurrent = 10f;
-    public int energyUpgradeLevel = 0;
-    public int energyMaxLevel = 4;
-    public float energyTimerReductionPerLevel = 0.4f;
-    public int energyUpgradeBaseCost = 10;
-    public int energyUpgradeIncrement = 3;
+    public int energy = 0, energyUpgradeLevel = 0, energyMaxLevel = 4;
+    public float energyTimerBase = 10f, energyTimerReductionPerLevel = 0.4f;
+    public int energyUpgradeBaseCost = 10, energyUpgradeIncrement = 3;
+    private float currentTimer, energyTimerCurrent = 10f;
 
     [Header("Progreso")]
-    public float progress = 0f;
-    public float progressSpeed = 1f;
+    public float progress = 0f, progressSpeed = 1f, damageSlowdownFactor = 0.8f, slowdownDuration = 5f;
     private float currentSpeed;
-    public float damageSlowdownFactor = 0.8f;
-    public float slowdownDuration = 5f;
 
     [Header("Estado")]
-    public bool isPlaying = false;
-    public bool isPausedForBoss = false;
+    public bool isPlaying = false, isPausedForBoss = false;
     public delegate void OnResetToLobby();
     public event OnResetToLobby onResetToLobby;
 
-    // NUEVO: Variables para spawn de bosses mejorado
     private bool[] bossesSpawned = new bool[3]; // Para 25%, 75%, 98%
 
     void Awake()
@@ -55,15 +39,12 @@ public class MoneyManager : MonoBehaviour
 
     void Start()
     {
-        // Inicialización correcta
         energyTimerCurrent = energyTimerBase;
         currentTimer = energyTimerCurrent;
         currentSpeed = progressSpeed;
         progress = 0f;
         ResetBossSpawns();
-
         UpdateUI();
-
         startButton.onClick.AddListener(StartGame);
         upgradeEnergyButton.onClick.AddListener(UpgradeEnergy);
         upgradeEnergyButton.gameObject.SetActive(!isPlaying && energyUpgradeLevel < energyMaxLevel);
@@ -73,16 +54,14 @@ public class MoneyManager : MonoBehaviour
     {
         if (isPlaying)
         {
-            // PROGRESO CONTINUO - Solo se pausa por daño, NO por bosses
-            if (progress < 100f)
+            if (progress < 100f) // Progreso continuo - solo se pausa por daño
             {
                 progress += currentSpeed * Time.deltaTime;
                 if (progress >= 100f) progress = 100f;
                 CheckProgressMilestones();
             }
 
-            // Timer energy
-            currentTimer -= Time.deltaTime;
+            currentTimer -= Time.deltaTime; // Timer energy
             if (currentTimer <= 0)
             {
                 energy++;
@@ -91,7 +70,6 @@ public class MoneyManager : MonoBehaviour
         }
 
         UpdateUI();
-
         upgradeEnergyButton.gameObject.SetActive(!isPlaying && energyUpgradeLevel < energyMaxLevel);
         if (upgradeEnergyCostText) upgradeEnergyCostText.text = GetEnergyUpgradeCost().ToString();
     }
@@ -136,24 +114,20 @@ public class MoneyManager : MonoBehaviour
         currentSpeed = progressSpeed;
     }
 
-    // MEJORADO: Sistema de spawn de bosses que no pausa el progreso
-    private void CheckProgressMilestones()
+    private void CheckProgressMilestones() // Sistema de spawn de bosses que no pausa el progreso
     {
-        // 25% - Spawn primer boss
         if (progress >= 25f && !bossesSpawned[0])
         {
             SpawnBosses(1);
             bossesSpawned[0] = true;
             Debug.Log("25% alcanzado - Spawning boss 1");
         }
-        // 75% - Spawn segundo grupo de bosses
         else if (progress >= 75f && !bossesSpawned[1])
         {
             SpawnBosses(2);
             bossesSpawned[1] = true;
             Debug.Log("75% alcanzado - Spawning boss 2");
         }
-        // 98% - Spawn boss final
         else if (progress >= 98f && !bossesSpawned[2])
         {
             SpawnBosses(3);
@@ -166,84 +140,52 @@ public class MoneyManager : MonoBehaviour
     {
         EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
         if (spawner) spawner.SpawnBosses(count);
-
-        // ELIMINADO: Ya no pausamos el progreso por bosses
-        // isPausedForBoss = true;
     }
 
-    public void BossesDefeated()
-    {
-        // ELIMINADO: Ya no hay pausa que quitar
-        // isPausedForBoss = false;
-        Debug.Log("Bosses derrotados - El progreso continúa normal");
-    }
+    public void BossesDefeated() => Debug.Log("Bosses derrotados - El progreso continúa normal");
 
     private void StartGame()
     {
         Debug.Log("=== INICIANDO JUEGO ===");
-
         isPlaying = true;
         startButton.gameObject.SetActive(false);
-
-        // IMPORTANTE: Reiniciar TODOS los valores al comenzar juego
-        progress = 0f;
+        progress = 0f; // Reiniciar TODOS los valores al comenzar juego
         currentSpeed = progressSpeed;
         energy = 0;
         currentTimer = energyTimerCurrent;
         isPausedForBoss = false;
-        ResetBossSpawns(); // Resetear spawns de bosses
-
+        ResetBossSpawns();
         Debug.Log($"Juego iniciado - Progress: {progress}, Speed: {currentSpeed}, isPausedForBoss: {isPausedForBoss}");
     }
 
     private void ResetBossSpawns()
     {
-        for (int i = 0; i < bossesSpawned.Length; i++)
-        {
-            bossesSpawned[i] = false;
-        }
+        for (int i = 0; i < bossesSpawned.Length; i++) bossesSpawned[i] = false;
     }
 
     public void ResetToLobby()
     {
         Debug.Log("=== REINICIANDO AL LOBBY ===");
-
-        // PASO 1: Cambiar estado inmediatamente
-        isPlaying = false;
+        isPlaying = false; // Cambiar estado inmediatamente
         isPausedForBoss = false;
-
-        // PASO 2: Reiniciar valores de juego
-        progress = 0f;
+        progress = 0f; // Reiniciar valores de juego
         currentSpeed = progressSpeed;
         energy = 0;
         currentTimer = energyTimerCurrent;
-        ResetBossSpawns(); // Resetear spawns de bosses
-
-        // PASO 3: Mostrar botón de inicio
+        ResetBossSpawns();
         startButton.gameObject.SetActive(true);
-
         Debug.Log($"Estado después del reset - isPlaying: {isPlaying}, progress: {progress}, isPausedForBoss: {isPausedForBoss}");
-
-        // PASO 4: Restablecer la vida de todos los objetos
-        RestablecerVidaDeTodosLosObjetos();
-
-        // PASO 5: Disparar evento para otros sistemas
+        RestablecerVidaDeTodosLosObjetos(); // Restablecer la vida de todos los objetos
         Debug.Log("Invocando evento onResetToLobby...");
-        onResetToLobby?.Invoke();
-
-        // PASO 6: Forzar actualización de UI
-        UpdateUI();
-
+        onResetToLobby?.Invoke(); // Disparar evento para otros sistemas
+        UpdateUI(); // Forzar actualización de UI
         Debug.Log("=== REINICIO COMPLETADO ===");
     }
 
     private void RestablecerVidaDeTodosLosObjetos()
     {
         HealthP[] todosLosHealthP = FindObjectsOfType<HealthP>();
-        foreach (HealthP health in todosLosHealthP)
-        {
-            health.RestablecerVida();
-        }
+        foreach (HealthP health in todosLosHealthP) health.RestablecerVida();
         Debug.Log($"Vida restablecida en {todosLosHealthP.Length} objetos");
     }
 
@@ -258,10 +200,7 @@ public class MoneyManager : MonoBehaviour
         }
     }
 
-    private int GetEnergyUpgradeCost()
-    {
-        return energyUpgradeBaseCost + (energyUpgradeLevel * energyUpgradeIncrement);
-    }
+    private int GetEnergyUpgradeCost() => energyUpgradeBaseCost + (energyUpgradeLevel * energyUpgradeIncrement);
 
     private void UpdateUI()
     {

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,26 +13,22 @@ public class GameManager : MonoBehaviour
     public int maxModules = 5;
 
     [Header("References")]
-    public GameObject chasis;
-    public GameObject modulePrefab;
+    public GameObject chasis, modulePrefab;
 
     [Header("UI")]
     public Button addModuleButton;
 
-    private int currentModuleCount = 1;
-    private float[] gridYPositions;
-
     [Header("Money")]
     public TextMeshProUGUI addModuleCostText;
-    public int moduleBaseCost = 50;
-    public int moduleCostIncrement = 15;
-    private int currentModuleCost => moduleBaseCost + ((currentModuleCount - 1) * moduleCostIncrement);
+    public int moduleBaseCost = 50, moduleCostIncrement = 15;
 
-    private int modulosIniciales = 1;
+    private int currentModuleCount = 1, modulosIniciales = 1;
+    private float[] gridYPositions;
+    private int currentModuleCost => moduleBaseCost + ((currentModuleCount - 1) * moduleCostIncrement);
 
     void Start()
     {
-        MoneyManager.Instance.onResetToLobby += RegenerarModulosPerdidos;
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby += RegenerarModulosPerdidos;
         addModuleButton.gameObject.SetActive(!MoneyManager.Instance.isPlaying);
         if (!ValidateReferences()) return;
         CalculateGridPositions();
@@ -41,12 +36,6 @@ public class GameManager : MonoBehaviour
         if (chasis.transform.parent != gridParent) chasis.transform.SetParent(gridParent);
         PositionObjectInGrid(chasis, 0);
         modulosIniciales = currentModuleCount;
-    }
-
-    private void OnDestroy()
-    {
-        if (MoneyManager.Instance != null)
-            MoneyManager.Instance.onResetToLobby -= RegenerarModulosPerdidos;
     }
 
     void Update()
@@ -58,6 +47,11 @@ public class GameManager : MonoBehaviour
             addModuleCostText.text = currentModuleCost.ToString();
             addModuleCostText.gameObject.SetActive(show);
         }
+    }
+
+    private void OnDestroy() // Desregistrar eventos para evitar memory leaks
+    {
+        if (MoneyManager.Instance != null) MoneyManager.Instance.onResetToLobby -= RegenerarModulosPerdidos;
     }
 
     private void RegenerarModulosPerdidos()
@@ -104,16 +98,13 @@ public class GameManager : MonoBehaviour
 
     public void AddModule()
     {
-        if (currentModuleCount >= maxModules) return;
-        if (MoneyManager.Instance.SpendMoney(currentModuleCost))
-        {
-            var newModule = Instantiate(modulePrefab, gridParent);
-            if (newModule == null) return;
-            ShiftExistingModulesUp();
-            PositionObjectInGrid(newModule, 0);
-            currentModuleCount++;
-            if (!MoneyManager.Instance.isPlaying) modulosIniciales = currentModuleCount;
-        }
+        if (currentModuleCount >= maxModules || !MoneyManager.Instance.SpendMoney(currentModuleCost)) return;
+        var newModule = Instantiate(modulePrefab, gridParent);
+        if (newModule == null) return;
+        ShiftExistingModulesUp();
+        PositionObjectInGrid(newModule, 0);
+        currentModuleCount++;
+        if (!MoneyManager.Instance.isPlaying) modulosIniciales = currentModuleCount;
     }
 
     private void PositionObjectInGrid(GameObject obj, int cellIndex)
@@ -157,7 +148,7 @@ public class GameManager : MonoBehaviour
 
     private System.Collections.IEnumerator ReposicionarModulosCorrutina(System.Collections.Generic.List<Transform> modulos)
     {
-        yield return null;
+        yield return null; // Wait one frame before repositioning
         modulos.Sort((a, b) => a.localPosition.y.CompareTo(b.localPosition.y));
         for (int i = 0; i < modulos.Count; i++)
             if (modulos[i] != null) PositionObjectInGrid(modulos[i].gameObject, i);
@@ -166,26 +157,17 @@ public class GameManager : MonoBehaviour
     private void OnDrawGizmos()
     {
         if (gridParent == null) return;
-        if (gridYPositions == null || gridYPositions.Length != maxModules) CalculateGridPositionsForGizmos();
+        if (gridYPositions?.Length != maxModules) CalculateGridPositions();
         Gizmos.color = Color.cyan;
         Vector3 parentPos = gridParent.position;
-        for (int i = 0; i < maxModules; i++)
+        for (int i = 0; i < maxModules && i < gridYPositions.Length; i++)
         {
-            if (i < gridYPositions.Length)
-            {
-                Vector3 cellCenter = parentPos + new Vector3(0, gridYPositions[i], 0);
-                Gizmos.DrawWireCube(cellCenter, new Vector3(gridCellSize.x, gridCellSize.y, 0.1f));
+            Vector3 cellCenter = parentPos + new Vector3(0, gridYPositions[i], 0);
+            Gizmos.DrawWireCube(cellCenter, new Vector3(gridCellSize.x, gridCellSize.y, 0.1f));
 #if UNITY_EDITOR
-                Handles.Label(cellCenter + Vector3.left * (gridCellSize.x * 0.6f), $"Celda {i + 1}\nY: {gridYPositions[i]:F1}");
+            Handles.Label(cellCenter + Vector3.left * (gridCellSize.x * 0.6f), $"Celda {i + 1}\nY: {gridYPositions[i]:F1}");
 #endif
-            }
         }
-    }
-
-    private void CalculateGridPositionsForGizmos()
-    {
-        gridYPositions = new float[maxModules];
-        for (int i = 0; i < maxModules; i++) gridYPositions[i] = i * gridCellSize.y;
     }
 
     [ContextMenu("Test Reposicionar Módulos")]
@@ -195,4 +177,4 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < gridParent.childCount; i++) modulos.Add(gridParent.GetChild(i));
         StartCoroutine(ReposicionarModulosCorrutina(modulos));
     }
-}   
+}

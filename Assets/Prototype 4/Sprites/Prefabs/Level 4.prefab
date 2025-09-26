@@ -278,18 +278,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14701dc06717f0f4eadb1f864da2ccf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saludMaxima: 100
+  saludMaxima: 80
   saludActual: 0
   esChasis: 0
   textoSalud3D: {fileID: 6684892798702103371}
   mostrarLogsDamage: 1
   upgradeLifeButtonName: AV1
-  upgradeLifeCostTextName: TAV1
+  upgradeLifeCostTextName: TM1
   upgradeLevel: 0
   maxUpgradeLevel: 4
-  healthIncreasePerLevel: 20
-  upgradeBaseCost: 30
-  upgradeIncrement: 15
+  healthIncreasePerLevel: 50
+  upgradeBaseCost: 100
+  upgradeIncrement: 50
 --- !u!61 &7956733536263118483
 BoxCollider2D:
   m_ObjectHideFlags: 0
