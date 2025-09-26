@@ -243,7 +243,7 @@ public class FSUS : MonoBehaviour
         }
     }
 
-    private void UpgradeWeapon()
+    private void UpgradeWeapon()  //a partir de estos terminos tenemos que cambiar mucho 
     {
         int cost = GetUpgradeCost();
         if (MoneyManager.Instance != null && MoneyManager.Instance.SpendMoney(cost) && upgradeLevel < maxUpgradeLevel)
