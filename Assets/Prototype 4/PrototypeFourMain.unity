@@ -4189,7 +4189,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &808555377
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4956,7 +4956,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 6862493053763851697, guid: 56e6da5e881220248a09a559faf57a1f, type: 3}
   bossPrefab: {fileID: 6862493053763851697, guid: ba9bf46155c5bfa41a163830dd201404, type: 3}
-  spawnInterval: 3
+  spawnInterval: 5
   minEnemies: 1
   maxEnemies: 3
 --- !u!4 &928714068
@@ -7099,7 +7099,7 @@ MonoBehaviour:
   upgradeEnergyCostText: {fileID: 630810317}
   startButton: {fileID: 1115151475}
   upgradeEnergyButton: {fileID: 2019500605}
-  money: 0
+  money: 500
   moneyRewardPerEnemy: 5
   energy: 0
   energyUpgradeLevel: 0
@@ -11411,7 +11411,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14701dc06717f0f4eadb1f864da2ccf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saludMaxima: 100
+  saludMaxima: 80
   saludActual: 0
   esChasis: 1
   textoSalud3D: {fileID: 1960720440}

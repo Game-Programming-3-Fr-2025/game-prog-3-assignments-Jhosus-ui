@@ -70,7 +70,7 @@ public class FSUS : MonoBehaviour
     {
         gameManager = FindObjectOfType<GameManager>();
         gunsSystem = FindObjectOfType<Guns>();
-        if (buttonSpriteActivo == null) buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo); // Buscar botones por nombre
+        if (buttonSpriteActivo == null) buttonSpriteActivo = BuscarBotonPorNombre(nombreBotonActivo); // Necesiito buscar el botón por nombre   
         if (upgradeButton == null) upgradeButton = BuscarBotonPorNombre(upgradeButtonName);
     }
 

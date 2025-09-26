@@ -174,7 +174,7 @@ MonoBehaviour:
   velocidadMin: 0.05
   velocidadMax: 0.8
   vida: 65
-  danioPorAtaque: 6
+  danioPorAtaque: 15
   intervaloAtaque: 1.7
   fuerzaSalto: 3.2
 --- !u!50 &-3144384912337954001
