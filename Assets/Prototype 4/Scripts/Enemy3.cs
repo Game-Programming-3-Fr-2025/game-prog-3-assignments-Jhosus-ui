@@ -9,7 +9,7 @@ public class Enemy3 : MonoBehaviour
     public float velocidadMin = 1.5f;
     [Tooltip("Velocidad máxima aleatoria")]
     public float velocidadMax = 3f;
-    private float velocidad; // Velocidad aleatoria asignada
+    private float velocidad; 
 
     public int vida = 30, danioPorAtaque = 10;
     public float intervaloAtaque = 1f, fuerzaSalto = 5f;
