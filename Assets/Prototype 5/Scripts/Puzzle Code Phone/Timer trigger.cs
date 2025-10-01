@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TimerTrigger : MonoBehaviour
 {
@@ -6,7 +6,7 @@ public class TimerTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Buscar el tel�fono y activar su timer
+            // Buscar el teléfono y activar su timer
             CodeRSecret phone = FindObjectOfType<CodeRSecret>();
             if (phone != null)
             {
