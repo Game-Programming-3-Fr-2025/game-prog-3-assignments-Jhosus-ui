@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player5 : MonoBehaviour
 {
@@ -10,14 +11,11 @@ public class Player5 : MonoBehaviour
 
     void Start()
     {
-        // Obtener el componente Rigidbody2D
         rb = GetComponent<Rigidbody2D>();
 
-        // Si no existe, lo a�adimos autom�ticamente
         if (rb == null)
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
-            // Configurar para movimiento kinem�tico o por f�sica seg�n prefieras
             rb.gravityScale = 0;
             rb.freezeRotation = true;
         }
@@ -25,17 +23,30 @@ public class Player5 : MonoBehaviour
 
     void Update()
     {
-        // Input handling en Update (mejor para resposividad)
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
-
-        // Normalizar el vector para que el movimiento diagonal no sea m�s r�pido
         movement = movement.normalized;
     }
 
     void FixedUpdate()
     {
-        // Movimiento por f�sica en FixedUpdate (mejor para consistencia)
         rb.linearVelocity = movement * moveSpeed;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Fathers"))
+        {
+            GameOver();
+        }
+    }
+
+    void GameOver()
+    {
+        Debug.Log("Game Over - Player tocó a un Father");
+
+        // Reiniciar la escena actual
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
     }
 }

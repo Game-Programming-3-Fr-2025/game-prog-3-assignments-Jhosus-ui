@@ -1,33 +1,38 @@
-using System.Collections;
+Ôªøusing UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Collections;
 
 public class TimeLoopManager : MonoBehaviour
 {
-    // Singleton para f·cil acceso
     public static TimeLoopManager Instance;
+    public Button loopButton; // Bot√≥n UI para hacer loop manual
 
-    // DuraciÛn del bucle en segundos
-    public float loopDuration = 60f; // Ejemplo: 1 minuto
+    [Header("Loop Settings")]
+    public float loopDuration = 300f; // 5 minutos por defecto
+    public bool allowManualLoop = true;
 
-    // Tiempo actual dentro del bucle
+    [Header("Player Reset")]
+    public Transform playerStartPosition;
+    private GameObject player;
+
     private float currentLoopTime;
+    private bool isLoopActive = true;
 
-    // Estado del bucle
-    private bool isLoopActive = false;
+    // Listas para guardar estados
+    private List<GameObject> collectedItems = new List<GameObject>();
+    private List<GameObject> activatedUI = new List<GameObject>();
+    private Dictionary<string, bool> objectStates = new Dictionary<string, bool>();
 
-    // Eventos para notificar a otros scripts (Muy importante para desacoplar el cÛdigo)
-    public System.Action OnLoopStart;
-    public System.Action OnLoopEnd;
+    // Evento para notificar el reset del loop
     public System.Action OnLoopReset;
 
     void Awake()
     {
-        // Configurar el Singleton
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Opcional: si quieres que persista entre escenas
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -37,6 +42,16 @@ public class TimeLoopManager : MonoBehaviour
 
     void Start()
     {
+        // Encontrar al jugador autom√°ticamente
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        // Configurar bot√≥n de loop
+        if (loopButton != null && allowManualLoop)
+        {
+            loopButton.onClick.AddListener(ForceLoopReset);
+            loopButton.gameObject.SetActive(true);
+        }
+
         StartTimeLoop();
     }
 
@@ -44,64 +59,141 @@ public class TimeLoopManager : MonoBehaviour
     {
         if (!isLoopActive) return;
 
-        // Actualizar el temporizador
         currentLoopTime += Time.deltaTime;
 
-        // Comprobar si el bucle debe terminar
+        // Loop autom√°tico
         if (currentLoopTime >= loopDuration)
         {
-            EndTimeLoop();
+            StartCoroutine(ResetLoopAfterDelay(2f));
         }
     }
 
-    public void StartTimeLoop()
+    // ===== REGISTRO DE ESTADOS IMPORTANTES =====
+
+    public void RegisterCollectedItem(GameObject item)
+    {
+        if (!collectedItems.Contains(item))
+        {
+            collectedItems.Add(item);
+            Debug.Log($"Item registrado: {item.name}");
+        }
+    }
+
+    public void RegisterActivatedUI(GameObject uiElement)
+    {
+        if (!activatedUI.Contains(uiElement))
+        {
+            activatedUI.Add(uiElement);
+        }
+    }
+
+    public void RegisterObjectState(string objectId, bool state)
+    {
+        objectStates[objectId] = state;
+    }
+
+    // ===== SISTEMA DE LOOP =====
+
+    void StartTimeLoop()
     {
         isLoopActive = true;
         currentLoopTime = 0f;
-        Debug.Log("°Bucle Temporal Iniciado!");
-
-        // Notificar a todos los suscriptores que el bucle ha comenzado
-        OnLoopStart?.Invoke();
+        Debug.Log("üîÑ Bucle Temporal Iniciado");
     }
 
-    private void EndTimeLoop()
+    IEnumerator ResetLoopAfterDelay(float delay)
     {
         isLoopActive = false;
-        Debug.Log("°Bucle Temporal Terminado! Reiniciando...");
+        Debug.Log("‚è∞ Bucle Terminado - Reiniciando en " + delay + " segundos");
 
-        // Notificar que el bucle ha terminado (˙til para efectos de transiciÛn)
-        OnLoopEnd?.Invoke();
-
-        // Iniciar el reinicio despuÈs de un pequeÒo delay (opcional)
-        StartCoroutine(ResetLoopAfterDelay(1f));
-    }
-
-    private IEnumerator ResetLoopAfterDelay(float delay)
-    {
         yield return new WaitForSeconds(delay);
         ResetTimeLoop();
     }
 
-    public void ResetTimeLoop()
+    public void ForceLoopReset()
     {
-        // Notificar a todos los objetos para que se reinicien
-        OnLoopReset?.Invoke();
+        if (!isLoopActive) return;
 
-        // Reiniciar el tiempo y reactivar el bucle
-        currentLoopTime = 0f;
-        isLoopActive = true;
-        Debug.Log("Mundo Reiniciado.");
+        Debug.Log("üéÆ Loop manual activado por jugador");
+        StartCoroutine(ResetLoopAfterDelay(1f));
     }
 
-    // MÈtodo para que otros objetos sepan cu·nto tiempo queda
+    void ResetTimeLoop()
+    {
+        Debug.Log("üîÑ Aplicando Reset del Loop...");
+
+        // 1. Resetear posici√≥n del jugador
+        if (player != null && playerStartPosition != null)
+        {
+            player.transform.position = playerStartPosition.position;
+            Debug.Log("üë§ Jugador regresado a posici√≥n inicial");
+        }
+        else
+        {
+            // Buscar jugador y posici√≥n inicial si no est√°n asignados
+            if (player == null) player = GameObject.FindGameObjectWithTag("Player");
+            if (playerStartPosition == null)
+            {
+                GameObject startPos = GameObject.Find("PlayerStartPosition");
+                if (startPos != null) playerStartPosition = startPos.transform;
+            }
+        }
+
+        // 2. Notificar a todos los objetos registrados que se reinicien
+        OnLoopReset?.Invoke();
+
+        // 3. Reactivar objetos recolectados
+        foreach (GameObject item in collectedItems)
+        {
+            if (item != null)
+            {
+                item.SetActive(true);
+                Debug.Log($"Reactivating: {item.name}");
+            }
+        }
+        collectedItems.Clear();
+
+        // 4. Desactivar UI elements activados
+        foreach (GameObject uiElement in activatedUI)
+        {
+            if (uiElement != null)
+            {
+                uiElement.SetActive(false);
+            }
+        }
+        activatedUI.Clear();
+
+        // 5. Limpiar estados de objetos
+        objectStates.Clear();
+
+        // 6. Reiniciar tiempo y estados
+        currentLoopTime = 0f;
+        isLoopActive = true;
+
+        Debug.Log("‚úÖ Mundo Reiniciado - Nuevo Loop Iniciado");
+    }
+
     public float GetRemainingTime()
     {
         return Mathf.Max(loopDuration - currentLoopTime, 0f);
     }
 
-    // Para activar el reinicio manualmente (˙til para debug o si el jugador muere)
-    public void ForceLoopReset()
+    public bool IsLoopActive()
     {
-        ResetTimeLoop();
+        return isLoopActive;
+    }
+
+    // Para asignar posici√≥n inicial desde otros scripts
+    public void SetPlayerStartPosition(Transform newStartPosition)
+    {
+        playerStartPosition = newStartPosition;
+    }
+
+    // Para obtener estados guardados
+    public bool GetObjectState(string objectId)
+    {
+        if (objectStates.ContainsKey(objectId))
+            return objectStates[objectId];
+        return false;
     }
 }
