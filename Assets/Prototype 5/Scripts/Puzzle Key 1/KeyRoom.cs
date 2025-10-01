@@ -9,7 +9,6 @@ public class KeyRoom : MonoBehaviour
 
     void Start()
     {
-        // Llaves especiales empiezan ocultas
         if (isKeySpecial)
         {
             gameObject.SetActive(false);
@@ -19,11 +18,28 @@ public class KeyRoom : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && isActive)
+        // Cambiar esta línea - solo verificar si el objeto está activo en escena
+        if (other.CompareTag("Player") && gameObject.activeInHierarchy)
         {
-            if (keyImageUI != null) keyImageUI.SetActive(true);
+            if (keyImageUI != null)
+            {
+                keyImageUI.SetActive(true);
+                TimeLoopManager.Instance.RegisterActivatedUI(keyImageUI);
+            }
+
             gameObject.SetActive(false);
             isActive = false;
+            TimeLoopManager.Instance.RegisterCollectedItem(gameObject);
+        }
+    }
+
+    // Método para activar llaves especiales desde Fathers.cs
+    public void ActivateSpecialKey()
+    {
+        if (isKeySpecial)
+        {
+            gameObject.SetActive(true);
+            isActive = true;
         }
     }
 }

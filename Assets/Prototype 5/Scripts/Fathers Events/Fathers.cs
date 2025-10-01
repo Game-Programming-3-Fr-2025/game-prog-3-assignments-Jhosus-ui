@@ -122,13 +122,11 @@ public class Fathers : MonoBehaviour
     {
         if (isMother && specialKey != null && !keySpawned && TimeLoopManager.Instance.IsLoopActive())
         {
-            specialKey.gameObject.SetActive(true);
+            specialKey.ActivateSpecialKey(); // En lugar de SetActive(true)
             keySpawned = true;
             Debug.Log("Llave especial apareció por Mother");
 
-            // Registrar la llave especial activada
             TimeLoopManager.Instance.RegisterObjectState("MotherKey_spawned", true);
-
             Invoke("DespawnSpecialKey", keyDisappearDelay);
         }
     }
