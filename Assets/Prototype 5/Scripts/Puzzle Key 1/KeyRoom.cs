@@ -2,22 +2,28 @@ using UnityEngine;
 
 public class KeyRoom : MonoBehaviour
 {
-    public GameObject keyImageUI; // Image UI que se activa al obtener la llave
+    public GameObject keyImageUI;
+    public bool isKeySpecial = false;
+
+    private bool isActive = true;
+
+    void Start()
+    {
+        // Llaves especiales empiezan ocultas
+        if (isKeySpecial)
+        {
+            gameObject.SetActive(false);
+            isActive = false;
+        }
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && isActive)
         {
-            // Activar el Image UI de la llave
-            if (keyImageUI != null)
-            {
-                keyImageUI.SetActive(true);
-            }
-
-            // Ocultar la llave del mundo
+            if (keyImageUI != null) keyImageUI.SetActive(true);
             gameObject.SetActive(false);
-
-            Debug.Log("¡Llave obtenida!");
+            isActive = false;
         }
     }
 }

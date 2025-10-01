@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Event : MonoBehaviour
 {
-    public GameObject objectToShow; // Objeto que aparecerá
+    public GameObject objectToShow; // El objeto "Is Mother" que aparecerá
     private bool activated; // Control interno
 
     void Start()
