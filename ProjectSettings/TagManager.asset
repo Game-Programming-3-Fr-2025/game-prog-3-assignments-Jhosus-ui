@@ -16,6 +16,7 @@ TagManager:
   - Point
   - Bullet
   - Modulo
+  - Fathers
   layers:
   - Default
   - TransparentFX
