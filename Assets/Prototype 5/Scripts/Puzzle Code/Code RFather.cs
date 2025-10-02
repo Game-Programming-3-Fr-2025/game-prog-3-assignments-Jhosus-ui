@@ -3,15 +3,15 @@ using UnityEngine.UI;
 
 public class CodeRFather : MonoBehaviour
 {
-    public string correctCode = "1234"; // Código para esta puerta
-    public GameObject codeUI; // Panel con los botones numéricos
+    public string correctCode = "1234"; 
+    public GameObject codeUI; 
 
     private string currentInput = "";
     private bool playerInRange = false;
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.E)) // Interacción con E
         {
             ShowCodeUI();
         }
@@ -19,7 +19,7 @@ public class CodeRFather : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player")) // Jugador cerca de la puerta
         {
             playerInRange = true;
         }
@@ -27,10 +27,10 @@ public class CodeRFather : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player")) 
         {
             playerInRange = false;
-            HideCodeUI();
+            HideCodeUI(); // Ocultar interfaz al salir
         }
     }
 
@@ -38,8 +38,8 @@ public class CodeRFather : MonoBehaviour
     {
         if (codeUI != null)
         {
-            codeUI.SetActive(true);
-            currentInput = "";
+            codeUI.SetActive(true); // Mostrar panel de código
+            currentInput = ""; 
         }
     }
 
@@ -47,16 +47,14 @@ public class CodeRFather : MonoBehaviour
     {
         if (codeUI != null)
         {
-            codeUI.SetActive(false);
+            codeUI.SetActive(false); 
         }
     }
-
-    // Llamado por los botones numéricos del UI
-    public void AddDigit(int digit)
+    public void AddDigit(int digit) // Llamado por botones numéricos
     {
-        currentInput += digit.ToString();
+        currentInput += digit.ToString(); 
 
-        if (currentInput.Length >= 4)
+        if (currentInput.Length >= 4) // Completaron 4 dígitos
         {
             CheckCode();
         }
@@ -64,18 +62,14 @@ public class CodeRFather : MonoBehaviour
 
     void CheckCode()
     {
-        if (currentInput == correctCode)
+        if (currentInput == correctCode) 
         {
-            // Código correcto - ocultar puerta
-            gameObject.SetActive(false);
-            HideCodeUI();
-            Debug.Log("¡Puerta desbloqueada!");
+            gameObject.SetActive(false); // Ocultar puerta
+            HideCodeUI(); 
         }
-        else
+        else 
         {
-            // Código incorrecto - resetear
-            currentInput = "";
-            Debug.Log("Código incorrecto");
+            currentInput = ""; // Reiniciar entrada
         }
     }
 }

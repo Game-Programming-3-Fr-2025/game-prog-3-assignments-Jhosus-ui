@@ -7,38 +7,33 @@ public class Event : MonoBehaviour
 
     void Start()
     {
-        if (objectToShow) objectToShow.SetActive(false);
+        if (objectToShow) objectToShow.SetActive(false); // Ocultar objeto al inicio
 
-        // Suscribirse al evento de reset del Time Loop
-        TimeLoopManager.Instance.OnLoopReset += ResetEvent;
+        TimeLoopManager.Instance.OnLoopReset += ResetEvent; // Suscribir al reset del loop
     }
 
     void OnDestroy()
     {
-        // Desuscribirse para evitar errores
         if (TimeLoopManager.Instance != null)
-            TimeLoopManager.Instance.OnLoopReset -= ResetEvent;
+            TimeLoopManager.Instance.OnLoopReset -= ResetEvent; // Limpiar suscripción
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player") && !activated && objectToShow)
         {
-            objectToShow.SetActive(true);
+            objectToShow.SetActive(true); // Mostrar objeto vinculado
             activated = true;
             GetComponent<Collider2D>().enabled = false;
 
-            // Registrar que este evento fue activado
-            TimeLoopManager.Instance.RegisterObjectState(gameObject.name + "_activated", true);
+            TimeLoopManager.Instance.RegisterObjectState(gameObject.name + "_activated", true); // Registrar estado
         }
     }
 
     public void ResetEvent()
     {
         activated = false;
-        GetComponent<Collider2D>().enabled = true;
-        if (objectToShow) objectToShow.SetActive(false);
-
-        Debug.Log($"Event {gameObject.name} reseteado");
+        GetComponent<Collider2D>().enabled = true; // Reactivar collider
+        if (objectToShow) objectToShow.SetActive(false); 
     }
 }

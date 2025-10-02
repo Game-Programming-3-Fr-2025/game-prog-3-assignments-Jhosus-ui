@@ -4,14 +4,12 @@ using TMPro;
 public class KeyROffice : MonoBehaviour
 {
     public GameObject keyImageUI;
-    public TextMeshProUGUI noKeyText;    // Texto cuando no tiene llave
-    public TextMeshProUGUI unlockText;   // Texto cuando desbloquea normal
-    public TextMeshProUGUI finalText;    // Texto cuando es final
+    public TextMeshProUGUI noKeyText, unlockText, finalText;
     public bool isFinal = false;
 
     private bool playerInRange = false;
 
-    void Update()
+    void Update()// Comprobar entrada del jugador
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
@@ -29,28 +27,28 @@ public class KeyROffice : MonoBehaviour
         if (other.CompareTag("Player")) playerInRange = false;
     }
 
-    void TryOpenDoor()
+    void TryOpenDoor()  // Intentar abrir la puerta
     {
         bool hasKey = keyImageUI != null && keyImageUI.activeInHierarchy;
 
         if (hasKey)
         {
-            gameObject.SetActive(false); // Puerta desaparece
-
-            if (isFinal && finalText != null)
-            {
-                finalText.gameObject.SetActive(true);
-                Invoke("HideAllMessages", 3f);
-            }
-            else if (unlockText != null)
-            {
-                unlockText.gameObject.SetActive(true);
-                Invoke("HideAllMessages", 3f);
-            }
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.doorOpen);
+            gameObject.SetActive(false); // Abrir puerta
+            ShowMessage(isFinal ? finalText : unlockText);
         }
-        else if (noKeyText != null)
+        else
         {
-            noKeyText.gameObject.SetActive(true);
+            ShowMessage(noKeyText);
+        }
+    }
+
+    void ShowMessage(TextMeshProUGUI textElement) // Mostrar mensaje temporalmente
+    {
+        if (textElement != null)
+        {
+            textElement.gameObject.SetActive(true);
             Invoke("HideAllMessages", 3f);
         }
     }

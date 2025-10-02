@@ -16,7 +16,7 @@ public class Fathers : MonoBehaviour
     public float keyDisappearDelay = 10f;
 
     [Header("Loop Reset")]
-    public Transform initialPosition; // Objeto vacío con posición inicial
+    public Transform initialPosition;
 
     private NavMeshAgent agent;
     private int currentPoint = 0;
@@ -25,7 +25,7 @@ public class Fathers : MonoBehaviour
     private Transform player;
     private bool isChasing = false;
     private bool keySpawned = false;
-    private Vector3 startPosition; // Guardar posición inicial
+    private Vector3 startPosition;
 
     void Start()
     {
@@ -34,57 +34,30 @@ public class Fathers : MonoBehaviour
         agent.updateUpAxis = false;
 
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        startPosition = initialPosition != null ? initialPosition.position : transform.position;
 
-        // Guardar posición inicial
-        if (initialPosition != null)
-        {
-            startPosition = initialPosition.position;
-        }
-        else
-        {
-            startPosition = transform.position;
-        }
-
-        // Suscribirse al Time Loop
         TimeLoopManager.Instance.OnLoopReset += ResetFather;
-
         InitializePatrol();
     }
 
     void OnDestroy()
     {
         if (TimeLoopManager.Instance != null)
-            TimeLoopManager.Instance.OnLoopReset -= ResetFather;
+            TimeLoopManager.Instance.OnLoopReset -= ResetFather; // Limpiar suscripción
     }
 
     void InitializePatrol()
     {
-        // Posicionar en inicio
-        if (initialPosition != null)
-        {
-            agent.Warp(initialPosition.position);
-        }
+        if (initialPosition != null) agent.Warp(initialPosition.position);
 
-        // Reiniciar punto de patrullaje
         currentPoint = 0;
+        if (patrolPoints.Length > 0) GoToNextPoint();
 
-        if (patrolPoints.Length > 0 && !isMother)
-        {
-            GoToNextPoint();
-        }
-
-        if (isMother && patrolPoints.Length > 0)
-        {
-            GoToNextPoint();
-            // Solo programar la llave si el Time Loop está activo
-            if (TimeLoopManager.Instance.IsLoopActive())
-            {
-                Invoke("SpawnSpecialKey", keyAppearDelay);
-            }
-        }
+        if (isMother && TimeLoopManager.Instance.IsLoopActive()) // Solo si el loop está activo
+            Invoke("SpawnSpecialKey", keyAppearDelay);
     }
 
-    void Update()
+    void Update() // Lógica de comportamiento
     {
         if (isWaiting)
         {
@@ -97,35 +70,21 @@ public class Fathers : MonoBehaviour
             return;
         }
 
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position); // Distancia al jugador
 
-        if (distanceToPlayer <= detectionRadius && !isChasing)
-        {
-            StartChasing();
-        }
-        else if (isChasing && distanceToPlayer > chaseRadius)
-        {
-            StopChasing();
-        }
+        if (distanceToPlayer <= detectionRadius && !isChasing) StartChasing();
+        else if (isChasing && distanceToPlayer > chaseRadius) StopChasing();
 
-        if (isChasing)
-        {
-            agent.SetDestination(player.position);
-        }
-        else if (!agent.pathPending && agent.remainingDistance < 0.1f && !isWaiting)
-        {
-            StartWaiting();
-        }
+        if (isChasing) agent.SetDestination(player.position);
+        else if (!agent.pathPending && agent.remainingDistance < 0.1f && !isWaiting) StartWaiting();
     }
 
-    void SpawnSpecialKey()
+    void SpawnSpecialKey() // Aparición de llave especial
     {
         if (isMother && specialKey != null && !keySpawned && TimeLoopManager.Instance.IsLoopActive())
         {
-            specialKey.ActivateSpecialKey(); // En lugar de SetActive(true)
+            specialKey.ActivateSpecialKey();
             keySpawned = true;
-            Debug.Log("Llave especial apareció por Mother");
-
             TimeLoopManager.Instance.RegisterObjectState("MotherKey_spawned", true);
             Invoke("DespawnSpecialKey", keyDisappearDelay);
         }
@@ -137,11 +96,10 @@ public class Fathers : MonoBehaviour
         {
             specialKey.gameObject.SetActive(false);
             keySpawned = false;
-            Debug.Log("Llave especial desapareció");
         }
     }
 
-    void StartChasing()
+    void StartChasing() // Comenzar persecución
     {
         isChasing = true;
         isWaiting = false;
@@ -156,8 +114,11 @@ public class Fathers : MonoBehaviour
     void GoToNextPoint()
     {
         if (patrolPoints.Length == 0) return;
-        agent.SetDestination(patrolPoints[currentPoint].position);
-        currentPoint = (currentPoint + 1) % patrolPoints.Length;
+        if (agent.isActiveAndEnabled && agent.isOnNavMesh)
+        {
+            agent.SetDestination(patrolPoints[currentPoint].position);
+            currentPoint = (currentPoint + 1) % patrolPoints.Length;
+        }
     }
 
     void StartWaiting()
@@ -166,56 +127,42 @@ public class Fathers : MonoBehaviour
         waitCounter = waitTime;
     }
 
-    // Resetear durante el Time Loop
-    void ResetFather()
+    void ResetFather()// Reseteo al inicio del loop
     {
-        // Cancelar todos los Invokes
         CancelInvoke("SpawnSpecialKey");
         CancelInvoke("DespawnSpecialKey");
 
-        // Resetear estados de comportamiento
         isChasing = false;
         isWaiting = false;
         keySpawned = false;
 
-        // Volver a posición inicial
-        if (initialPosition != null)
-        {
-            agent.Warp(initialPosition.position);
-        }
-        else
-        {
-            agent.Warp(startPosition);
-        }
+        if (initialPosition != null) agent.Warp(initialPosition.position);
+        else agent.Warp(startPosition);
 
-        // Reiniciar patrullaje desde el primer punto
         currentPoint = 0;
-        if (patrolPoints.Length > 0)
+        if (patrolPoints.Length > 0 && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
             agent.SetDestination(patrolPoints[0].position);
         }
 
-        // Si es Mother, reprogramar la llave desde cero
         if (isMother && specialKey != null)
         {
-            specialKey.gameObject.SetActive(false);
+            specialKey.gameObject.SetActive(false); 
+            keySpawned = false; // Resetear estado de spawn
             if (TimeLoopManager.Instance.IsLoopActive())
             {
-                Invoke("SpawnSpecialKey", keyAppearDelay);
+                Invoke("SpawnSpecialKey", keyAppearDelay); 
             }
         }
-
-        Debug.Log($"Father {gameObject.name} reseteado - Posición y patrullaje reiniciados");
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected() // Visualización en editor
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseRadius);
 
-        // Dibujar posición inicial
         if (initialPosition != null)
         {
             Gizmos.color = Color.blue;

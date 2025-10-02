@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Player5 : MonoBehaviour
 {
@@ -13,11 +12,11 @@ public class Player5 : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        if (rb == null)
+        if (rb == null) 
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
-            rb.gravityScale = 0;
-            rb.freezeRotation = true;
+            rb.gravityScale = 0; 
+            rb.freezeRotation = true; 
         }
     }
 
@@ -25,7 +24,7 @@ public class Player5 : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
-        movement = movement.normalized;
+        movement = movement.normalized; 
     }
 
     void FixedUpdate()
@@ -35,7 +34,7 @@ public class Player5 : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Fathers"))
+        if (collision.gameObject.CompareTag("Fathers")) 
         {
             GameOver();
         }
@@ -43,10 +42,6 @@ public class Player5 : MonoBehaviour
 
     void GameOver()
     {
-        Debug.Log("Game Over - Player tocó a un Father");
-
-        // Reiniciar la escena actual
-        Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.name);
+        TimeLoopManager.Instance.ForceLoopReset(); // Activar loop de escena
     }
 }

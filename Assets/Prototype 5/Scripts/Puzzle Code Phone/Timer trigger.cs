@@ -4,13 +4,12 @@ public class TimerTrigger : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player")) // Cuando el jugador entra al trigger
         {
-            // Buscar el teléfono y activar su timer
-            CodeRSecret phone = FindObjectOfType<CodeRSecret>();
+            CodeRSecret phone = FindObjectOfType<CodeRSecret>(); // Buscar teléfono en escena
             if (phone != null)
             {
-                phone.StartCodeTimer();
+                phone.StartCodeTimer(); 
             }
         }
     }

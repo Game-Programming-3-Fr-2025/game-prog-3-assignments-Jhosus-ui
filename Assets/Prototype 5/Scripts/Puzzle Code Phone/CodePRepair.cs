@@ -16,31 +16,30 @@ public class CodePRepair : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInRange = true;
+        if (other.CompareTag("Player")) playerInRange = true; // Player cerca
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInRange = false;
+        if (other.CompareTag("Player")) playerInRange = false; // Player lejos
     }
-
     void RepairPhone()
     {
         CodeRSecret phone = FindObjectOfType<CodeRSecret>();
         if (phone != null)
         {
-            phone.RepairPhone();
+            phone.RepairPhone(); // Reparar teléfono
 
             if (repairMessage != null)
             {
-                repairMessage.gameObject.SetActive(true);
-                Invoke("HideMessage", 3f);
+                repairMessage.gameObject.SetActive(true); 
+                Invoke("HideMessage", 3f); 
             }
         }
     }
 
     void HideMessage()
     {
-        if (repairMessage != null) repairMessage.gameObject.SetActive(false);
+        if (repairMessage != null) repairMessage.gameObject.SetActive(false); // Ocultar UI
     }
 }

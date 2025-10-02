@@ -6,7 +6,7 @@ using System.Collections;
 public class TimeLoopManager : MonoBehaviour
 {
     public static TimeLoopManager Instance;
-    public Button loopButton; // Botón UI para hacer loop manual
+    public Button loopButton; // Botón UI para loop manual
 
     [Header("Loop Settings")]
     public float loopDuration = 300f; // 5 minutos por defecto
@@ -24,15 +24,14 @@ public class TimeLoopManager : MonoBehaviour
     private List<GameObject> activatedUI = new List<GameObject>();
     private Dictionary<string, bool> objectStates = new Dictionary<string, bool>();
 
-    // Evento para notificar el reset del loop
-    public System.Action OnLoopReset;
+    public System.Action OnLoopReset; // Evento para notificar reset
 
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // Persistir entre escenas
         }
         else
         {
@@ -42,13 +41,11 @@ public class TimeLoopManager : MonoBehaviour
 
     void Start()
     {
-        // Encontrar al jugador automáticamente
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("Player"); // Buscar jugador automáticamente
 
-        // Configurar botón de loop
         if (loopButton != null && allowManualLoop)
         {
-            loopButton.onClick.AddListener(ForceLoopReset);
+            loopButton.onClick.AddListener(ForceLoopReset); // Configurar botón manual
             loopButton.gameObject.SetActive(true);
         }
 
@@ -59,23 +56,18 @@ public class TimeLoopManager : MonoBehaviour
     {
         if (!isLoopActive) return;
 
-        currentLoopTime += Time.deltaTime;
+        currentLoopTime += Time.deltaTime; // Contador de tiempo del loop
 
-        // Loop automático
-        if (currentLoopTime >= loopDuration)
+        if (currentLoopTime >= loopDuration) 
         {
             StartCoroutine(ResetLoopAfterDelay(2f));
         }
     }
-
-    // ===== REGISTRO DE ESTADOS IMPORTANTES =====
-
     public void RegisterCollectedItem(GameObject item)
     {
         if (!collectedItems.Contains(item))
         {
-            collectedItems.Add(item);
-            Debug.Log($"Item registrado: {item.name}");
+            collectedItems.Add(item); // Registrar item recolectado
         }
     }
 
@@ -83,28 +75,23 @@ public class TimeLoopManager : MonoBehaviour
     {
         if (!activatedUI.Contains(uiElement))
         {
-            activatedUI.Add(uiElement);
+            activatedUI.Add(uiElement); // Registrar UI activado
         }
     }
 
     public void RegisterObjectState(string objectId, bool state)
     {
-        objectStates[objectId] = state;
+        objectStates[objectId] = state; // Guardar estado de objeto
     }
-
-    // ===== SISTEMA DE LOOP =====
-
     void StartTimeLoop()
     {
         isLoopActive = true;
-        currentLoopTime = 0f;
-        Debug.Log("🔄 Bucle Temporal Iniciado");
+        currentLoopTime = 0f; // Reiniciar contador
     }
 
     IEnumerator ResetLoopAfterDelay(float delay)
     {
-        isLoopActive = false;
-        Debug.Log("⏰ Bucle Terminado - Reiniciando en " + delay + " segundos");
+        isLoopActive = false; // Pausar loop durante reset
 
         yield return new WaitForSeconds(delay);
         ResetTimeLoop();
@@ -114,23 +101,21 @@ public class TimeLoopManager : MonoBehaviour
     {
         if (!isLoopActive) return;
 
-        Debug.Log("🎮 Loop manual activado por jugador");
-        StartCoroutine(ResetLoopAfterDelay(1f));
+        StartCoroutine(ResetLoopAfterDelay(1f)); // Loop manual más rápido
     }
 
     void ResetTimeLoop()
     {
-        Debug.Log("🔄 Aplicando Reset del Loop...");
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.loopReset); // SONIDO LOOP
 
         // 1. Resetear posición del jugador
         if (player != null && playerStartPosition != null)
         {
-            player.transform.position = playerStartPosition.position;
-            Debug.Log("👤 Jugador regresado a posición inicial");
+            player.transform.position = playerStartPosition.position; // Volver al inicio
         }
         else
         {
-            // Buscar jugador y posición inicial si no están asignados
+            // Buscar componentes si no están asignados
             if (player == null) player = GameObject.FindGameObjectWithTag("Player");
             if (playerStartPosition == null)
             {
@@ -139,61 +124,50 @@ public class TimeLoopManager : MonoBehaviour
             }
         }
 
-        // 2. Notificar a todos los objetos registrados que se reinicien
-        OnLoopReset?.Invoke();
+        // 2. Notificar a todos los objetos registrados
+        OnLoopReset?.Invoke(); 
 
         // 3. Reactivar objetos recolectados
         foreach (GameObject item in collectedItems)
         {
-            if (item != null)
-            {
-                item.SetActive(true);
-                Debug.Log($"Reactivating: {item.name}");
-            }
+            if (item != null) item.SetActive(true); 
         }
-        collectedItems.Clear();
+        collectedItems.Clear(); 
 
         // 4. Desactivar UI elements activados
         foreach (GameObject uiElement in activatedUI)
         {
-            if (uiElement != null)
-            {
-                uiElement.SetActive(false);
-            }
+            if (uiElement != null) uiElement.SetActive(false); 
         }
         activatedUI.Clear();
 
         // 5. Limpiar estados de objetos
-        objectStates.Clear();
+        objectStates.Clear(); 
 
         // 6. Reiniciar tiempo y estados
         currentLoopTime = 0f;
-        isLoopActive = true;
-
-        Debug.Log("✅ Mundo Reiniciado - Nuevo Loop Iniciado");
+        isLoopActive = true; 
     }
 
     public float GetRemainingTime()
     {
-        return Mathf.Max(loopDuration - currentLoopTime, 0f);
+        return Mathf.Max(loopDuration - currentLoopTime, 0f); // Tiempo restante
     }
 
     public bool IsLoopActive()
     {
-        return isLoopActive;
+        return isLoopActive; // Estado actual del loop
     }
 
-    // Para asignar posición inicial desde otros scripts
     public void SetPlayerStartPosition(Transform newStartPosition)
     {
-        playerStartPosition = newStartPosition;
+        playerStartPosition = newStartPosition; // Cambiar posición inicial
     }
 
-    // Para obtener estados guardados
     public bool GetObjectState(string objectId)
     {
         if (objectStates.ContainsKey(objectId))
-            return objectStates[objectId];
+            return objectStates[objectId]; // Obtener estado guardado
         return false;
     }
 }

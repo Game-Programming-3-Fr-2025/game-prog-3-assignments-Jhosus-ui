@@ -16,18 +16,13 @@ public class CodeRSecret : MonoBehaviour
 
     void Update()
     {
-        // Verificar si el temporizador expiró
-        if (timerActive && !codeExpired && Time.time - timerStartTime >= timeToShowCode)
+        if (timerActive && !codeExpired && Time.time - timerStartTime >= timeToShowCode) // Timer expirado
         {
             codeExpired = true;
             timerActive = false;
-            Debug.Log("Código expirado");
         }
 
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
-        {
-            ShowMessage();
-        }
+        if (playerInRange && Input.GetKeyDown(KeyCode.E)) ShowMessage();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -45,18 +40,15 @@ public class CodeRSecret : MonoBehaviour
         isRepaired = true;
         codeExpired = false;
         timerActive = false;
-        Debug.Log("Teléfono reparado - esperando activación del timer");
     }
 
-    // Llamado por el objeto trigger externo
-    public void StartCodeTimer()
+    public void StartCodeTimer() // Llamado por trigger externo
     {
         if (isRepaired && !timerActive)
         {
             timerStartTime = Time.time;
             timerActive = true;
             codeExpired = false;
-            Debug.Log("Timer activado - código disponible por " + timeToShowCode + " segundos");
         }
     }
 

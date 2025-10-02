@@ -3,23 +3,22 @@ using UnityEngine.UI;
 
 public class NumberObject : MonoBehaviour
 {
-    public int number; // Número que representa (0-9)
-    public Image numberImageUI; // Image UI que muestra este número
+    public int number; 
+    public Image numberImageUI; 
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            // Activar el Image UI que muestra el número
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.pickup);
+
             if (numberImageUI != null)
             {
-                numberImageUI.gameObject.SetActive(true);
+                numberImageUI.gameObject.SetActive(true); // Mostrar en UI
             }
 
-            // Ocultar el objeto del mundo
-            gameObject.SetActive(false);
-
-            Debug.Log($"Número {number} recolectado");
+            gameObject.SetActive(false); // Ocultar del mundo
         }
     }
 }

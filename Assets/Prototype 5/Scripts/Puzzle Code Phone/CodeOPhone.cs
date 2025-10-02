@@ -4,7 +4,6 @@ public class CodeOPhone : MonoBehaviour
 {
     public string correctCode = "1234";
     public GameObject codeUI;
-
     private string currentInput = "";
     private bool playerInRange = false;
 
@@ -18,7 +17,7 @@ public class CodeOPhone : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInRange = true;
+        if (other.CompareTag("Player")) playerInRange = true; 
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -26,7 +25,7 @@ public class CodeOPhone : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            HideCodeUI();
+            HideCodeUI(); // Ocultar UI al alejarse
         }
     }
 
@@ -34,32 +33,31 @@ public class CodeOPhone : MonoBehaviour
     {
         if (codeUI != null)
         {
-            codeUI.SetActive(true);
-            currentInput = "";
+            codeUI.SetActive(true); // Mostrar teclado
+            currentInput = ""; 
         }
     }
 
     void HideCodeUI()
     {
-        if (codeUI != null) codeUI.SetActive(false);
+        if (codeUI != null) codeUI.SetActive(false); // Ocultar teclado
     }
-
     public void AddDigit(int digit)
     {
-        currentInput += digit.ToString();
-        if (currentInput.Length >= 4) CheckCode();
+        currentInput += digit.ToString(); 
+        if (currentInput.Length >= 4) CheckCode(); // Verificar si completo
     }
 
     void CheckCode()
     {
         if (currentInput == correctCode)
         {
-            gameObject.SetActive(false);
+            gameObject.SetActive(false); // Desbloquear objeto
             HideCodeUI();
         }
         else
         {
-            currentInput = "";
+            currentInput = ""; // Resetear si incorrecto
         }
     }
 }
