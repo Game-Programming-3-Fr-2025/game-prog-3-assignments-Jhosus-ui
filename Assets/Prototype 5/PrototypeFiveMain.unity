@@ -17889,7 +17889,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!61 &384487339
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -17946,7 +17946,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 1.3
+  m_Speed: 1.2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -17983,8 +17983,8 @@ MonoBehaviour:
   - {fileID: 112124999}
   - {fileID: 1984571563}
   - {fileID: 1561225784}
-  waitTime: 2
-  detectionRadius: 1.4
+  waitTime: 1.5
+  detectionRadius: 1.57
   chaseRadius: 7
   isMother: 0
   specialKey: {fileID: 0}
@@ -56775,12 +56775,12 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 170
+  Priority: 142
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -59746,7 +59746,7 @@ MonoBehaviour:
   chaseRadius: 5
   isMother: 1
   specialKey: {fileID: 834175976}
-  keyAppearDelay: 60
+  keyAppearDelay: 66
   keyDisappearDelay: 104
   initialPosition: {fileID: 592726651}
 --- !u!195 &1684868224
@@ -59759,7 +59759,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 1.2
+  m_Speed: 1.1
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
