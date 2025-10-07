@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class Movement : MonoBehaviour
 {
@@ -118,11 +118,11 @@ public class Movement : MonoBehaviour
     {
         if (animator != null)
         {
-            // PAR¡METROS QUE SIEMPRE SE ACTUALIZAN:
+            // PAR√ÅMETROS QUE SIEMPRE SE ACTUALIZAN:
             animator.SetBool("IsGrounded", isGrounded);
             animator.SetFloat("YVelocity", rb.linearVelocity.y);
 
-            // IsWalking solo se actualiza si no est· atacando
+            // IsWalking solo se actualiza si no est√° atacando
             bool isAttacking = combate != null && combate.IsAttacking();
             if (!isAttacking)
             {
