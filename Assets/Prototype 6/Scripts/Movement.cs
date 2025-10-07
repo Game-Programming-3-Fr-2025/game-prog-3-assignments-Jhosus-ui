@@ -16,10 +16,11 @@ public class Movement : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private Combate combate;
 
     // State Variables
     private float horizontalInput;
-    private bool isGrounded;
+    public bool isGrounded;
     private bool isFacingRight = true;
     private bool isJumping;
     private float jumpTimeCounter;
@@ -32,11 +33,10 @@ public class Movement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        combate = GetComponent<Combate>();
 
-        // Auto-configure ground layer mask
         groundLayerMask = 1 << LayerMask.NameToLayer("Ground");
 
-        // Auto-create groundCheck if missing
         if (groundCheck == null)
         {
             GameObject groundCheckObj = new GameObject("GroundCheck");
@@ -45,7 +45,6 @@ public class Movement : MonoBehaviour
             groundCheck = groundCheckObj.transform;
         }
 
-        // Configure Rigidbody for better physics
         if (rb != null)
         {
             rb.freezeRotation = true;
@@ -66,13 +65,11 @@ public class Movement : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Movement physics in FixedUpdate
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
     }
 
     void HandleJumpInput()
     {
-        // Start jump
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             isJumping = true;
@@ -80,7 +77,6 @@ public class Movement : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
-        // Variable jump height - release jump early to jump lower
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * cutJumpHeight);
@@ -94,7 +90,6 @@ public class Movement : MonoBehaviour
         {
             if (jumpTimeCounter > 0)
             {
-                // Maintain jump height while button is held
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 jumpTimeCounter -= Time.deltaTime;
             }
@@ -104,7 +99,6 @@ public class Movement : MonoBehaviour
             }
         }
 
-        // Reset jumping when grounded
         if (isGrounded)
         {
             isJumping = false;
@@ -124,17 +118,15 @@ public class Movement : MonoBehaviour
     {
         if (animator != null)
         {
-            animator.SetBool("IsWalking", Mathf.Abs(horizontalInput) > 0.01f);
+            // PARÁMETROS QUE SIEMPRE SE ACTUALIZAN:
             animator.SetBool("IsGrounded", isGrounded);
             animator.SetFloat("YVelocity", rb.linearVelocity.y);
 
-            // Additional animation triggers for better control
-            if (isGrounded)
+            // IsWalking solo se actualiza si no está atacando
+            bool isAttacking = combate != null && combate.IsAttacking();
+            if (!isAttacking)
             {
-                if (Mathf.Abs(horizontalInput) > 0.01f)
-                    animator.SetTrigger("Run");
-                else
-                    animator.SetTrigger("Idle");
+                animator.SetBool("IsWalking", Mathf.Abs(horizontalInput) > 0.01f);
             }
         }
     }

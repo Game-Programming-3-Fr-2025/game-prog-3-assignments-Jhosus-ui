@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Combate : MonoBehaviour
 {
@@ -10,6 +10,7 @@ public class Combate : MonoBehaviour
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private Movement movement; // ← AGREGAR ESTA REFERENCIA
     private float lastAttackTime = -999f;
     private bool isAttacking = false;
     private LayerMask enemyLayer;
@@ -18,14 +19,13 @@ public class Combate : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        movement = GetComponent<Movement>(); // ← OBTENER LA REFERENCIA
 
-        // Asignar autom�ticamente el layer Enemy
         enemyLayer = LayerMask.GetMask("Enemy");
     }
 
     void Update()
     {
-        // Attack input usando Fire1
         if (Input.GetButtonDown("Fire1") && CanAttack())
         {
             Attack();
@@ -43,10 +43,15 @@ public class Combate : MonoBehaviour
         lastAttackTime = Time.time;
 
         if (animator != null)
+        {
+            // ← FORZAR LOS PARÁMETROS PARA QUE LA ANIMACIÓN DE ATAQUE FUNCIONE
+            animator.SetBool("IsGrounded", true); // Temporalmente forzar grounded
+            animator.SetFloat("YVelocity", 0); // Temporalmente forzar YVelocity = 0
             animator.SetTrigger("Attack");
+        }
 
         DealDamage();
-        Invoke(nameof(EndAttack), 0.1f);
+        Invoke(nameof(EndAttack), 0.3f);
     }
 
     void DealDamage()
@@ -56,7 +61,6 @@ public class Combate : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
-            // Intenta obtener componente de vida del enemigo
             var enemyHealth = hit.GetComponent<EnemyHealth>();
             if (enemyHealth != null)
             {
@@ -72,6 +76,8 @@ public class Combate : MonoBehaviour
     void EndAttack()
     {
         isAttacking = false;
+        // Los parámetros IsGrounded y YVelocity se restaurarán automáticamente 
+        // en el próximo Update() del Movement.cs
     }
 
     Vector2 GetAttackPosition()
