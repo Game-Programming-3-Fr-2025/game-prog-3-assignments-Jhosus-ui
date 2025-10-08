@@ -18,14 +18,14 @@ public class Movement : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Combate combate;
 
-    // State Variables
+    // State Variables (públicas para Evasion)
     private float horizontalInput;
-    public bool isGrounded;
-    private bool isFacingRight = true;
+    [HideInInspector] public bool isGrounded;
+    [HideInInspector] public bool isFacingRight = true;
     private bool isJumping;
     private float jumpTimeCounter;
+    private bool canMove = true; // Para desactivar durante dash
 
-    // Layer mask for ground (automatically set to "Ground" layer)
     private int groundLayerMask;
 
     void Start()
@@ -54,33 +54,48 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        horizontalInput = canMove ? Input.GetAxisRaw("Horizontal") : 0;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
 
-        HandleJumpInput();
-        HandleJumpHold();
-        HandleFlip();
+        if (canMove)
+        {
+            HandleJumpInput();
+            HandleJumpHold();
+            HandleFlip();
+        }
+
         UpdateAnimations();
     }
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        if (canMove)
+        {
+            rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        }
     }
 
     void HandleJumpInput()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            isJumping = true;
-            jumpTimeCounter = jumpTime;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            Jump();
         }
 
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * cutJumpHeight);
             isJumping = false;
+        }
+    }
+
+    public void Jump()
+    {
+        if (isGrounded && canMove)
+        {
+            isJumping = true;
+            jumpTimeCounter = jumpTime;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
 
@@ -116,19 +131,20 @@ public class Movement : MonoBehaviour
 
     void UpdateAnimations()
     {
-        if (animator != null)
-        {
-            // PARÁMETROS QUE SIEMPRE SE ACTUALIZAN:
-            animator.SetBool("IsGrounded", isGrounded);
-            animator.SetFloat("YVelocity", rb.linearVelocity.y);
+        if (animator == null) return;
 
-            // IsWalking solo se actualiza si no está atacando
-            bool isAttacking = combate != null && combate.IsAttacking();
-            if (!isAttacking)
-            {
-                animator.SetBool("IsWalking", Mathf.Abs(horizontalInput) > 0.01f);
-            }
+        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetFloat("YVelocity", rb.linearVelocity.y);
+
+        bool isAttacking = combate != null && combate.IsAttacking();
+        if (!isAttacking)
+        {
+            animator.SetBool("IsWalking", Mathf.Abs(horizontalInput) > 0.01f);
         }
+    }
+    public void SetCanMove(bool canMove)
+    {
+        this.canMove = canMove;
     }
 
     void OnDrawGizmosSelected()

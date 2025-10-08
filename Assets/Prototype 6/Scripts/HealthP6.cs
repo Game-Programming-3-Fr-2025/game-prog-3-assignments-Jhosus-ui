@@ -7,7 +7,7 @@ public class HealthP6 : MonoBehaviour
     [Header("Health Settings")]
     public int maxHealth = 3;
     public float invincibilityTime = 1.5f;
-    public float knockbackForce = 8f; // ← AGREGAR: Fuerza de retroceso
+    public float knockbackForce = 8f;
 
     [Header("UI References")]
     public Image[] healthHearts;
@@ -17,12 +17,15 @@ public class HealthP6 : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Animator animator;
     private Rigidbody2D rb;
+    private ManagerUp manager;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>(); // ← AGREGAR
+        rb = GetComponent<Rigidbody2D>();
+        manager = FindObjectOfType<ManagerUp>();
+
         currentHealth = maxHealth;
         UpdateHealthUI();
     }
@@ -42,16 +45,10 @@ public class HealthP6 : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
         UpdateHealthUI();
 
-        // ← AGREGAR: Activar animación de Hit y retroceso
         if (currentHealth > 0)
         {
             ApplyKnockback();
-            if (animator != null)
-                animator.SetTrigger("Hit");
-        }
-
-        if (currentHealth > 0)
-        {
+            if (animator != null) animator.SetTrigger("Hit");
             StartCoroutine(InvincibilityRoutine());
         }
         else
@@ -62,24 +59,18 @@ public class HealthP6 : MonoBehaviour
         Debug.Log($"Player health: {currentHealth}");
     }
 
-    // ← AGREGAR: Método para aplicar retroceso
-    private void ApplyKnockback()
+    void ApplyKnockback()
     {
-        if (rb != null)
-        {
-            // Calcular dirección opuesta basada en la mirada del jugador
-            Vector2 knockbackDirection = spriteRenderer.flipX ?
-                Vector2.right : Vector2.left;
+        if (rb == null) return;
 
-            knockbackDirection.y = 0.2f; // Un poco hacia arriba
+        Vector2 direction = spriteRenderer.flipX ? Vector2.right : Vector2.left;
+        direction.y = 0.2f;
 
-            // Aplicar fuerza de retroceso
-            rb.linearVelocity = Vector2.zero; // Resetear velocidad
-            rb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
-        }
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
     }
 
-    private IEnumerator InvincibilityRoutine()
+    IEnumerator InvincibilityRoutine()
     {
         isInvincible = true;
         yield return new WaitForSeconds(invincibilityTime);
@@ -101,8 +92,17 @@ public class HealthP6 : MonoBehaviour
     void Die()
     {
         Debug.Log("Player died!");
-        if (animator != null)
-            animator.SetTrigger("Die");
+        if (animator != null) animator.SetTrigger("Die");
+        // Aquí puedes agregar lógica de respawn o game over
+    }
+
+    public void Respawn()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+        isInvincible = false;
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
+        if (manager != null) manager.OnPlayerRespawn();
     }
 
     public void Heal(int amount = 1)
