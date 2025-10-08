@@ -17,6 +17,7 @@ public class Movement : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Combate combate;
+    private Evasion evasion;
 
     // State Variables (públicas para Evasion)
     private float horizontalInput;
@@ -24,7 +25,7 @@ public class Movement : MonoBehaviour
     [HideInInspector] public bool isFacingRight = true;
     private bool isJumping;
     private float jumpTimeCounter;
-    private bool canMove = true; // Para desactivar durante dash
+    private bool canMove = true;
 
     private int groundLayerMask;
 
@@ -34,6 +35,7 @@ public class Movement : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         combate = GetComponent<Combate>();
+        evasion = GetComponent<Evasion>();
 
         groundLayerMask = 1 << LayerMask.NameToLayer("Ground");
 
@@ -91,12 +93,9 @@ public class Movement : MonoBehaviour
 
     public void Jump()
     {
-        if (isGrounded && canMove)
-        {
-            isJumping = true;
-            jumpTimeCounter = jumpTime;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
+        isJumping = true;
+        jumpTimeCounter = jumpTime;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
     void HandleJumpHold()
@@ -122,7 +121,16 @@ public class Movement : MonoBehaviour
 
     void HandleFlip()
     {
-        if ((horizontalInput > 0 && !isFacingRight) || (horizontalInput < 0 && isFacingRight))
+        // NO hacer flip durante wall slide o dash
+        bool canFlip = true;
+
+        if (evasion != null)
+        {
+            if (evasion.IsWallSliding() || evasion.IsDashing())
+                canFlip = false;
+        }
+
+        if (canFlip && ((horizontalInput > 0 && !isFacingRight) || (horizontalInput < 0 && isFacingRight)))
         {
             isFacingRight = !isFacingRight;
             spriteRenderer.flipX = !spriteRenderer.flipX;
@@ -142,9 +150,10 @@ public class Movement : MonoBehaviour
             animator.SetBool("IsWalking", Mathf.Abs(horizontalInput) > 0.01f);
         }
     }
-    public void SetCanMove(bool canMove)
+
+    public void SetCanMove(bool state)
     {
-        this.canMove = canMove;
+        canMove = state;
     }
 
     void OnDrawGizmosSelected()

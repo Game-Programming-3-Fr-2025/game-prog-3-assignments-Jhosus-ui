@@ -5,7 +5,7 @@ using System.Collections;
 public class HealthP6 : MonoBehaviour
 {
     [Header("Health Settings")]
-    public int maxHealth = 3;
+    public int maxHealth = 4;
     public float invincibilityTime = 1.5f;
     public float knockbackForce = 8f;
 
@@ -25,6 +25,12 @@ public class HealthP6 : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         manager = FindObjectOfType<ManagerUp>();
+
+        if (manager != null)
+        {
+            int healthLevel = manager.GetHealthLevel();
+            maxHealth = 4 + healthLevel;
+        }
 
         currentHealth = maxHealth;
         UpdateHealthUI();
@@ -55,8 +61,6 @@ public class HealthP6 : MonoBehaviour
         {
             Die();
         }
-
-        Debug.Log($"Player health: {currentHealth}");
     }
 
     void ApplyKnockback()
@@ -78,37 +82,52 @@ public class HealthP6 : MonoBehaviour
         if (spriteRenderer != null) spriteRenderer.enabled = true;
     }
 
-    void UpdateHealthUI()
+    public void UpdateHealthUI()
     {
         if (healthHearts == null) return;
 
         for (int i = 0; i < healthHearts.Length; i++)
         {
             if (healthHearts[i] != null)
+            {
                 healthHearts[i].enabled = i < currentHealth;
+            }
         }
     }
 
     void Die()
     {
-        Debug.Log("Player died!");
-        if (animator != null) animator.SetTrigger("Die");
-        // Aquí puedes agregar lógica de respawn o game over
+        if (animator != null)
+        {
+            animator.SetTrigger("Die");
+        }
+
+        GameManager6.Instance?.PlayerDied();
     }
 
     public void Respawn()
     {
+        if (manager != null)
+        {
+            int healthLevel = manager.GetHealthLevel();
+            maxHealth = 4 + healthLevel;
+        }
+
         currentHealth = maxHealth;
         UpdateHealthUI();
         isInvincible = false;
         if (spriteRenderer != null) spriteRenderer.enabled = true;
-        if (manager != null) manager.OnPlayerRespawn();
     }
 
     public void Heal(int amount = 1)
     {
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
         UpdateHealthUI();
+    }
+
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
     }
 
     public bool IsAlive() => currentHealth > 0;
