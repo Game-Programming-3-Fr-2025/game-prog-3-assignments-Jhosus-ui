@@ -61,7 +61,7 @@ public class Combate : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
-            var enemyHealth = hit.GetComponent<EnemyHealth>();
+            var enemyHealth = hit.GetComponent<BossHealth>();
             if (enemyHealth != null)
             {
                 enemyHealth.TakeDamage(attackDamage);
