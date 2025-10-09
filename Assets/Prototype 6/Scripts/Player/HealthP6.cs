@@ -104,7 +104,7 @@ public class HealthP6 : MonoBehaviour
         rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
     }
 
-    IEnumerator InvincibilityRoutine()
+    IEnumerator InvincibilityRoutine() // Cambié el nombre de la función para que sea más claro
     {
         isInvincible = true;
         yield return new WaitForSeconds(invincibilityTime);

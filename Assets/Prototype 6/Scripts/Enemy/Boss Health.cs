@@ -118,7 +118,7 @@ public class BossHealth : MonoBehaviour
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        switch (currentState)
+        switch (currentState) // Lógica de estados
         {
             case State.Idle:
                 UpdateIdle(distance);
@@ -152,7 +152,7 @@ public class BossHealth : MonoBehaviour
             currentState = State.Chase;
     }
 
-    void UpdateChase(float distance)
+    void UpdateChase(float distance) // Perseguir al jugador
     {
         Vector2 direction = (player.position - transform.position).normalized;
         float speed = phase == 1 ? chaseSpeed : phase2Speed;
@@ -202,7 +202,7 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    void CheckContactDamage()
+    void CheckContactDamage() // Daño por contacto
     {
         Vector2 damagePos = GetFlippedPosition(contactOffset);
         Collider2D hit = Physics2D.OverlapCircle(damagePos, contactRange, LayerMask.GetMask("Player"));
@@ -238,7 +238,7 @@ public class BossHealth : MonoBehaviour
     {
         bool playerHigher = player.position.y > transform.position.y + 1f;
         bool playerJumping = IsPlayerJumping();
-        bool shouldJump = playerHigher || (playerJumping && Random.value < jumpChance);
+        bool shouldJump = playerHigher || (playerJumping && Random.value < jumpChance); // Mayor probabilidad si el jugador está saltando
 
         if (shouldJump)
         {
@@ -252,7 +252,7 @@ public class BossHealth : MonoBehaviour
         currentState = State.Attacking;
         attackTimer = attackCooldown;
 
-        Vector2 direction = (player.position - transform.position).normalized;
+        Vector2 direction = (player.position - transform.position).normalized; // Dirección hacia el jugador
         rb.linearVelocity = new Vector2(direction.x * phase2Speed, jumpForce);
 
         if (anim != null) anim.SetTrigger("Attack");
@@ -288,7 +288,7 @@ public class BossHealth : MonoBehaviour
         if (proj != null) proj.SetDirection(direction);
     }
 
-    void ShootFanProjectiles(int count)
+    void ShootFanProjectiles(int count) // Dispara proyectiles en todas las direcciones
     {
         if (projectilePrefab == null) return;
 
@@ -304,7 +304,7 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    void UpdateVisuals()
+    void UpdateVisuals() // Actualiza animaciones y efectos visuales
     {
         if (anim == null) return;
 
@@ -353,7 +353,7 @@ public class BossHealth : MonoBehaviour
         if (currentHealth <= 0) Die();
     }
 
-    void CheckPhaseTransition()
+    void CheckPhaseTransition() // Cambiar de fase según la salud
     {
         float healthPercent = currentHealth / maxHealth;
 
@@ -369,7 +369,7 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    IEnumerator PhaseTransition()
+    IEnumerator PhaseTransition() // Efecto de aturdimiento al cambiar de fase
     {
         stunTimer = 1.5f;
         StartCoroutine(BlinkEffect());
@@ -407,7 +407,7 @@ public class BossHealth : MonoBehaviour
         Destroy(gameObject, 2f);
     }
 
-    public void OnMeleeHit()
+    public void OnMeleeHit() //llamado desde animación
     {
         Vector2 attackPos = GetFlippedPosition(meleeOffset);
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, meleeRange, LayerMask.GetMask("Player"));
@@ -427,7 +427,7 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected() // Visualizar rangos de ataque y detección
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(GetFlippedPosition(contactOffset), contactRange);

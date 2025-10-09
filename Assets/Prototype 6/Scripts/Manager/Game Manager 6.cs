@@ -45,7 +45,7 @@ public class GameManager6 : MonoBehaviour
         if (resetBoss) ResetBoss();
     }
 
-    IEnumerator RespawnCoroutine()
+    IEnumerator RespawnCoroutine() //Cambié el nombre de la función para que sea más claro
     {
         yield return new WaitForSeconds(respawnDelay);
         RespawnPlayer();

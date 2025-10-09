@@ -96,7 +96,7 @@ public class Movement : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
-    void HandleJumpHold()
+    void HandleJumpHold() //permitir salto sostenido
     {
         if (isJumping)
         {
@@ -117,7 +117,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    void HandleFlip()
+    void HandleFlip() //girar sprite
     {
         if (evasion != null && (evasion.IsWallSliding() || evasion.IsDashing()))
         {

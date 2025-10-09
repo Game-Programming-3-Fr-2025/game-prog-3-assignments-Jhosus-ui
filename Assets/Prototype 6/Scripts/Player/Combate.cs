@@ -31,7 +31,7 @@ public class Combate : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        enemyLayer = LayerMask.GetMask("Enemy");
+        enemyLayer = LayerMask.GetMask("Enemy"); // Asegúrar enemigos en la capa "Enemy"
         manager = FindObjectOfType<ManagerUp>();
     }
 
@@ -51,7 +51,7 @@ public class Combate : MonoBehaviour
     void Attack()
     {
         isAttacking = true;
-        lastAttackTime = Time.time;
+        lastAttackTime = Time.time; // Actualiza el tiempo del último ataque
 
         if (animator != null)
             animator.SetTrigger("Attack");
@@ -89,7 +89,7 @@ public class Combate : MonoBehaviour
         isAttacking = false;
     }
 
-    Vector2 GetAttackPosition()
+    Vector2 GetAttackPosition() //calcular la posicion del ataque
     {
         float offsetX = spriteRenderer != null && spriteRenderer.flipX ? -attackOffset.x : attackOffset.x;
         return (Vector2)transform.position + new Vector2(offsetX, attackOffset.y);

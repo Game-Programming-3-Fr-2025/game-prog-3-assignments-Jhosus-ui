@@ -88,7 +88,7 @@ public class Evasion : MonoBehaviour
         if (movement != null) movement.SetCanMove(true);
     }
 
-    void HandleDoubleJump()
+    void HandleDoubleJump() // llamado en Update
     {
         if (movement.isGrounded)
         {
@@ -106,10 +106,10 @@ public class Evasion : MonoBehaviour
         }
     }
 
-    void HandleWallClimb()
+    void HandleWallClimb() 
     {
         Vector2 checkDirection = movement.isFacingRight ? Vector2.right : Vector2.left;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, wallCheckDistance, wallLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, wallCheckDistance, wallLayer); // Debug raycast in editor
 
         bool touchingWall = hit.collider != null && !movement.isGrounded;
         bool isOnRightWall = hit.collider != null && checkDirection.x > 0;
@@ -158,7 +158,7 @@ public class Evasion : MonoBehaviour
         }
     }
 
-    public void ForceExitWallSlide()
+    public void ForceExitWallSlide() //llamado desde Movement y Evasion
     {
         if (isWallSliding)
         {

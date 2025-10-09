@@ -125,7 +125,7 @@ public class ManagerUp : MonoBehaviour
         if (playerHealth == null) return;
 
         playerHealth.maxHealth = 4 + healthLevel;
-        playerHealth.Heal(playerHealth.maxHealth - playerHealth.GetCurrentHealth());
+        playerHealth.Heal(playerHealth.maxHealth - playerHealth.GetCurrentHealth()); // Actualiza la salud al máximo
         playerHealth.UpdateHealthUI();
     }
 
@@ -137,7 +137,7 @@ public class ManagerUp : MonoBehaviour
         exp -= cost;
         damageLevel++;
 
-        if (playerCombat != null && damageLevel < damageValues.Length)
+        if (playerCombat != null && damageLevel < damageValues.Length) // Asegura que no exceda el array
             playerCombat.attackDamage = damageValues[damageLevel];
 
         UpdateUI();
@@ -172,7 +172,7 @@ public class ManagerUp : MonoBehaviour
         expTimer = 0f;
     }
 
-    public void UpdateUI()
+    public void UpdateUI() //llamar cada vez que se actualice algo
     {
         expText.text = $"EXP: {exp}";
         dashButton.gameObject.SetActive(!dashBought);
