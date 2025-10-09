@@ -155,20 +155,26 @@ MonoBehaviour:
   maxHealth: 50
   damageToPlayer: 1
   damageRange: 0.9
-  damageInterval: 2
+  damageInterval: 4
+  damageOffset: {x: 0.4, y: -0.3}
   phase1Threshold: 0.6
   phase2Threshold: 0.3
-  moveSpeed_F1: 2
-  moveSpeed_F2_F3: 5
-  meleeRange: 2.4
-  jumpDetectRange: 8
-  jumpForce_F2: 15
-  activationRange: 9
-  attackCooldown: 0.8
-  meleeDamage: 30
+  moveSpeed_F1: 1.5
+  moveSpeed_F2_F3: 3
+  meleeRange: 1.5
+  jumpDetectRange: 5
+  jumpForce_F2: 9
+  activationRange: 7
+  idleTimeout: 5
+  attackCooldown: 2
+  meleeDamage: 1
   projectilePrefab: {fileID: 7374863252574312481, guid: 1ef61daa052843f4885df1a2e6896b55, type: 3}
   projectileSpeed: 8
+  projectileCooldown: 15
   fanShotInterval: 15
+  meleeOffset: {x: 1.2, y: 0.1}
+  jumpDetectOffset: {x: 2, y: 0}
+  activationOffset: {x: 2, y: 0}
   groundCheck: {fileID: 1969349873}
   groundCheckRadius: 0.5
 --- !u!61 &15244551
@@ -16430,7 +16436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
-  jumpForce: 13
+  jumpForce: 14
   jumpTime: 0.32
   cutJumpHeight: 0.5
   groundCheck: {fileID: 460434183}

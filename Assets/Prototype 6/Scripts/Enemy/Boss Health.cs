@@ -10,7 +10,7 @@ public class BossHealth : MonoBehaviour
     public int damageToPlayer = 2;
     public float damageRange = 1.5f;
     public float damageInterval = 1f;
-    public Vector2 damageOffset = Vector2.zero; // NUEVO: Offset para el daño
+    public Vector2 damageOffset = Vector2.zero;
 
     [Header("Phase Settings")]
     public float phase1Threshold = 0.6f;
@@ -23,14 +23,24 @@ public class BossHealth : MonoBehaviour
     public float jumpDetectRange = 4.0f;
     public float jumpForce_F2 = 10f;
     public float activationRange = 15f;
-    public float idleTimeout = 3f; // NUEVO: Timeout para idle
+    public float idleTimeout = 3f;
 
     [Header("Attack Settings")]
     public float attackCooldown = 0.8f;
     public int meleeDamage = 30;
     public GameObject projectilePrefab;
     public float projectileSpeed = 8f;
+    public float projectileCooldown = 5f;
     public float fanShotInterval = 15f;
+
+    [Header("Gizmos Offsets")]
+    public Vector2 meleeOffset = Vector2.zero;
+    public Vector2 jumpDetectOffset = Vector2.zero;
+    public Vector2 activationOffset = Vector2.zero;
+
+    [Header("Ground Detection")]
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
 
     // Components
     private Transform player;
@@ -40,7 +50,7 @@ public class BossHealth : MonoBehaviour
     private LayerMask playerLayer;
     private LayerMask groundLayer;
 
-    // State Management
+    // State
     private enum BossState { IDLE, CHASE, MELEE_ATTACK, JUMP_ATTACK, STUN, COOLDOWN, PROJECTILE_ATTACK }
     private BossState currentState;
     private int currentPhase = 1;
@@ -51,14 +61,12 @@ public class BossHealth : MonoBehaviour
     private float cooldownTimer;
     private float projectileTimer;
     private float fanShotTimer;
-    private float idleTimer; // NUEVO: Timer para idle
+    private float idleTimer;
     private bool isJumping = false;
-    private Vector2 jumpTarget;
-
-    // Ground Detection
     private bool isGrounded;
-    public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
+
+    // Nueva variable para trackear dirección
+    private bool isFacingRight = true;
 
     void Start()
     {
@@ -75,13 +83,30 @@ public class BossHealth : MonoBehaviour
 
         currentState = BossState.IDLE;
         fanShotTimer = fanShotInterval;
-        projectileTimer = 2f; // Iniciar timer de proyectiles
+        projectileTimer = projectileCooldown;
         idleTimer = idleTimeout;
+
+        // Determinar dirección inicial
+        if (spriteRenderer != null)
+        {
+            isFacingRight = !spriteRenderer.flipX;
+        }
+
+        // Auto-crear groundCheck si no existe
+        if (groundCheck == null)
+        {
+            GameObject gc = new GameObject("GroundCheck");
+            gc.transform.SetParent(transform);
+            gc.transform.localPosition = new Vector3(0, -1f, 0);
+            groundCheck = gc.transform;
+        }
     }
 
     void Update()
     {
         if (player == null) return;
+
+        UpdateGroundDetection();
 
         if (Time.time >= lastDamageTime + damageInterval)
         {
@@ -92,42 +117,24 @@ public class BossHealth : MonoBehaviour
         UpdateStateMachine();
         UpdateAnimations();
         FlipSprite();
-        UpdateTimers(); // NUEVO: Actualizar timers
-
-        // Timer para disparos en abanico (Fase 3)
-        if (currentPhase == 3)
-        {
-            fanShotTimer -= Time.deltaTime;
-        }
+        UpdateTimers();
     }
 
-    // NUEVO: Método para actualizar timers importantes
     void UpdateTimers()
     {
         if (projectileTimer > 0) projectileTimer -= Time.deltaTime;
-    }
-
-    void FixedUpdate()
-    {
-        UpdateGroundDetection();
+        if (fanShotTimer > 0 && currentPhase == 3) fanShotTimer -= Time.deltaTime;
     }
 
     void UpdateGroundDetection()
     {
-        if (groundCheck != null)
-        {
-            isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-        }
-        else
-        {
-            isGrounded = Physics2D.OverlapCircle(transform.position, groundCheckRadius, groundLayer);
-        }
+        Vector2 checkPos = groundCheck != null ? groundCheck.position : transform.position;
+        isGrounded = Physics2D.OverlapCircle(checkPos, groundCheckRadius, groundLayer);
     }
 
     void CheckForPlayerContact()
     {
-        // NUEVO: Usar offset para el daño
-        Vector2 damageCenter = (Vector2)transform.position + damageOffset;
+        Vector2 damageCenter = GetFlippedPosition(damageOffset);
         Collider2D playerCollider = Physics2D.OverlapCircle(damageCenter, damageRange, playerLayer);
 
         if (playerCollider != null)
@@ -141,15 +148,26 @@ public class BossHealth : MonoBehaviour
         }
     }
 
+    // NUEVO: Método para obtener posición con offset flipado
+    Vector2 GetFlippedPosition(Vector2 offset)
+    {
+        Vector2 flippedOffset = offset;
+        if (!isFacingRight)
+        {
+            flippedOffset.x = -offset.x;
+        }
+        return (Vector2)transform.position + flippedOffset;
+    }
+
     void UpdatePhase()
     {
         float healthPercent = currentHealth / maxHealth;
 
-        if (currentPhase == 1 && healthPercent < phase1Threshold)
+        if (currentPhase == 1 && healthPercent <= phase1Threshold)
         {
             StartPhaseTransition(2);
         }
-        else if (currentPhase == 2 && healthPercent < phase2Threshold)
+        else if (currentPhase == 2 && healthPercent <= phase2Threshold)
         {
             StartPhaseTransition(3);
         }
@@ -159,13 +177,14 @@ public class BossHealth : MonoBehaviour
     {
         currentPhase = newPhase;
         currentState = BossState.STUN;
-        cooldownTimer = 1f;
-        animator.SetTrigger("Hit");
+        cooldownTimer = 1.5f;
+
+        if (animator != null) animator.SetTrigger("Hit");
 
         if (player != null)
         {
             Vector2 knockbackDir = (transform.position - player.position).normalized;
-            rb.linearVelocity = new Vector2(knockbackDir.x * 3f, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(knockbackDir.x * 5f, 3f);
         }
     }
 
@@ -180,67 +199,33 @@ public class BossHealth : MonoBehaviour
             case BossState.IDLE:
                 IdleBehavior(distanceToPlayer);
                 break;
-
             case BossState.CHASE:
                 ChaseBehavior(distanceToPlayer);
                 break;
-
             case BossState.MELEE_ATTACK:
-                MeleeAttackBehavior(); // NUEVO: Comportamiento para melee
+                MeleeAttackBehavior();
                 break;
-
             case BossState.JUMP_ATTACK:
                 JumpAttackBehavior();
                 break;
-
             case BossState.STUN:
                 StunBehavior();
                 break;
-
             case BossState.COOLDOWN:
                 CooldownBehavior();
                 break;
-
             case BossState.PROJECTILE_ATTACK:
-                ProjectileAttackBehavior(); // NUEVO: Comportamiento para proyectiles
+                ProjectileAttackBehavior();
                 break;
-        }
-    }
-
-    // NUEVO: Comportamiento para ataque melee
-    void MeleeAttackBehavior()
-    {
-        cooldownTimer -= Time.deltaTime;
-        if (cooldownTimer <= 0)
-        {
-            TransitionToState(BossState.COOLDOWN);
-        }
-    }
-
-    // NUEVO: Comportamiento para ataque con proyectiles
-    void ProjectileAttackBehavior()
-    {
-        // Este estado ahora se maneja principalmente por la corrutina
-        // Pero añadimos un timeout por seguridad
-        cooldownTimer -= Time.deltaTime;
-        if (cooldownTimer <= -1f) // Timeout de seguridad
-        {
-            TransitionToState(BossState.COOLDOWN);
         }
     }
 
     void IdleBehavior(float distance)
     {
-        // Timeout para idle - si pasa mucho tiempo en idle, volver a chase
-        idleTimer -= Time.deltaTime;
-        if (idleTimer <= 0)
-        {
-            TransitionToState(BossState.CHASE);
-            return;
-        }
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
 
-        // Solo activarse si el player está en rango
-        if (distance < activationRange)
+        idleTimer -= Time.deltaTime;
+        if (idleTimer <= 0 || distance < activationRange)
         {
             TransitionToState(BossState.CHASE);
         }
@@ -248,29 +233,41 @@ public class BossHealth : MonoBehaviour
 
     void ChaseBehavior(float distance)
     {
-        Vector2 direction = (player.position - transform.position).normalized;
         float currentSpeed = (currentPhase == 1) ? moveSpeed_F1 : moveSpeed_F2_F3;
+        Vector2 direction = (player.position - transform.position).normalized;
 
         rb.linearVelocity = new Vector2(direction.x * currentSpeed, rb.linearVelocity.y);
 
+        // Prioridad de ataques
         if (distance < meleeRange)
         {
             TransitionToState(BossState.MELEE_ATTACK);
+        }
+        else if (currentPhase == 3 && projectileTimer <= 0 && distance < 10f)
+        {
+            TransitionToState(BossState.PROJECTILE_ATTACK);
         }
         else if (currentPhase >= 2 && CheckJumpCondition(distance))
         {
             TransitionToState(BossState.JUMP_ATTACK);
         }
-        else if (currentPhase == 3 && projectileTimer <= 0)
-        {
-            TransitionToState(BossState.PROJECTILE_ATTACK);
-        }
     }
 
     bool CheckJumpCondition(float distance)
     {
-        bool isPlayerHigher = player.position.y > transform.position.y + 0.5f;
-        return distance < jumpDetectRange && isPlayerHigher && isGrounded;
+        bool isPlayerHigher = player.position.y > transform.position.y + 1f;
+        return distance < jumpDetectRange && isPlayerHigher && isGrounded && !isJumping;
+    }
+
+    void MeleeAttackBehavior()
+    {
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        cooldownTimer -= Time.deltaTime;
+
+        if (cooldownTimer <= 0)
+        {
+            TransitionToState(BossState.COOLDOWN);
+        }
     }
 
     void JumpAttackBehavior()
@@ -279,10 +276,8 @@ public class BossHealth : MonoBehaviour
         {
             isJumping = true;
             StartCoroutine(JumpAttackRoutine());
-            return;
         }
-
-        if (isGrounded && isJumping)
+        else if (isGrounded)
         {
             isJumping = false;
             TransitionToState(BossState.COOLDOWN);
@@ -292,14 +287,25 @@ public class BossHealth : MonoBehaviour
     IEnumerator JumpAttackRoutine()
     {
         rb.linearVelocity = Vector2.zero;
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.3f);
 
         if (player != null)
         {
-            jumpTarget = player.position;
-            Vector2 jumpDirection = (jumpTarget - (Vector2)transform.position).normalized;
+            Vector2 jumpDirection = (player.position - transform.position).normalized;
             rb.linearVelocity = new Vector2(jumpDirection.x * moveSpeed_F2_F3, jumpForce_F2);
-            animator.SetTrigger("Attack");
+
+            if (animator != null) animator.SetTrigger("Attack");
+        }
+    }
+
+    void ProjectileAttackBehavior()
+    {
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        cooldownTimer -= Time.deltaTime;
+
+        if (cooldownTimer <= -2f)
+        {
+            TransitionToState(BossState.COOLDOWN);
         }
     }
 
@@ -310,8 +316,7 @@ public class BossHealth : MonoBehaviour
 
         if (cooldownTimer <= 0)
         {
-            BossState nextState = (currentPhase == 1) ? BossState.IDLE : BossState.CHASE;
-            TransitionToState(nextState);
+            TransitionToState(BossState.CHASE);
         }
     }
 
@@ -328,16 +333,9 @@ public class BossHealth : MonoBehaviour
 
     void TransitionToState(BossState newState)
     {
-        // Reset idle timer cuando salimos de idle
         if (currentState == BossState.IDLE && newState != BossState.IDLE)
         {
             idleTimer = idleTimeout;
-        }
-
-        // Detener movimiento al cambiar de estado
-        if (newState != BossState.CHASE && newState != BossState.JUMP_ATTACK)
-        {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
 
         currentState = newState;
@@ -349,18 +347,18 @@ public class BossHealth : MonoBehaviour
                 break;
 
             case BossState.MELEE_ATTACK:
-                animator.SetTrigger("Attack");
+                if (animator != null) animator.SetTrigger("Attack");
                 cooldownTimer = attackCooldown;
                 break;
 
             case BossState.JUMP_ATTACK:
-                cooldownTimer = 0.2f;
+                cooldownTimer = 1f;
                 break;
 
             case BossState.PROJECTILE_ATTACK:
-                animator.SetTrigger("Attack");
+                if (animator != null) animator.SetTrigger("Attack");
                 StartCoroutine(ProjectileAttackRoutine());
-                cooldownTimer = 2f; // Timeout de seguridad
+                cooldownTimer = 2f;
                 break;
 
             case BossState.COOLDOWN:
@@ -368,8 +366,8 @@ public class BossHealth : MonoBehaviour
                 break;
 
             case BossState.STUN:
-                animator.SetTrigger("Hit");
-                cooldownTimer = 0.5f;
+                if (animator != null) animator.SetTrigger("Hit");
+                cooldownTimer = 0.8f;
                 break;
         }
     }
@@ -380,18 +378,19 @@ public class BossHealth : MonoBehaviour
         {
             ShootFanPattern(8);
             fanShotTimer = fanShotInterval;
+            yield return new WaitForSeconds(0.5f);
         }
         else
         {
             for (int i = 0; i < 3; i++)
             {
                 ShootProjectileAtPlayer();
-                yield return new WaitForSeconds(0.3f);
+                yield return new WaitForSeconds(0.4f);
             }
         }
 
-        projectileTimer = 3f;
-        // La transición a COOLDOWN ahora se hace en OnAttackAnimationEnd
+        projectileTimer = projectileCooldown;
+        TransitionToState(BossState.COOLDOWN);
     }
 
     void ShootProjectileAtPlayer()
@@ -417,7 +416,10 @@ public class BossHealth : MonoBehaviour
         for (int i = 0; i < projectileCount; i++)
         {
             float angle = i * angleStep;
-            Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+            Vector2 direction = new Vector2(
+                Mathf.Cos(angle * Mathf.Deg2Rad),
+                Mathf.Sin(angle * Mathf.Deg2Rad)
+            );
 
             GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
             Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
@@ -430,14 +432,27 @@ public class BossHealth : MonoBehaviour
 
     void UpdateAnimations()
     {
-        animator.SetBool("IsRunning", currentState == BossState.CHASE && Mathf.Abs(rb.linearVelocity.x) > 0.1f);
+        if (animator == null) return;
+
+        bool isRunning = currentState == BossState.CHASE && Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+        animator.SetBool("IsRunning", isRunning);
+        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetFloat("YVelocity", rb.linearVelocity.y);
     }
 
     void FlipSprite()
     {
-        if (player != null && currentState != BossState.MELEE_ATTACK && currentState != BossState.STUN)
+        if (player == null || spriteRenderer == null) return;
+
+        if (currentState != BossState.MELEE_ATTACK && currentState != BossState.STUN && currentState != BossState.PROJECTILE_ATTACK)
         {
-            spriteRenderer.flipX = player.position.x < transform.position.x;
+            bool shouldFaceRight = player.position.x > transform.position.x;
+
+            if (shouldFaceRight != isFacingRight)
+            {
+                isFacingRight = shouldFaceRight;
+                spriteRenderer.flipX = !isFacingRight;
+            }
         }
     }
 
@@ -453,29 +468,20 @@ public class BossHealth : MonoBehaviour
         }
         else
         {
-            if (currentState != BossState.STUN)
-            {
-                TransitionToState(BossState.STUN);
+            TransitionToState(BossState.STUN);
 
-                if (player != null)
-                {
-                    Vector2 knockbackDir = (transform.position - player.position).normalized;
-                    if (currentPhase == 1)
-                    {
-                        rb.AddForce(new Vector2(knockbackDir.x * 5f, 0), ForceMode2D.Impulse);
-                    }
-                    else
-                    {
-                        rb.AddForce(knockbackDir * 5f, ForceMode2D.Impulse);
-                    }
-                }
+            if (player != null)
+            {
+                Vector2 knockbackDir = (transform.position - player.position).normalized;
+                float knockbackForce = (currentPhase == 1) ? 5f : 8f;
+                rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
             }
         }
     }
 
     void Die()
     {
-        animator.SetTrigger("Death");
+        if (animator != null) animator.SetTrigger("Death");
         rb.linearVelocity = Vector2.zero;
 
         Collider2D collider = GetComponent<Collider2D>();
@@ -485,26 +491,25 @@ public class BossHealth : MonoBehaviour
         Destroy(gameObject, 2f);
     }
 
-    // ANIMATION EVENTS
+    // ANIMATION EVENTS - Llama estos desde el Animator
     public void OnMeleeAttackHit()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, meleeRange);
+        // Usar el offset del melee flipado para la detección
+        Vector2 meleeCenter = GetFlippedPosition(meleeOffset);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(meleeCenter, meleeRange, playerLayer);
         foreach (Collider2D hit in hits)
         {
-            if (hit.CompareTag("Player"))
+            HealthP6 playerHealth = hit.GetComponent<HealthP6>();
+            if (playerHealth != null)
             {
-                HealthP6 playerHealth = hit.GetComponent<HealthP6>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(meleeDamage);
-                }
+                playerHealth.TakeDamage(meleeDamage);
             }
         }
     }
 
     public void OnAttackAnimationEnd()
     {
-        if (currentState == BossState.MELEE_ATTACK || currentState == BossState.PROJECTILE_ATTACK)
+        if (currentState == BossState.MELEE_ATTACK)
         {
             TransitionToState(BossState.COOLDOWN);
         }
@@ -512,29 +517,66 @@ public class BossHealth : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Gizmo para daño al player con offset
+        // Obtener centros con offsets flipados
+        Vector2 damageCenter = GetFlippedPosition(damageOffset);
+        Vector2 meleeCenter = GetFlippedPosition(meleeOffset);
+        Vector2 jumpDetectCenter = GetFlippedPosition(jumpDetectOffset);
+        Vector2 activationCenter = GetFlippedPosition(activationOffset);
+
+        // Daño por contacto (Rojo)
+        Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
+        Gizmos.DrawWireSphere(damageCenter, damageRange);
         Gizmos.color = Color.red;
-        Vector2 damageCenter = (Vector2)transform.position + damageOffset;
         Gizmos.DrawWireSphere(damageCenter, damageRange);
 
+        // Ataque melee (Amarillo)
+        Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+        Gizmos.DrawWireSphere(meleeCenter, meleeRange);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, meleeRange);
+        Gizmos.DrawWireSphere(meleeCenter, meleeRange);
 
+        // Detección de salto (Azul)
+        Gizmos.color = new Color(0f, 0f, 1f, 0.2f);
+        Gizmos.DrawWireSphere(jumpDetectCenter, jumpDetectRange);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, jumpDetectRange);
+        Gizmos.DrawWireSphere(jumpDetectCenter, jumpDetectRange);
 
+        // Rango de activación (Verde)
+        Gizmos.color = new Color(0f, 1f, 0f, 0.15f);
+        Gizmos.DrawWireSphere(activationCenter, activationRange);
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, activationRange);
+        Gizmos.DrawWireSphere(activationCenter, activationRange);
 
-        // Gizmo para detección de suelo
+        // Detección de suelo
         if (groundCheck != null)
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
 
-        // NUEVO: Mostrar el punto de offset de daño
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireCube(damageCenter, Vector3.one * 0.2f);
+        // Dibujar líneas desde el centro hasta los círculos para mejor referencia
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine(transform.position, damageCenter);
+        Gizmos.DrawLine(transform.position, meleeCenter);
+        Gizmos.DrawLine(transform.position, jumpDetectCenter);
+        Gizmos.DrawLine(transform.position, activationCenter);
+
+        // Marcadores en los centros de los gizmos
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(damageCenter, Vector3.one * 0.1f);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(meleeCenter, Vector3.one * 0.1f);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(jumpDetectCenter, Vector3.one * 0.1f);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(activationCenter, Vector3.one * 0.1f);
+
+        // NUEVO: Mostrar dirección actual
+        Gizmos.color = Color.cyan;
+        Vector3 directionLine = isFacingRight ? Vector3.right : Vector3.left;
+        Gizmos.DrawRay(transform.position, directionLine * 1f);
     }
 }
