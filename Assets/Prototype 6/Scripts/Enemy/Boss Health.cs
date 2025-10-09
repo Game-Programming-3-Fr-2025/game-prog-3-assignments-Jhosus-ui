@@ -32,6 +32,10 @@ public class BossHealth : MonoBehaviour
     public float projectileSpeed = 8f;
     public float projectileCooldown = 5f;
     public float fanShotInterval = 15f;
+    public float jumpAttackChance = 0.2f; // Reducido para menos saltos aleatorios
+
+    [Header("Flip Settings")]
+    public float flipCooldown = 0.3f; // NUEVO: Cooldown para voltear
 
     [Header("Gizmos Offsets")]
     public Vector2 meleeOffset = Vector2.zero;
@@ -41,6 +45,10 @@ public class BossHealth : MonoBehaviour
     [Header("Ground Detection")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+
+    [Header("Visual Feedback")]
+    public float blinkDuration = 0.1f;
+    public int blinkCount = 3;
 
     // Components
     private Transform player;
@@ -62,10 +70,14 @@ public class BossHealth : MonoBehaviour
     private float projectileTimer;
     private float fanShotTimer;
     private float idleTimer;
+    private float lastFlipTime = -999f; // NUEVO: Control de flip
     private bool isJumping = false;
+    private bool hasLandedAfterJump = false; // NUEVO: Evitar saltos repetidos
     private bool isGrounded;
+    private bool wasGrounded; // NUEVO: Detectar aterrizaje
+    private bool isActive = false;
 
-    // Nueva variable para trackear dirección
+    // Variable para trackear dirección
     private bool isFacingRight = true;
 
     void Start()
@@ -85,12 +97,6 @@ public class BossHealth : MonoBehaviour
         fanShotTimer = fanShotInterval;
         projectileTimer = projectileCooldown;
         idleTimer = idleTimeout;
-
-        // Determinar dirección inicial
-        if (spriteRenderer != null)
-        {
-            isFacingRight = !spriteRenderer.flipX;
-        }
 
         // Auto-crear groundCheck si no existe
         if (groundCheck == null)
@@ -114,10 +120,32 @@ public class BossHealth : MonoBehaviour
         }
 
         UpdatePhase();
-        UpdateStateMachine();
+
+        // Solo actualizar state machine si está activo
+        if (isActive)
+        {
+            UpdateStateMachine();
+        }
+        else
+        {
+            CheckActivation();
+        }
+
         UpdateAnimations();
         FlipSprite();
         UpdateTimers();
+    }
+
+    void CheckActivation()
+    {
+        if (player == null) return;
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        if (distanceToPlayer <= activationRange)
+        {
+            isActive = true;
+            TransitionToState(BossState.CHASE);
+        }
     }
 
     void UpdateTimers()
@@ -128,8 +156,15 @@ public class BossHealth : MonoBehaviour
 
     void UpdateGroundDetection()
     {
+        wasGrounded = isGrounded;
         Vector2 checkPos = groundCheck != null ? groundCheck.position : transform.position;
         isGrounded = Physics2D.OverlapCircle(checkPos, groundCheckRadius, groundLayer);
+
+        // Detectar aterrizaje después de salto
+        if (!wasGrounded && isGrounded && isJumping)
+        {
+            hasLandedAfterJump = true;
+        }
     }
 
     void CheckForPlayerContact()
@@ -148,7 +183,7 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    // NUEVO: Método para obtener posición con offset flipado
+    // Método para obtener posición con offset flipado
     Vector2 GetFlippedPosition(Vector2 offset)
     {
         Vector2 flippedOffset = offset;
@@ -179,12 +214,23 @@ public class BossHealth : MonoBehaviour
         currentState = BossState.STUN;
         cooldownTimer = 1.5f;
 
-        if (animator != null) animator.SetTrigger("Hit");
+        StartCoroutine(BlinkEffect());
 
         if (player != null)
         {
             Vector2 knockbackDir = (transform.position - player.position).normalized;
             rb.linearVelocity = new Vector2(knockbackDir.x * 5f, 3f);
+        }
+    }
+
+    IEnumerator BlinkEffect()
+    {
+        for (int i = 0; i < blinkCount; i++)
+        {
+            spriteRenderer.color = new Color(1f, 0.5f, 0.5f, 0.7f);
+            yield return new WaitForSeconds(blinkDuration);
+            spriteRenderer.color = Color.white;
+            yield return new WaitForSeconds(blinkDuration);
         }
     }
 
@@ -255,8 +301,24 @@ public class BossHealth : MonoBehaviour
 
     bool CheckJumpCondition(float distance)
     {
-        bool isPlayerHigher = player.position.y > transform.position.y + 1f;
-        return distance < jumpDetectRange && isPlayerHigher && isGrounded && !isJumping;
+        // NO saltar si ya estamos saltando o acabamos de aterrizar
+        if (isJumping || !isGrounded || !hasLandedAfterJump)
+            return false;
+
+        // Condición: player más alto (más tolerante)
+        bool isPlayerHigher = player.position.y > transform.position.y + 2f;
+
+        // Salto aleatorio SOLO cuando el player está en el aire o saltando
+        bool isPlayerJumping = false;
+        Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+        if (playerRb != null)
+        {
+            isPlayerJumping = Mathf.Abs(playerRb.linearVelocity.y) > 0.5f;
+        }
+
+        bool randomJump = isPlayerJumping && currentPhase >= 2 && Random.value < jumpAttackChance;
+
+        return distance < jumpDetectRange && distance > meleeRange && (isPlayerHigher || randomJump);
     }
 
     void MeleeAttackBehavior()
@@ -275,10 +337,12 @@ public class BossHealth : MonoBehaviour
         if (!isJumping)
         {
             isJumping = true;
+            hasLandedAfterJump = false; // IMPORTANTE: Reset al empezar salto
             StartCoroutine(JumpAttackRoutine());
         }
-        else if (isGrounded)
+        else if (isGrounded && hasLandedAfterJump)
         {
+            // Pequeña pausa después de aterrizar antes de continuar persiguiendo
             isJumping = false;
             TransitionToState(BossState.COOLDOWN);
         }
@@ -327,6 +391,7 @@ public class BossHealth : MonoBehaviour
 
         if (cooldownTimer <= 0)
         {
+            hasLandedAfterJump = true; // NUEVO: Reset después de cooldown
             TransitionToState(BossState.CHASE);
         }
     }
@@ -362,11 +427,11 @@ public class BossHealth : MonoBehaviour
                 break;
 
             case BossState.COOLDOWN:
-                cooldownTimer = attackCooldown;
+                cooldownTimer = attackCooldown * 0.5f; // Cooldown más corto después de ataques
                 break;
 
             case BossState.STUN:
-                if (animator != null) animator.SetTrigger("Hit");
+                StartCoroutine(BlinkEffect());
                 cooldownTimer = 0.8f;
                 break;
         }
@@ -376,12 +441,14 @@ public class BossHealth : MonoBehaviour
     {
         if (fanShotTimer <= 0)
         {
+            // Fan Pattern (360 grados)
             ShootFanPattern(8);
             fanShotTimer = fanShotInterval;
             yield return new WaitForSeconds(0.5f);
         }
         else
         {
+            // Triple disparo hacia el jugador
             for (int i = 0; i < 3; i++)
             {
                 ShootProjectileAtPlayer();
@@ -397,13 +464,26 @@ public class BossHealth : MonoBehaviour
     {
         if (projectilePrefab == null || player == null) return;
 
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        // Spawn ligeramente adelante del boss en su dirección
+        Vector2 spawnOffset = isFacingRight ? Vector2.right * 0.5f : Vector2.left * 0.5f;
+        Vector2 spawnPosition = (Vector2)transform.position + spawnOffset;
+
+        GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
         Vector2 direction = (player.position - transform.position).normalized;
 
-        Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
-        if (projRb != null)
+        ProyectilBoss proyectilScript = projectile.GetComponent<ProyectilBoss>();
+        if (proyectilScript != null)
         {
-            projRb.linearVelocity = direction * projectileSpeed;
+            proyectilScript.SetDirection(direction);
+        }
+        else
+        {
+            // Fallback
+            Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
+            if (projRb != null)
+            {
+                projRb.linearVelocity = direction * projectileSpeed;
+            }
         }
     }
 
@@ -422,10 +502,18 @@ public class BossHealth : MonoBehaviour
             );
 
             GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
-            if (projRb != null)
+            ProyectilBoss proyectilScript = projectile.GetComponent<ProyectilBoss>();
+            if (proyectilScript != null)
             {
-                projRb.linearVelocity = direction * projectileSpeed;
+                proyectilScript.SetDirection(direction);
+            }
+            else
+            {
+                Rigidbody2D projRb = projectile.GetComponent<Rigidbody2D>();
+                if (projRb != null)
+                {
+                    projRb.linearVelocity = direction * projectileSpeed;
+                }
             }
         }
     }
@@ -444,15 +532,23 @@ public class BossHealth : MonoBehaviour
     {
         if (player == null || spriteRenderer == null) return;
 
-        if (currentState != BossState.MELEE_ATTACK && currentState != BossState.STUN && currentState != BossState.PROJECTILE_ATTACK)
-        {
-            bool shouldFaceRight = player.position.x > transform.position.x;
+        // No voltear durante ataques o stun
+        if (currentState == BossState.MELEE_ATTACK ||
+            currentState == BossState.STUN ||
+            currentState == BossState.PROJECTILE_ATTACK)
+            return;
 
-            if (shouldFaceRight != isFacingRight)
-            {
-                isFacingRight = shouldFaceRight;
-                spriteRenderer.flipX = !isFacingRight;
-            }
+        // Cooldown para voltear (evita volteos instantáneos)
+        if (Time.time < lastFlipTime + flipCooldown)
+            return;
+
+        bool shouldFaceRight = player.position.x > transform.position.x;
+
+        if (shouldFaceRight != isFacingRight)
+        {
+            isFacingRight = shouldFaceRight;
+            spriteRenderer.flipX = !isFacingRight;
+            lastFlipTime = Time.time;
         }
     }
 
@@ -468,13 +564,14 @@ public class BossHealth : MonoBehaviour
         }
         else
         {
-            TransitionToState(BossState.STUN);
+            StartCoroutine(BlinkEffect());
 
-            if (player != null)
+            // Pequeño stun solo si no está atacando
+            if (currentState != BossState.MELEE_ATTACK &&
+                currentState != BossState.PROJECTILE_ATTACK &&
+                currentState != BossState.JUMP_ATTACK)
             {
-                Vector2 knockbackDir = (transform.position - player.position).normalized;
-                float knockbackForce = (currentPhase == 1) ? 5f : 8f;
-                rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+                TransitionToState(BossState.STUN);
             }
         }
     }
@@ -494,7 +591,6 @@ public class BossHealth : MonoBehaviour
     // ANIMATION EVENTS - Llama estos desde el Animator
     public void OnMeleeAttackHit()
     {
-        // Usar el offset del melee flipado para la detección
         Vector2 meleeCenter = GetFlippedPosition(meleeOffset);
         Collider2D[] hits = Physics2D.OverlapCircleAll(meleeCenter, meleeRange, playerLayer);
         foreach (Collider2D hit in hits)
@@ -525,25 +621,25 @@ public class BossHealth : MonoBehaviour
 
         // Daño por contacto (Rojo)
         Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
-        Gizmos.DrawWireSphere(damageCenter, damageRange);
+        Gizmos.DrawSphere(damageCenter, damageRange);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(damageCenter, damageRange);
 
         // Ataque melee (Amarillo)
         Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-        Gizmos.DrawWireSphere(meleeCenter, meleeRange);
+        Gizmos.DrawSphere(meleeCenter, meleeRange);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(meleeCenter, meleeRange);
 
         // Detección de salto (Azul)
         Gizmos.color = new Color(0f, 0f, 1f, 0.2f);
-        Gizmos.DrawWireSphere(jumpDetectCenter, jumpDetectRange);
+        Gizmos.DrawSphere(jumpDetectCenter, jumpDetectRange);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(jumpDetectCenter, jumpDetectRange);
 
         // Rango de activación (Verde)
         Gizmos.color = new Color(0f, 1f, 0f, 0.15f);
-        Gizmos.DrawWireSphere(activationCenter, activationRange);
+        Gizmos.DrawSphere(activationCenter, activationRange);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(activationCenter, activationRange);
 
@@ -554,29 +650,35 @@ public class BossHealth : MonoBehaviour
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
 
-        // Dibujar líneas desde el centro hasta los círculos para mejor referencia
-        Gizmos.color = Color.white;
+        // Líneas de referencia
+        Gizmos.color = Color.white * 0.5f;
         Gizmos.DrawLine(transform.position, damageCenter);
         Gizmos.DrawLine(transform.position, meleeCenter);
         Gizmos.DrawLine(transform.position, jumpDetectCenter);
         Gizmos.DrawLine(transform.position, activationCenter);
 
-        // Marcadores en los centros de los gizmos
+        // Marcadores en los centros
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(damageCenter, Vector3.one * 0.1f);
+        Gizmos.DrawWireCube(damageCenter, Vector3.one * 0.15f);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(meleeCenter, Vector3.one * 0.1f);
+        Gizmos.DrawWireCube(meleeCenter, Vector3.one * 0.15f);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(jumpDetectCenter, Vector3.one * 0.1f);
+        Gizmos.DrawWireCube(jumpDetectCenter, Vector3.one * 0.15f);
 
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(activationCenter, Vector3.one * 0.1f);
+        Gizmos.DrawWireCube(activationCenter, Vector3.one * 0.15f);
 
-        // NUEVO: Mostrar dirección actual
+        // Indicador de dirección
         Gizmos.color = Color.cyan;
         Vector3 directionLine = isFacingRight ? Vector3.right : Vector3.left;
-        Gizmos.DrawRay(transform.position, directionLine * 1f);
+        Gizmos.DrawRay(transform.position, directionLine * 1.5f);
+
+        // Texto debug (solo en Scene view)
+#if UNITY_EDITOR
+        UnityEditor.Handles.Label(transform.position + Vector3.up * 2f,
+            $"State: {currentState}\nPhase: {currentPhase}\nGrounded: {isGrounded}\nJumping: {isJumping}");
+#endif
     }
 }

@@ -169,14 +169,18 @@ MonoBehaviour:
   attackCooldown: 2
   meleeDamage: 1
   projectilePrefab: {fileID: 7374863252574312481, guid: 1ef61daa052843f4885df1a2e6896b55, type: 3}
-  projectileSpeed: 8
-  projectileCooldown: 15
-  fanShotInterval: 15
+  projectileSpeed: 7
+  projectileCooldown: 8
+  fanShotInterval: 12
+  jumpAttackChance: 0.3
+  flipCooldown: 1
   meleeOffset: {x: 1.2, y: 0.1}
   jumpDetectOffset: {x: 2, y: 0}
   activationOffset: {x: 2, y: 0}
   groundCheck: {fileID: 1969349873}
   groundCheckRadius: 0.5
+  blinkDuration: 0.1
+  blinkCount: 3
 --- !u!61 &15244551
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16456,7 +16460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackRange: 0.8
-  attackOffset: {x: 0.7, y: 0}
+  attackOffset: {x: 0.9, y: 0}
   attackDamage: 5
   attackCooldown: 0.5
 --- !u!114 &2064380409
