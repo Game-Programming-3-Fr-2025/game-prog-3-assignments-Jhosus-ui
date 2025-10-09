@@ -8,8 +8,13 @@ public class Combate : MonoBehaviour
     public float attackDamage = 5f;
     public float attackCooldown = 0.5f;
 
+    [Header("Sound Settings")]
+    public AudioClip attackSound; // Arrastra el archivo de sonido aquí en el Inspector
+    public float soundVolume = 1f;
+
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private AudioSource audioSource;
     private float lastAttackTime = -999f;
     private bool isAttacking = false;
     private LayerMask enemyLayer;
@@ -19,6 +24,14 @@ public class Combate : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Obtener o crear AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         enemyLayer = LayerMask.GetMask("Enemy");
         manager = FindObjectOfType<ManagerUp>();
     }
@@ -44,20 +57,25 @@ public class Combate : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Attack");
 
+        // Reproducir sonido de ataque
+        PlayAttackSound();
+
         DealDamage();
         Invoke(nameof(EndAttack), 0.1f);
+    }
+
+    void PlayAttackSound()
+    {
+        if (attackSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(attackSound, soundVolume);
+        }
     }
 
     void DealDamage()
     {
         Vector2 attackPos = GetAttackPosition();
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRange, enemyLayer);
-
-        // Registrar golpe en ManagerUp si hay hits
-        if (manager != null && hits.Length > 0)
-        {
-            manager.RegisterHit();
-        }
 
         foreach (Collider2D hit in hits)
         {

@@ -12,12 +12,20 @@ public class ManagerUp : MonoBehaviour
     public int dashCost = 100, doubleJumpCost = 150, wallClimbCost = 120;
     public int healthCost = 80, damageCost = 100, expBonusCost = 60;
 
-    private int exp = 1000;
+    [Header("EXP Settings")]
+    public float expGainInterval = 5f; // Cada cuántos segundos gana EXP
+    public int baseExpGain = 3; // EXP base que gana por intervalo
+
+    private int exp = 0;
     private int healthLevel = 0, damageLevel = 0, expLevel = 0;
     private bool dashBought, doubleJumpBought, wallClimbBought;
+    private bool isInExpZone = false;
+    private float expTimer = 0f;
 
-    private const int MAX_HEALTH = 4, MAX_DAMAGE = 4, MAX_EXP = 11;
+    private const int MAX_HEALTH = 4, MAX_DAMAGE = 4, MAX_EXP = 8;
     private int[] damageValues = { 5, 9, 13, 17, 21 };
+    // NUEVO: Array con los valores fijos de EXP por nivel
+    private int[] expValues = { 3, 4, 6, 7, 9, 12, 13, 15 };
 
     private Evasion playerEvasion;
     private HealthP6 playerHealth;
@@ -30,6 +38,20 @@ public class ManagerUp : MonoBehaviour
         FindPlayer();
         SetupButtons();
         UpdateUI();
+    }
+
+    void Update()
+    {
+        // Ganar EXP automáticamente si está en la zona
+        if (isInExpZone)
+        {
+            expTimer += Time.deltaTime;
+            if (expTimer >= expGainInterval)
+            {
+                GainExperience();
+                expTimer = 0f;
+            }
+        }
     }
 
     void FindPlayer()
@@ -133,16 +155,30 @@ public class ManagerUp : MonoBehaviour
         UpdateUI();
     }
 
-    public void RegisterHit()
+    // MODIFICADO: Usar array de valores fijos en lugar de cálculo
+    void GainExperience()
     {
-        if (++hitCount >= 3)
-        {
-            hitCount = 0;
-            exp += Mathf.RoundToInt(10 * (1.12f + expLevel * 0.06f));
-            UpdateUI();
-        }
+        int expGained = expValues[Mathf.Min(expLevel, expValues.Length - 1)];
+        exp += expGained;
+        UpdateUI();
+
+        Debug.Log($"Ganaste {expGained} EXP! Total: {exp}");
     }
-    private int hitCount = 0;
+
+    // NUEVO: Métodos para entrar/salir de la zona de EXP
+    public void EnterExpZone()
+    {
+        isInExpZone = true;
+        expTimer = 0f;
+        Debug.Log("Entró a zona de EXP");
+    }
+
+    public void ExitExpZone()
+    {
+        isInExpZone = false;
+        expTimer = 0f;
+        Debug.Log("Salió de zona de EXP");
+    }
 
     public void UpdateUI()
     {
@@ -153,7 +189,7 @@ public class ManagerUp : MonoBehaviour
 
         healthText.text = GetUpgradeText("HP +1", healthLevel, MAX_HEALTH, healthCost);
         damageText.text = GetUpgradeText($"DMG: {damageValues[damageLevel]}", damageLevel, MAX_DAMAGE, damageCost);
-        expBonusText.text = GetUpgradeText($"+{12 + expLevel * 6}%", expLevel, MAX_EXP, expBonusCost);
+        expBonusText.text = GetUpgradeText($"+{expValues[Mathf.Min(expLevel, expValues.Length - 1)]} EXP", expLevel, MAX_EXP, expBonusCost);
     }
 
     string GetUpgradeText(string description, int level, int maxLevel, int cost)

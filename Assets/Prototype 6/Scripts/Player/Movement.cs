@@ -17,12 +17,12 @@ public class Movement : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Combate combate;
-    private Evasion evasion;
+    private Evasion evasion; // Referencia a Evasion
 
     // State Variables (públicas para Evasion)
     private float horizontalInput;
     [HideInInspector] public bool isGrounded;
-    [HideInInspector] public bool isFacingRight = true;
+    [HideInInspector] public bool isFacingRight = true; // TRUE = Mirando a la DERECHA
     private bool isJumping;
     private float jumpTimeCounter;
     private bool canMove = true;
@@ -35,7 +35,7 @@ public class Movement : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         combate = GetComponent<Combate>();
-        evasion = GetComponent<Evasion>();
+        evasion = GetComponent<Evasion>(); // Inicializar referencia
 
         groundLayerMask = 1 << LayerMask.NameToLayer("Ground");
 
@@ -121,19 +121,29 @@ public class Movement : MonoBehaviour
 
     void HandleFlip()
     {
-        // NO hacer flip durante wall slide o dash
-        bool canFlip = true;
-
-        if (evasion != null)
+        // ARREGLO CLAVE: Ceder el control si Evasion está activo
+        if (evasion != null && (evasion.IsWallSliding() || evasion.IsDashing()))
         {
-            if (evasion.IsWallSliding() || evasion.IsDashing())
-                canFlip = false;
+            // El script Evasion.cs se encargará de spriteRenderer.flipX
+            return;
         }
 
-        if (canFlip && ((horizontalInput > 0 && !isFacingRight) || (horizontalInput < 0 && isFacingRight)))
+        // Lógica normal de volteo por Input
+        if ((horizontalInput > 0 && !isFacingRight) || (horizontalInput < 0 && isFacingRight))
         {
             isFacingRight = !isFacingRight;
-            spriteRenderer.flipX = !spriteRenderer.flipX;
+            // Nueva lógica de FlipX: FALSE = Derecha, TRUE = Izquierda
+            spriteRenderer.flipX = !isFacingRight;
+        }
+    }
+
+    // NUEVO: Método público para restaurar el Flip desde Evasion.cs
+    public void RestoreFlipToMovementDirection()
+    {
+        if (spriteRenderer != null)
+        {
+            // Aplica la convención normal de Flip: FALSE para Derecha (isFacingRight = true)
+            spriteRenderer.flipX = !isFacingRight;
         }
     }
 

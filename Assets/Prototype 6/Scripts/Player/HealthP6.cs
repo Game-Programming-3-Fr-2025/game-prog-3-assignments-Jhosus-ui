@@ -12,12 +12,18 @@ public class HealthP6 : MonoBehaviour
     [Header("UI References")]
     public Image[] healthHearts;
 
+    [Header("Sound Settings")]
+    public AudioClip damageSound; // Sonido cuando recibe daño
+    public AudioClip deathSound;  // Sonido cuando muere
+    public float soundVolume = 1f;
+
     private int currentHealth;
     private bool isInvincible = false;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
     private Rigidbody2D rb;
     private ManagerUp manager;
+    private AudioSource audioSource;
 
     void Start()
     {
@@ -25,6 +31,13 @@ public class HealthP6 : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         manager = FindObjectOfType<ManagerUp>();
+
+        // Obtener o crear AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
 
         if (manager != null)
         {
@@ -51,6 +64,9 @@ public class HealthP6 : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
         UpdateHealthUI();
 
+        // Reproducir sonido de daño
+        PlayDamageSound();
+
         if (currentHealth > 0)
         {
             ApplyKnockback();
@@ -60,6 +76,22 @@ public class HealthP6 : MonoBehaviour
         else
         {
             Die();
+        }
+    }
+
+    void PlayDamageSound()
+    {
+        if (damageSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(damageSound, soundVolume);
+        }
+    }
+
+    void PlayDeathSound()
+    {
+        if (deathSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(deathSound, soundVolume);
         }
     }
 
@@ -97,6 +129,9 @@ public class HealthP6 : MonoBehaviour
 
     void Die()
     {
+        // Reproducir sonido de muerte
+        PlayDeathSound();
+
         if (animator != null)
         {
             animator.SetTrigger("Die");

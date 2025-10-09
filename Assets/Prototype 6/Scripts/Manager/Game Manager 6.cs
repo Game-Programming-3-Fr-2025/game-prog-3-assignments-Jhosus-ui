@@ -5,11 +5,14 @@ public class GameManager6 : MonoBehaviour
 {
     public static GameManager6 Instance;
 
-    [Header("Respawn Settings")]
+    [Header("Settings")]
     public float respawnDelay = 2f;
     public Transform respawnPoint;
+    public bool resetBoss = true;
 
     private GameObject player;
+    private BossHealth boss;
+    private Vector3 bossStartPosition;
 
     void Awake()
     {
@@ -17,6 +20,11 @@ public class GameManager6 : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Encontrar y guardar referencia del boss
+            boss = FindObjectOfType<BossHealth>();
+            if (boss != null)
+                bossStartPosition = boss.transform.position;
         }
         else
         {
@@ -26,58 +34,54 @@ public class GameManager6 : MonoBehaviour
 
     void Start()
     {
-        FindPlayer();
-        if (respawnPoint == null)
-        {
-            GameObject spawnObj = GameObject.FindGameObjectWithTag("Respawn");
-            if (spawnObj != null) respawnPoint = spawnObj.transform;
-        }
-    }
-
-    void FindPlayer()
-    {
         player = GameObject.FindGameObjectWithTag("Player");
+        if (respawnPoint == null)
+            respawnPoint = GameObject.FindGameObjectWithTag("Respawn")?.transform;
     }
 
-    public void PlayerDied()
+    public void PlayerDied() => StartCoroutine(RespawnCoroutine());
+
+    public void OnPlayerTeleported()
     {
-        StartCoroutine(RespawnSequence());
+        if (resetBoss) ResetBoss();
     }
 
-    IEnumerator RespawnSequence()
+    IEnumerator RespawnCoroutine()
     {
         yield return new WaitForSeconds(respawnDelay);
-        ExecuteRespawn();
+        RespawnPlayer();
+        if (resetBoss) ResetBoss();
     }
 
-    void ExecuteRespawn()
+    void RespawnPlayer()
     {
-        if (player == null) FindPlayer();
+        if (player == null) player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null || respawnPoint == null) return;
 
-        if (player != null && respawnPoint != null)
+        Vector3 spawnPos = respawnPoint.position;
+        spawnPos.z = 0;
+
+        player.transform.position = spawnPos;
+        player.SetActive(true);
+
+        // CORREGIDO: Usar linearVelocity en vez de Reset()
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
         {
-            // ✅ FORZAR POSICIÓN Z = 0
-            Vector3 spawnPosition = respawnPoint.position;
-            spawnPosition.z = 0; // ← ESTA ES LA LÍNEA CLAVE
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
 
-            player.transform.position = spawnPosition;
+        player.GetComponent<HealthP6>()?.Respawn();
+        FindObjectOfType<ManagerUp>()?.OnPlayerRespawn();
+    }
 
-            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
-
-            player.SetActive(true);
-
-            HealthP6 playerHealth = player.GetComponent<HealthP6>();
-            if (playerHealth != null)
-            {
-                playerHealth.Respawn();
-            }
-
-            ManagerUp manager = FindObjectOfType<ManagerUp>();
-            manager?.OnPlayerRespawn();
+    void ResetBoss()
+    {
+        if (boss != null)
+        {
+            boss.transform.position = bossStartPosition;
+            boss.ResetBoss();
         }
     }
 }
