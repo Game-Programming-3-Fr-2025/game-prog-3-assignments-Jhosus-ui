@@ -13,10 +13,10 @@ public class ManagerUp : MonoBehaviour
     public int healthCost = 80, damageCost = 100, expBonusCost = 60;
 
     [Header("EXP Settings")]
-    public float expGainInterval = 5f; // Cada cuántos segundos gana EXP
-    public int baseExpGain = 3; // EXP base que gana por intervalo
+    public float expGainInterval = 5f;
+    public int baseExpGain = 3;
 
-    private int exp = 0;
+    private int exp = 90;
     private int healthLevel = 0, damageLevel = 0, expLevel = 0;
     private bool dashBought, doubleJumpBought, wallClimbBought;
     private bool isInExpZone = false;
@@ -24,8 +24,7 @@ public class ManagerUp : MonoBehaviour
 
     private const int MAX_HEALTH = 4, MAX_DAMAGE = 4, MAX_EXP = 8;
     private int[] damageValues = { 5, 9, 13, 17, 21 };
-    // NUEVO: Array con los valores fijos de EXP por nivel
-    private int[] expValues = { 3, 4, 6, 7, 9, 12, 13, 15 };
+    private int[] expValues = { 3, 6, 10, 15, 21, 28, 34, 42 };
 
     private Evasion playerEvasion;
     private HealthP6 playerHealth;
@@ -42,7 +41,6 @@ public class ManagerUp : MonoBehaviour
 
     void Update()
     {
-        // Ganar EXP automáticamente si está en la zona
         if (isInExpZone)
         {
             expTimer += Time.deltaTime;
@@ -155,29 +153,23 @@ public class ManagerUp : MonoBehaviour
         UpdateUI();
     }
 
-    // MODIFICADO: Usar array de valores fijos en lugar de cálculo
     void GainExperience()
     {
         int expGained = expValues[Mathf.Min(expLevel, expValues.Length - 1)];
         exp += expGained;
         UpdateUI();
-
-        Debug.Log($"Ganaste {expGained} EXP! Total: {exp}");
     }
 
-    // NUEVO: Métodos para entrar/salir de la zona de EXP
     public void EnterExpZone()
     {
         isInExpZone = true;
         expTimer = 0f;
-        Debug.Log("Entró a zona de EXP");
     }
 
     public void ExitExpZone()
     {
         isInExpZone = false;
         expTimer = 0f;
-        Debug.Log("Salió de zona de EXP");
     }
 
     public void UpdateUI()

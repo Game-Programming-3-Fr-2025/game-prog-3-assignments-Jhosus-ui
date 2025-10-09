@@ -13,7 +13,7 @@ public class Evasion : MonoBehaviour
     public float dashCooldown = 1f;
 
     [Header("Double Jump Settings")]
-    public float doubleJumpForceMultiplier = 0.7f; // ← 70% del salto normal (como Hollow Knight)
+    public float doubleJumpForceMultiplier = 0.7f;
 
     [Header("Wall Settings")]
     public float wallSlideSpeed = 2f;
@@ -61,7 +61,6 @@ public class Evasion : MonoBehaviour
         {
             if (dashTimeLeft > 0)
             {
-                // USAR la dirección actual del sprite para el Dash
                 float dir = movement.isFacingRight ? 1f : -1f;
                 rb.linearVelocity = new Vector2(dir * dashSpeed, 0);
                 dashTimeLeft -= Time.deltaTime;
@@ -91,43 +90,31 @@ public class Evasion : MonoBehaviour
 
     void HandleDoubleJump()
     {
-        // Reset double jump cuando toca el suelo
         if (movement.isGrounded)
         {
             canDoubleJump = true;
         }
 
-        // Double jump input - con porcentaje de fuerza reducida
         if (Input.GetKeyDown(KeyCode.Space) && !movement.isGrounded && canDoubleJump && !isWallSliding)
         {
-            // APLICAR SALTO CON PORCENTAJE REDUCIDO
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); // Reset Y velocity
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             float doubleJumpForce = movement.jumpForce * doubleJumpForceMultiplier;
             rb.AddForce(Vector2.up * doubleJumpForce, ForceMode2D.Impulse);
 
             canDoubleJump = false;
             if (animator != null) animator.SetTrigger("DoubleJump");
-
-            Debug.Log($"Double Jump! Fuerza: {doubleJumpForce} ({doubleJumpForceMultiplier * 100}% del salto normal)");
         }
     }
 
     void HandleWallClimb()
     {
-        // 1. Detección de pared (Raycast en ambas direcciones si no hay input, o solo en la dirección del input)
         Vector2 checkDirection = movement.isFacingRight ? Vector2.right : Vector2.left;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, wallCheckDistance, wallLayer);
 
-        // Asume que si golpea la pared y no está en el suelo, está tocando
         bool touchingWall = hit.collider != null && !movement.isGrounded;
-
-        // 2. Determinar el lado de la pared (útil para el flip)
-        // Si el Raycast fue a la Derecha y golpeó, es la pared Derecha
         bool isOnRightWall = hit.collider != null && checkDirection.x > 0;
-        // Si el Raycast fue a la Izquierda y golpeó, es la pared Izquierda
         bool isOnLeftWall = hit.collider != null && checkDirection.x < 0;
 
-        // Guardar estado anterior
         wasWallSliding = isWallSliding;
 
         if (touchingWall && rb.linearVelocity.y < 0)
@@ -135,12 +122,8 @@ public class Evasion : MonoBehaviour
             isWallSliding = true;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed));
 
-            // ARREGLO CLAVE: VOLTEAR SPRITE para mirar hacia la pared
             if (spriteRenderer != null)
             {
-                // Convención: flipX=false (derecha), flipX=true (izquierda)
-                // Si la pared está a la derecha, el sprite debe mirar a la derecha (flipX=false)
-                // Si la pared está a la izquierda, el sprite debe mirar a la izquierda (flipX=true)
                 spriteRenderer.flipX = isOnLeftWall;
             }
 
@@ -148,10 +131,8 @@ public class Evasion : MonoBehaviour
         }
         else
         {
-            // RESTAURAR FLIP al salir de la pared
             if (wasWallSliding)
             {
-                // Usar el nuevo método del Movement.cs para restaurar la dirección
                 if (movement != null) movement.RestoreFlipToMovementDirection();
             }
 
@@ -159,29 +140,24 @@ public class Evasion : MonoBehaviour
             if (animator != null) animator.SetBool("IsWallSliding", false);
         }
 
-        // Wall jump
         if (isWallSliding && Input.GetKeyDown(KeyCode.Space))
         {
-            // La dirección del salto es la opuesta a la pared
             float wallDirection = isOnRightWall ? -1f : 1f;
             Vector2 jumpDir = new Vector2(wallDirection * wallJumpDirection.x, wallJumpDirection.y);
 
             rb.linearVelocity = Vector2.zero;
             rb.AddForce(jumpDir * wallJumpForce, ForceMode2D.Impulse);
 
-            // 3. Actualizar dirección del personaje y restaurar Flip después del wall jump
-            movement.isFacingRight = wallDirection > 0; // Si wallDirection es positivo (saltó a la derecha), isFacingRight es TRUE
+            movement.isFacingRight = wallDirection > 0;
             if (movement != null) movement.RestoreFlipToMovementDirection();
 
-            // Reset double jump después del wall jump
             canDoubleJump = true;
-            ForceExitWallSlide(); // Forzar la salida de Wall Slide para limpiar estados
+            ForceExitWallSlide();
 
             if (animator != null) animator.SetTrigger("WallJump");
         }
     }
 
-    // Función de soporte para forzar la salida del estado
     public void ForceExitWallSlide()
     {
         if (isWallSliding)

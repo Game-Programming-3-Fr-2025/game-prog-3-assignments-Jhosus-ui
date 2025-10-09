@@ -12,17 +12,15 @@ public class Movement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
 
-    // Component References
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Combate combate;
-    private Evasion evasion; // Referencia a Evasion
+    private Evasion evasion;
 
-    // State Variables (públicas para Evasion)
     private float horizontalInput;
     [HideInInspector] public bool isGrounded;
-    [HideInInspector] public bool isFacingRight = true; // TRUE = Mirando a la DERECHA
+    [HideInInspector] public bool isFacingRight = true;
     private bool isJumping;
     private float jumpTimeCounter;
     private bool canMove = true;
@@ -35,7 +33,7 @@ public class Movement : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         combate = GetComponent<Combate>();
-        evasion = GetComponent<Evasion>(); // Inicializar referencia
+        evasion = GetComponent<Evasion>();
 
         groundLayerMask = 1 << LayerMask.NameToLayer("Ground");
 
@@ -121,28 +119,22 @@ public class Movement : MonoBehaviour
 
     void HandleFlip()
     {
-        // ARREGLO CLAVE: Ceder el control si Evasion está activo
         if (evasion != null && (evasion.IsWallSliding() || evasion.IsDashing()))
         {
-            // El script Evasion.cs se encargará de spriteRenderer.flipX
             return;
         }
 
-        // Lógica normal de volteo por Input
         if ((horizontalInput > 0 && !isFacingRight) || (horizontalInput < 0 && isFacingRight))
         {
             isFacingRight = !isFacingRight;
-            // Nueva lógica de FlipX: FALSE = Derecha, TRUE = Izquierda
             spriteRenderer.flipX = !isFacingRight;
         }
     }
 
-    // NUEVO: Método público para restaurar el Flip desde Evasion.cs
     public void RestoreFlipToMovementDirection()
     {
         if (spriteRenderer != null)
         {
-            // Aplica la convención normal de Flip: FALSE para Derecha (isFacingRight = true)
             spriteRenderer.flipX = !isFacingRight;
         }
     }

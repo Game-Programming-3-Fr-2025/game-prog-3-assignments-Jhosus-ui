@@ -21,7 +21,6 @@ public class GameManager6 : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Encontrar y guardar referencia del boss
             boss = FindObjectOfType<BossHealth>();
             if (boss != null)
                 bossStartPosition = boss.transform.position;
@@ -64,7 +63,6 @@ public class GameManager6 : MonoBehaviour
         player.transform.position = spawnPos;
         player.SetActive(true);
 
-        // CORREGIDO: Usar linearVelocity en vez de Reset()
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         if (rb != null)
         {

@@ -10,10 +10,7 @@ public class ExpZone : MonoBehaviour
         if (other.CompareTag(playerTag))
         {
             ManagerUp manager = FindObjectOfType<ManagerUp>();
-            if (manager != null)
-            {
-                manager.EnterExpZone();
-            }
+            manager?.EnterExpZone();
         }
     }
 
@@ -22,16 +19,12 @@ public class ExpZone : MonoBehaviour
         if (other.CompareTag(playerTag))
         {
             ManagerUp manager = FindObjectOfType<ManagerUp>();
-            if (manager != null)
-            {
-                manager.ExitExpZone();
-            }
+            manager?.ExitExpZone();
         }
     }
 
     void OnDrawGizmos()
     {
-        // Visualizar la zona en el editor
         Collider2D collider = GetComponent<Collider2D>();
         if (collider != null)
         {

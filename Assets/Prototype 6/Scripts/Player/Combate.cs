@@ -9,7 +9,7 @@ public class Combate : MonoBehaviour
     public float attackCooldown = 0.5f;
 
     [Header("Sound Settings")]
-    public AudioClip attackSound; // Arrastra el archivo de sonido aquí en el Inspector
+    public AudioClip attackSound;
     public float soundVolume = 1f;
 
     private Animator animator;
@@ -25,7 +25,6 @@ public class Combate : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // Obtener o crear AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -57,9 +56,7 @@ public class Combate : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Attack");
 
-        // Reproducir sonido de ataque
         PlayAttackSound();
-
         DealDamage();
         Invoke(nameof(EndAttack), 0.1f);
     }

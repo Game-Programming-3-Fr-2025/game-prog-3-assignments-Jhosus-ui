@@ -37,7 +37,6 @@ public class BossHealth : MonoBehaviour
     public Transform groundCheck;
     public float groundRadius = 0.2f;
 
-    // Privadas
     private Transform player;
     private Animator anim;
     private Rigidbody2D rb;
@@ -49,7 +48,6 @@ public class BossHealth : MonoBehaviour
     private bool isJumping = false;
     private bool facingRight = true;
 
-    // Timers
     private float contactTimer = 0f;
     private float attackTimer = 0f;
     private float projectileTimer = 0f;
@@ -57,7 +55,6 @@ public class BossHealth : MonoBehaviour
     private float flipTimer = 0f;
     private float stunTimer = 0f;
 
-    // Estados simples
     private enum State { Idle, Chase, Attacking, Stunned }
     private State currentState = State.Idle;
 
@@ -71,10 +68,9 @@ public class BossHealth : MonoBehaviour
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
 
-        // Crear groundCheck si no existe
         if (groundCheck == null) CreateGroundCheck();
 
-        projectileTimer = projectileCooldown * 0.5f; // Primer ataque más rápido
+        projectileTimer = projectileCooldown * 0.5f;
     }
 
     void Update()
@@ -158,12 +154,10 @@ public class BossHealth : MonoBehaviour
 
     void UpdateChase(float distance)
     {
-        // Movimiento hacia el player
         Vector2 direction = (player.position - transform.position).normalized;
         float speed = phase == 1 ? chaseSpeed : phase2Speed;
         rb.linearVelocity = new Vector2(direction.x * speed, rb.linearVelocity.y);
 
-        // Flip sprite
         if (flipTimer <= 0)
         {
             bool shouldFaceRight = player.position.x > transform.position.x;
@@ -175,14 +169,12 @@ public class BossHealth : MonoBehaviour
             }
         }
 
-        // Daño por contacto
         if (contactTimer <= 0)
         {
             CheckContactDamage();
             contactTimer = 1f;
         }
 
-        // Decidir ataque
         if (attackTimer <= 0)
         {
             if (distance < meleeRange)
@@ -268,17 +260,15 @@ public class BossHealth : MonoBehaviour
 
     IEnumerator ExecuteProjectileAttack()
     {
-        yield return new WaitForSeconds(0.2f); // Pequeño delay para sincronizar con animación
+        yield return new WaitForSeconds(0.2f);
 
         if (fanTimer <= 0)
         {
-            // Disparo en abanico
             ShootFanProjectiles(8);
             fanTimer = fanShotCooldown;
         }
         else
         {
-            // Triple disparo dirigido
             for (int i = 0; i < 3; i++)
             {
                 ShootAtPlayer();
@@ -323,7 +313,6 @@ public class BossHealth : MonoBehaviour
         anim.SetBool("IsGrounded", isGrounded);
         anim.SetFloat("YVelocity", rb.linearVelocity.y);
 
-        // Detectar aterrizaje después de salto
         if (isJumping && isGrounded)
         {
             isJumping = false;
@@ -357,7 +346,7 @@ public class BossHealth : MonoBehaviour
 
         currentHealth -= damage;
         StartCoroutine(BlinkEffect());
-        stunTimer = 0.3f; // Stun corto
+        stunTimer = 0.3f;
 
         CheckPhaseTransition();
 
@@ -385,7 +374,6 @@ public class BossHealth : MonoBehaviour
         stunTimer = 1.5f;
         StartCoroutine(BlinkEffect());
 
-        // Pequeño knockback
         if (player != null)
         {
             Vector2 knockback = (transform.position - player.position).normalized;
@@ -419,7 +407,6 @@ public class BossHealth : MonoBehaviour
         Destroy(gameObject, 2f);
     }
 
-    // Animation Events
     public void OnMeleeHit()
     {
         Vector2 attackPos = GetFlippedPosition(meleeOffset);
@@ -442,23 +429,18 @@ public class BossHealth : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Contact damage
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(GetFlippedPosition(contactOffset), contactRange);
 
-        // Melee attack
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(GetFlippedPosition(meleeOffset), meleeRange);
 
-        // Jump range
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, jumpRange);
 
-        // Activation range
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, activationRange);
 
-        // Ground check
         if (groundCheck != null)
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
@@ -474,19 +456,16 @@ public class BossHealth : MonoBehaviour
         isActive = false;
         isJumping = false;
 
-        // Resetear todos los timers
         attackTimer = 0;
         projectileTimer = projectileCooldown * 0.5f;
         fanTimer = 0;
 
-        // Resetear física
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
         }
 
-        // Resetear animación
         if (anim != null)
         {
             anim.SetBool("IsRunning", false);

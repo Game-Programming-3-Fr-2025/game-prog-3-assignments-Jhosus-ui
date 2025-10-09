@@ -2,20 +2,14 @@ using UnityEngine;
 
 public class ShopTrigger : MonoBehaviour
 {
-    public GameObject shopUI; // Arrastra el Canvas de la tienda aquí
+    public GameObject shopUI;
     public KeyCode interactKey = KeyCode.E;
 
     private bool isShopOpen = false;
 
     void Start()
     {
-        if (shopUI != null)
-            shopUI.SetActive(false);
-    }
-
-    void Update()
-    {
-        // Solo verificar input si el jugador está en el trigger
+        shopUI?.SetActive(false);
     }
 
     void OnTriggerStay2D(Collider2D other)
@@ -37,15 +31,12 @@ public class ShopTrigger : MonoBehaviour
     void ToggleShop()
     {
         isShopOpen = !isShopOpen;
-
-        if (shopUI != null)
-            shopUI.SetActive(isShopOpen);
+        shopUI?.SetActive(isShopOpen);
     }
 
     void CloseShop()
     {
         isShopOpen = false;
-        if (shopUI != null)
-            shopUI.SetActive(false);
+        shopUI?.SetActive(false);
     }
 }

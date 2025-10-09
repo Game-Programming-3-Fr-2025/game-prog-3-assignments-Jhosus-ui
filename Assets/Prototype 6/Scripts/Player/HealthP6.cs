@@ -13,8 +13,8 @@ public class HealthP6 : MonoBehaviour
     public Image[] healthHearts;
 
     [Header("Sound Settings")]
-    public AudioClip damageSound; // Sonido cuando recibe daño
-    public AudioClip deathSound;  // Sonido cuando muere
+    public AudioClip damageSound;
+    public AudioClip deathSound;
     public float soundVolume = 1f;
 
     private int currentHealth;
@@ -32,7 +32,6 @@ public class HealthP6 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         manager = FindObjectOfType<ManagerUp>();
 
-        // Obtener o crear AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -64,7 +63,6 @@ public class HealthP6 : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
         UpdateHealthUI();
 
-        // Reproducir sonido de daño
         PlayDamageSound();
 
         if (currentHealth > 0)
@@ -129,7 +127,6 @@ public class HealthP6 : MonoBehaviour
 
     void Die()
     {
-        // Reproducir sonido de muerte
         PlayDeathSound();
 
         if (animator != null)
