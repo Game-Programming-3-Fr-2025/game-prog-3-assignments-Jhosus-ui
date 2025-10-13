@@ -98,7 +98,7 @@ public class HealthP6 : MonoBehaviour
         if (rb == null) return;
 
         Vector2 direction = spriteRenderer.flipX ? Vector2.right : Vector2.left;
-        direction.y = 0.2f;
+        direction.y = 0.3f;
 
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);

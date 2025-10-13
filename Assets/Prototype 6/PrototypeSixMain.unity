@@ -8275,7 +8275,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shopUI: {fileID: 1640302067}
-  interactKey: 101
 --- !u!61 &1314610862
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -17165,7 +17164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 4
-  invincibilityTime: 0.4
+  invincibilityTime: 0.5
   knockbackForce: 50
   healthHearts:
   - {fileID: 1627437843}

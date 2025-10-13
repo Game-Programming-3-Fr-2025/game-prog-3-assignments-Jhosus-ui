@@ -16,7 +16,7 @@ public class ManagerUp : MonoBehaviour
     public float expGainInterval = 5f;
     public int baseExpGain = 3;
 
-    private int exp = 90;
+    private int exp = 150;
     private int healthLevel = 0, damageLevel = 0, expLevel = 0;
     private bool dashBought, doubleJumpBought, wallClimbBought;
     private bool isInExpZone = false;

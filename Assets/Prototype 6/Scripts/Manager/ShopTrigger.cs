@@ -3,7 +3,7 @@ using UnityEngine;
 public class ShopTrigger : MonoBehaviour
 {
     public GameObject shopUI;
-    public KeyCode interactKey = KeyCode.E;
+    private KeyCode interactKey = KeyCode.E;
 
     private bool isShopOpen = false;
 
