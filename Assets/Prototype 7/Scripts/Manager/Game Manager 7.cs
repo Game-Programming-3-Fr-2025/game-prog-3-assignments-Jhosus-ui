@@ -11,7 +11,7 @@ public class GameManager7 : MonoBehaviour
 
     [Header("Boss Settings")]
     public int bossSpawnCount = 3;
-    private bool[] bossWaveSpawned = new bool[3]; // Para 7.5, 5 y 2.5 minutos
+    private bool[] bossWaveSpawned = new bool[3]; 
     private bool finalBossSpawned = false;
     private bool waitingForBossClear = false;
 
