@@ -4,149 +4,131 @@ using System.Linq;
 
 public class SpawnerEnemy7 : MonoBehaviour
 {
-    [Header("Enemy Spawn")]
+    [Header("Configuración")]
     public GameObject enemyPrefab;
+    public GameObject bossPrefab;
+    public Transform[] spawnPoints;
+
+    [Header("Spawn")]
     public float spawnInterval = 3f;
     public int minEnemies = 3;
     public int maxEnemies = 50;
-    public int spawnIncreaseInterval = 3;
-
-    [Header("Spawn Points")]
-    public Transform[] spawnPoints;
+    public int waveIncrement = 3;
     public float minDistanceFromPlayer = 10f;
 
-    [Header("Boss Spawn")]
-    public GameObject bossPrefab;
-    public Transform[] bossSpawnPoints;
+    [Header("Pooling")]
+    public int initialPoolSize = 20;
+    public int maxPoolSize = 100;
 
-    private float spawnTimer;
-    private GameManager7 gameManager;
     private Transform player;
-    private int currentWave = 0;
+    private GameManager7 gameManager;
+    private float spawnTimer;
+    private int currentWave;
     private int currentSpawnCount;
+
+    private Queue<GameObject> enemyPool = new Queue<GameObject>();
+    private Queue<GameObject> bossPool = new Queue<GameObject>();
+    private List<GameObject> activeEnemies = new List<GameObject>();
+    private List<GameObject> activeBosses = new List<GameObject>();
 
     void Start()
     {
         gameManager = FindObjectOfType<GameManager7>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        spawnTimer = spawnInterval;
         currentSpawnCount = minEnemies;
+
+        for (int i = 0; i < initialPoolSize; i++) CreatePooledObject(enemyPrefab, enemyPool, false);
+        for (int i = 0; i < 10; i++) CreatePooledObject(bossPrefab ?? enemyPrefab, bossPool, true);
     }
 
     void Update()
     {
-        if (player == null || !gameManager.CanSpawnEnemies()) return;
+        if (!player || !gameManager.CanSpawnEnemies()) return;
 
-        spawnTimer -= Time.deltaTime;
-
-        if (spawnTimer <= 0)
+        if ((spawnTimer -= Time.deltaTime) <= 0)
         {
-            SpawnEnemies();
+            SpawnWave();
             spawnTimer = spawnInterval;
-            currentWave++;
-
-            if (currentWave % spawnIncreaseInterval == 0 && currentSpawnCount < maxEnemies)
-            {
-                currentSpawnCount++;
-                Debug.Log($"Spawn increased to {currentSpawnCount} enemies/wave");
-            }
+            if (++currentWave % waveIncrement == 0 && currentSpawnCount < maxEnemies) currentSpawnCount++;
         }
     }
 
-    void SpawnEnemies()
+    void SpawnWave()
     {
-        if (enemyPrefab == null)
-        {
-            Debug.LogError("Enemy Prefab not assigned!");
-            return;
-        }
+        var points = GetValidSpawnPoints();
+        int count = Mathf.Min(currentSpawnCount, points.Count);
 
-        var availablePoints = GetAvailableSpawnPoints();
-        if (availablePoints.Count == 0)
-        {
-            Debug.LogWarning("No spawn points available (player too close)");
-            return;
-        }
-
-        int count = Mathf.Min(currentSpawnCount, availablePoints.Count);
         for (int i = 0; i < count; i++)
-        {
-            var spawnPoint = availablePoints[Random.Range(0, availablePoints.Count)];
-            Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
-        }
-
-        Debug.Log($"Wave {currentWave}: Spawned {count} enemies");
+            SpawnFromPool(enemyPool, activeEnemies, points[Random.Range(0, points.Count)].position, false);
     }
 
-    List<Transform> GetAvailableSpawnPoints()
+    public void SpawnBossWave(int count)
     {
-        if (spawnPoints == null || spawnPoints.Length == 0)
-        {
-            Debug.LogError("No spawn points assigned!");
-            return new List<Transform>();
-        }
-
-        return spawnPoints
-            .Where(sp => sp != null && Vector2.Distance(player.position, sp.position) >= minDistanceFromPlayer)
-            .ToList();
+        for (int i = 0; i < count; i++)
+            SpawnFromPool(bossPool, activeBosses, GetValidSpawnPoints().FirstOrDefault()?.position ?? transform.position, true);
     }
 
-    public void SpawnBossWave(int bossCount)
+    void CreatePooledObject(GameObject prefab, Queue<GameObject> pool, bool isBoss)
     {
-        if (bossPrefab == null)
+        if (!prefab) return;
+
+        var obj = Instantiate(prefab);
+        obj.SetActive(false);
+
+        var enemy = obj.GetComponent<Enemy7>();
+        if (enemy)
         {
-            Debug.LogError("Boss Prefab not assigned!");
-            return;
+            enemy.Initialize(this, isBoss);
+            enemy.OnEnemyDeath += () => ReturnToPool(obj, isBoss ? activeBosses : activeEnemies, pool);
         }
 
-        if (bossSpawnPoints == null || bossSpawnPoints.Length == 0)
-        {
-            Debug.LogError("Boss Spawn Points not assigned!");
-            return;
-        }
-
-        for (int i = 0; i < bossCount; i++)
-        {
-            var spawnPoint = bossSpawnPoints[Random.Range(0, bossSpawnPoints.Length)];
-            Instantiate(bossPrefab, spawnPoint.position, Quaternion.identity);
-        }
-        Debug.Log($"Boss wave spawned: {bossCount} bosses");
+        pool.Enqueue(obj);
     }
 
-    public bool AreAllBossesDefeated()
+    void SpawnFromPool(Queue<GameObject> pool, List<GameObject> activeList, Vector3 position, bool isBoss)
     {
-        return GameObject.FindGameObjectsWithTag("Boss").Length == 0;
+        if (pool.Count == 0 && activeList.Count + pool.Count < maxPoolSize)
+            CreatePooledObject(isBoss ? (bossPrefab ?? enemyPrefab) : enemyPrefab, pool, isBoss);
+
+        if (pool.Count > 0)
+        {
+            var obj = pool.Dequeue();
+            obj.transform.position = position;
+            obj.SetActive(true);
+            activeList.Add(obj);
+        }
     }
 
+    void ReturnToPool(GameObject obj, List<GameObject> activeList, Queue<GameObject> pool)
+    {
+        if (!obj) return;
+        obj.SetActive(false);
+        activeList.Remove(obj);
+        pool.Enqueue(obj);
+    }
+
+    public void ReturnEnemyToPool(GameObject enemy) => ReturnToPool(enemy, activeEnemies, enemyPool);
+    public void ReturnBossToPool(GameObject boss) => ReturnToPool(boss, activeBosses, bossPool);
+    public bool AreAllBossesDefeated() => activeBosses.Count == 0;
+
+    List<Transform> GetValidSpawnPoints() =>
+        spawnPoints?.Where(sp => sp && Vector2.Distance(player.position, sp.position) >= minDistanceFromPlayer).ToList()
+        ?? new List<Transform>();
+
+    // GIZMOS PARA VISUALIZAR LA DISTANCIA MÍNIMA DEL PLAYER
     void OnDrawGizmos()
     {
         if (spawnPoints == null) return;
 
-        foreach (var point in spawnPoints.Where(p => p != null))
+        // Dibujar área de exclusión alrededor de cada spawn point
+        Gizmos.color = new Color(1f, 0.5f, 0f, 0.3f); // Naranja semitransparente
+
+        foreach (var spawnPoint in spawnPoints)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(point.position, 0.5f);
-
-            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-            Gizmos.DrawSphere(point.position, minDistanceFromPlayer);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (spawnPoints == null) return;
-
-        foreach (var point in spawnPoints.Where(p => p != null))
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(point.position, 0.3f);
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(point.position, minDistanceFromPlayer);
-
-#if UNITY_EDITOR
-            UnityEditor.Handles.Label(point.position + Vector3.up, $"Dist: {minDistanceFromPlayer}m");
-#endif
+            if (spawnPoint != null)
+            {
+                Gizmos.DrawWireSphere(spawnPoint.position, minDistanceFromPlayer);
+            }
         }
     }
 }

@@ -4,36 +4,37 @@ using System.Collections;
 
 public class GameManager7 : MonoBehaviour
 {
-    [Header("Timer Settings")]
-    public float maxGameTime = 600f; // 10 minutos en segundos
+    [Header("Settings")]
+    public float maxGameTime = 600f;
     public float startDelay = 3f;
+    public int bossSpawnCount = 3;
     public TMP_Text timerText;
 
-    [Header("Boss Settings")]
-    public int bossSpawnCount = 3;
-    private bool[] bossWaveSpawned = new bool[3]; 
-    private bool finalBossSpawned = false;
-    private bool waitingForBossClear = false;
+    [Header("EXP System")]
+    public TMP_Text expText; // UI para mostrar EXP
+    private int currentEXP = 0;
 
-    [Header("Game State")]
-    public bool gameStarted = false;
-    public bool gameEnded = false;
+    public bool gameStarted { get; private set; }
+    public bool gameEnded { get; private set; }
 
     private float currentTime;
-    private bool playerHasMoved = false;
+    private bool playerHasMoved;
+    private bool waitingForBossClear;
+    private bool finalBossSpawned;
     private Vector3 lastPlayerPosition;
     private SpawnerEnemy7 spawner;
+    private Transform player;
+    private readonly float[] bossTimes = { 450f, 300f, 150f };
+    private bool[] bossWaveSpawned = new bool[3];
 
     void Start()
     {
         currentTime = maxGameTime;
         spawner = FindObjectOfType<SpawnerEnemy7>();
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            lastPlayerPosition = player.transform.position;
-        }
+        if (player)
+            lastPlayerPosition = player.position;
 
         StartCoroutine(StartGameAfterDelay());
         UpdateTimerDisplay();
@@ -45,14 +46,12 @@ public class GameManager7 : MonoBehaviour
 
         CheckPlayerMovement();
 
-        // Si estamos esperando que eliminen los bosses, no reducimos el timer
         if (waitingForBossClear)
         {
             CheckBossClear();
             return;
         }
 
-        // Reducir timer solo si el jugador se ha movido y no estamos en pausa de bosses
         if (playerHasMoved && currentTime > 0)
         {
             currentTime -= Time.deltaTime;
@@ -60,9 +59,7 @@ public class GameManager7 : MonoBehaviour
             CheckBossSpawn();
 
             if (currentTime <= 0 && !finalBossSpawned)
-            {
                 TriggerFinalBosses();
-            }
         }
     }
 
@@ -74,36 +71,41 @@ public class GameManager7 : MonoBehaviour
 
     void CheckPlayerMovement()
     {
-        if (playerHasMoved) return;
+        if (playerHasMoved || !player) return;
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null && Vector3.Distance(lastPlayerPosition, player.transform.position) > 0.1f)
-        {
+        if (Vector3.Distance(lastPlayerPosition, player.position) > 0.1f)
             playerHasMoved = true;
-        }
     }
 
     void UpdateTimerDisplay()
     {
-        if (timerText != null)
-        {
-            int minutes = Mathf.FloorToInt(currentTime / 60f);
-            int seconds = Mathf.FloorToInt(currentTime % 60f);
-            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        if (!timerText) return;
 
-            // Cambiar color cuando queden 10 segundos
-            if (currentTime <= 10f)
-            {
-                timerText.color = Color.red;
-            }
+        int minutes = Mathf.FloorToInt(currentTime / 60f);
+        int seconds = Mathf.FloorToInt(currentTime % 60f);
+        timerText.text = $"{minutes:00}:{seconds:00}";
+
+        if (currentTime <= 10f)
+            timerText.color = Color.red;
+    }
+
+    public void AddEXP(int amount)
+    {
+        currentEXP += amount;
+        UpdateEXPDisplay();
+        Debug.Log($"EXP total: {currentEXP}");
+    }
+
+    void UpdateEXPDisplay()
+    {
+        if (expText != null)
+        {
+            expText.text = $"EXP: {currentEXP}";
         }
     }
 
     void CheckBossSpawn()
     {
-        // Spawn bosses cada 2.5 minutos (150 segundos)
-        float[] bossTimes = { 450f, 300f, 150f }; // 7.5min, 5min, 2.5min
-
         for (int i = 0; i < bossTimes.Length; i++)
         {
             if (currentTime <= bossTimes[i] && currentTime > bossTimes[i] - 1f && !bossWaveSpawned[i])
@@ -117,11 +119,8 @@ public class GameManager7 : MonoBehaviour
 
     void TriggerBossWave()
     {
-        if (spawner != null)
-        {
+        if (spawner)
             spawner.SpawnBossWave(bossSpawnCount);
-            Debug.Log($"GameManager: Solicitando oleada de {bossSpawnCount} bosses");
-        }
     }
 
     void TriggerFinalBosses()
@@ -129,25 +128,19 @@ public class GameManager7 : MonoBehaviour
         finalBossSpawned = true;
         waitingForBossClear = true;
         TriggerBossWave();
-        Debug.Log("GameManager: ¡Jefes finales! Elimínalos todos para terminar el juego.");
     }
 
     void CheckBossClear()
     {
-        if (spawner != null && spawner.AreAllBossesDefeated())
-        {
+        if (spawner && spawner.AreAllBossesDefeated())
             EndGame();
-        }
     }
 
     void EndGame()
     {
         gameEnded = true;
-        Debug.Log("GameManager: ¡Juego terminado! Todos los bosses eliminados.");
     }
 
-    public bool CanSpawnEnemies()
-    {
-        return gameStarted && playerHasMoved && !gameEnded && !waitingForBossClear;
-    }
+    public bool CanSpawnEnemies() =>
+        gameStarted && playerHasMoved && !gameEnded && !waitingForBossClear;
 }
