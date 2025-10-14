@@ -1,16 +1,40 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy7 : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [Header("Enemy Settings")]
+    public float moveSpeed = 3f;
+    public float stoppingDistance = 1f;
+
+    private Transform player;
+    private NavMeshAgent navMeshAgent;
+
     void Start()
     {
-        
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
+        if (navMeshAgent != null)
+        {
+            navMeshAgent.speed = moveSpeed;
+            navMeshAgent.stoppingDistance = stoppingDistance;
+            navMeshAgent.updateRotation = false; 
+            navMeshAgent.updateUpAxis = false; 
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (player != null && navMeshAgent != null)
+        {
+            navMeshAgent.SetDestination(player.position);
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, stoppingDistance);
     }
 }
