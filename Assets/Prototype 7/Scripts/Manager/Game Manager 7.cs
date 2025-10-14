@@ -104,6 +104,21 @@ public class GameManager7 : MonoBehaviour
         }
     }
 
+    public int GetCurrentEXP()
+    {
+        return currentEXP;
+    }
+
+    public bool GastarEXP(int cantidad)
+    {
+        if (currentEXP >= cantidad)
+        {
+            currentEXP -= cantidad;
+            UpdateEXPDisplay();
+            return true;
+        }
+        return false;
+    }
     void CheckBossSpawn()
     {
         for (int i = 0; i < bossTimes.Length; i++)
