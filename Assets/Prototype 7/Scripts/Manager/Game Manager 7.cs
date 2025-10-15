@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager7 : MonoBehaviour
 {
@@ -11,21 +12,22 @@ public class GameManager7 : MonoBehaviour
     public TMP_Text timerText;
 
     [Header("EXP System")]
-    public TMP_Text expText; // UI para mostrar EXP
-    private int currentEXP = 0;
+    public TMP_Text expText;
+    private int currentEXP = 1;
+
+    [Header("Boss Spawn")]
+    public float bossSpawnInterval = 150f; // Cada 2.5 minutos
 
     public bool gameStarted { get; private set; }
     public bool gameEnded { get; private set; }
 
     private float currentTime;
     private bool playerHasMoved;
-    private bool waitingForBossClear;
-    private bool finalBossSpawned;
     private Vector3 lastPlayerPosition;
     private SpawnerEnemy7 spawner;
     private Transform player;
-    private readonly float[] bossTimes = { 450f, 300f, 150f };
-    private bool[] bossWaveSpawned = new bool[3];
+    private float nextBossSpawnTime;
+    private bool reinicioProgramado = false;
 
     void Start()
     {
@@ -35,6 +37,8 @@ public class GameManager7 : MonoBehaviour
 
         if (player)
             lastPlayerPosition = player.position;
+
+        nextBossSpawnTime = maxGameTime - bossSpawnInterval; // Primer boss a los 7.5 minutos
 
         StartCoroutine(StartGameAfterDelay());
         UpdateTimerDisplay();
@@ -46,20 +50,18 @@ public class GameManager7 : MonoBehaviour
 
         CheckPlayerMovement();
 
-        if (waitingForBossClear)
-        {
-            CheckBossClear();
-            return;
-        }
-
         if (playerHasMoved && currentTime > 0)
         {
             currentTime -= Time.deltaTime;
             UpdateTimerDisplay();
             CheckBossSpawn();
 
-            if (currentTime <= 0 && !finalBossSpawned)
-                TriggerFinalBosses();
+            // Reiniciar cuando el tiempo llegue a 0
+            if (currentTime <= 0 && !reinicioProgramado)
+            {
+                reinicioProgramado = true;
+                StartCoroutine(ReiniciarEscena());
+            }
         }
     }
 
@@ -89,11 +91,40 @@ public class GameManager7 : MonoBehaviour
             timerText.color = Color.red;
     }
 
+    void CheckBossSpawn()
+    {
+        // Spawnear bosses cada X tiempo
+        if (currentTime <= nextBossSpawnTime)
+        {
+            TriggerBossWave();
+            nextBossSpawnTime -= bossSpawnInterval; // Siguiente boss
+        }
+    }
+
+    void TriggerBossWave()
+    {
+        if (spawner)
+        {
+            spawner.SpawnBossWave(bossSpawnCount);
+            Debug.Log($"¡Oleada de {bossSpawnCount} bosses apareció! Tiempo: {currentTime:F0}s");
+        }
+    }
+
+    IEnumerator ReiniciarEscena()
+    {
+        Debug.Log("Tiempo agotado! Reiniciando escena...");
+
+        // Pequeño delay antes del reinicio
+        yield return new WaitForSeconds(2f);
+
+        // Reiniciar la escena actual
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void AddEXP(int amount)
     {
         currentEXP += amount;
         UpdateEXPDisplay();
-        Debug.Log($"EXP total: {currentEXP}");
     }
 
     void UpdateEXPDisplay()
@@ -109,53 +140,6 @@ public class GameManager7 : MonoBehaviour
         return currentEXP;
     }
 
-    public bool GastarEXP(int cantidad)
-    {
-        if (currentEXP >= cantidad)
-        {
-            currentEXP -= cantidad;
-            UpdateEXPDisplay();
-            return true;
-        }
-        return false;
-    }
-    void CheckBossSpawn()
-    {
-        for (int i = 0; i < bossTimes.Length; i++)
-        {
-            if (currentTime <= bossTimes[i] && currentTime > bossTimes[i] - 1f && !bossWaveSpawned[i])
-            {
-                bossWaveSpawned[i] = true;
-                TriggerBossWave();
-                break;
-            }
-        }
-    }
-
-    void TriggerBossWave()
-    {
-        if (spawner)
-            spawner.SpawnBossWave(bossSpawnCount);
-    }
-
-    void TriggerFinalBosses()
-    {
-        finalBossSpawned = true;
-        waitingForBossClear = true;
-        TriggerBossWave();
-    }
-
-    void CheckBossClear()
-    {
-        if (spawner && spawner.AreAllBossesDefeated())
-            EndGame();
-    }
-
-    void EndGame()
-    {
-        gameEnded = true;
-    }
-
     public bool CanSpawnEnemies() =>
-        gameStarted && playerHasMoved && !gameEnded && !waitingForBossClear;
+        gameStarted && playerHasMoved && !gameEnded;
 }
