@@ -5,42 +5,42 @@ using UnityEngine.SceneManagement;
 
 public class GameManager7 : MonoBehaviour
 {
-    [Header("Settings")]
-    public float maxGameTime = 600f;
-    public float startDelay = 3f;
-    public int bossSpawnCount = 3;
-    public TMP_Text timerText;
+    [Header("Game Settings")]
+    [SerializeField] private float maxGameTime = 600f;
+    [SerializeField] private float startDelay = 3f;
+    [SerializeField] private TMP_Text timerText;
 
     [Header("EXP System")]
-    public TMP_Text expText;
+    [SerializeField] private TMP_Text expText;
     private int currentEXP = 1;
 
-    [Header("Boss Spawn")]
-    public float bossSpawnInterval = 150f; // Cada 2.5 minutos
+    [Header("Boss Wave")]
+    [SerializeField] private float bossSpawnInterval = 150f;
+    [SerializeField] private int bossSpawnCount = 3;
 
     public bool gameStarted { get; private set; }
     public bool gameEnded { get; private set; }
 
     private float currentTime;
-    private bool playerHasMoved;
-    private Vector3 lastPlayerPosition;
-    private SpawnerEnemy7 spawner;
-    private Transform player;
     private float nextBossSpawnTime;
-    private bool reinicioProgramado = false;
+    private bool playerHasMoved;
+    private bool restartScheduled;
+    private Vector3 lastPlayerPosition;
+    private Transform player;
+    private SpawnerEnemy7 spawner;
 
     void Start()
     {
         currentTime = maxGameTime;
+        nextBossSpawnTime = maxGameTime - bossSpawnInterval;
+
         spawner = FindObjectOfType<SpawnerEnemy7>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
         if (player)
             lastPlayerPosition = player.position;
 
-        nextBossSpawnTime = maxGameTime - bossSpawnInterval; // Primer boss a los 7.5 minutos
-
-        StartCoroutine(StartGameAfterDelay());
+        StartCoroutine(DelayedGameStart());
         UpdateTimerDisplay();
     }
 
@@ -56,16 +56,15 @@ public class GameManager7 : MonoBehaviour
             UpdateTimerDisplay();
             CheckBossSpawn();
 
-            // Reiniciar cuando el tiempo llegue a 0
-            if (currentTime <= 0 && !reinicioProgramado)
+            if (currentTime <= 0 && !restartScheduled)
             {
-                reinicioProgramado = true;
-                StartCoroutine(ReiniciarEscena());
+                restartScheduled = true;
+                StartCoroutine(RestartScene());
             }
         }
     }
 
-    IEnumerator StartGameAfterDelay()
+    IEnumerator DelayedGameStart()
     {
         yield return new WaitForSeconds(startDelay);
         gameStarted = true;
@@ -74,7 +73,6 @@ public class GameManager7 : MonoBehaviour
     void CheckPlayerMovement()
     {
         if (playerHasMoved || !player) return;
-
         if (Vector3.Distance(lastPlayerPosition, player.position) > 0.1f)
             playerHasMoved = true;
     }
@@ -93,53 +91,27 @@ public class GameManager7 : MonoBehaviour
 
     void CheckBossSpawn()
     {
-        // Spawnear bosses cada X tiempo
         if (currentTime <= nextBossSpawnTime)
         {
-            TriggerBossWave();
-            nextBossSpawnTime -= bossSpawnInterval; // Siguiente boss
+            spawner?.SpawnBossWave(bossSpawnCount);
+            nextBossSpawnTime -= bossSpawnInterval;
         }
     }
 
-    void TriggerBossWave()
+    IEnumerator RestartScene()
     {
-        if (spawner)
-        {
-            spawner.SpawnBossWave(bossSpawnCount);
-            Debug.Log($"¡Oleada de {bossSpawnCount} bosses apareció! Tiempo: {currentTime:F0}s");
-        }
-    }
-
-    IEnumerator ReiniciarEscena()
-    {
-        Debug.Log("Tiempo agotado! Reiniciando escena...");
-
-        // Pequeño delay antes del reinicio
         yield return new WaitForSeconds(2f);
-
-        // Reiniciar la escena actual
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void AddEXP(int amount)
     {
         currentEXP += amount;
-        UpdateEXPDisplay();
-    }
-
-    void UpdateEXPDisplay()
-    {
-        if (expText != null)
-        {
+        if (expText)
             expText.text = $"EXP: {currentEXP}";
-        }
     }
 
-    public int GetCurrentEXP()
-    {
-        return currentEXP;
-    }
+    public int GetCurrentEXP() => currentEXP;
 
-    public bool CanSpawnEnemies() =>
-        gameStarted && playerHasMoved && !gameEnded;
+    public bool CanSpawnEnemies() => gameStarted && playerHasMoved && !gameEnded;
 }

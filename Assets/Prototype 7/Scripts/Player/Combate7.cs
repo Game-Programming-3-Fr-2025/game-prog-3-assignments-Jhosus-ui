@@ -1,176 +1,139 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Combate7 : MonoBehaviour
 {
-    [Header("Configuración de Disparo")]
-    public GameObject balaPrefab;
-    public float cadenciaDisparo = 1.8f;
-    public float damage = 10f;
-    public float rangoDeteccion = 4f;
+    [Header("Shoot Settings")]
+    [SerializeField] private GameObject balaPrefab;
+    [SerializeField] private Transform puntoDisparo;
+    [SerializeField] private float cadenciaDisparo = 1.8f;
+    [SerializeField] private float damage = 10f;
+    [SerializeField] private float rangoDeteccion = 4f;
 
-    [Header("Punto de Disparo")]
-    public Transform puntoDisparo;
+    [Header("Critical System")]
+    [SerializeField] private float critChance = 6f;
+    [SerializeField] private float critMultiplier = 2f;
 
-    [Header("Sistema Crítico")]
-    public float critChance = 6f; // % de probabilidad
-    public float critMultiplier = 2f; // Multiplicador de daño crítico
+    [Header("Area Damage")]
+    [SerializeField] private float areaDamage = 0f;
+    [SerializeField] private float areaRange = 2f;
+    [SerializeField] private float areaCooldown = 2f;
 
-    [Header("Sistema de Área")]
-    public float areaDamage = 0f;
-    public float areaRange = 2f;
-    public float areaCooldown = 2f;
+    [Header("Lights")]
+    [SerializeField] private Light2D areaLight;
+    [SerializeField] private Light2D visionLight;
 
-    [Header("Referencias Visuales")]
-    public UnityEngine.Rendering.Universal.Light2D areaLight;
-    public UnityEngine.Rendering.Universal.Light2D visionLight;
-
-    private float tiempoUltimoDisparo;
-    private float tiempoUltimoAreaDamage;
-    private Transform enemigoCercano;
-    private UPManager7 upManager;
+    private float lastShootTime;
+    private float lastAreaDamageTime;
+    private Transform nearestEnemy;
 
     void Start()
     {
-        if (puntoDisparo == null)
+        if (!puntoDisparo)
             puntoDisparo = transform;
 
-        upManager = FindObjectOfType<UPManager7>();
-        ActualizarLuces();
+        UpdateLights();
     }
 
     void Update()
     {
-        BuscarEnemigoCercano();
-        DispararAutomatico();
-        AplicarDamageArea();
+        FindNearestEnemy();
+        AutoShoot();
+        ApplyAreaDamage();
     }
 
-    void BuscarEnemigoCercano()
+    void FindNearestEnemy()
     {
-        GameObject[] enemigos = GameObject.FindGameObjectsWithTag("Enemy");
-        float distanciaMasCercana = Mathf.Infinity;
-        enemigoCercano = null;
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        float minDistance = Mathf.Infinity;
+        nearestEnemy = null;
 
-        foreach (GameObject enemigo in enemigos)
+        foreach (var enemy in enemies)
         {
-            float distancia = Vector2.Distance(transform.position, enemigo.transform.position);
-            if (distancia < distanciaMasCercana && distancia <= rangoDeteccion)
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance < minDistance && distance <= rangoDeteccion)
             {
-                distanciaMasCercana = distancia;
-                enemigoCercano = enemigo.transform;
+                minDistance = distance;
+                nearestEnemy = enemy.transform;
             }
         }
     }
 
-    void DispararAutomatico()
+    void AutoShoot()
     {
-        if (Time.time - tiempoUltimoDisparo >= cadenciaDisparo && enemigoCercano != null)
+        if (Time.time - lastShootTime >= cadenciaDisparo && nearestEnemy)
         {
-            Disparar();
-            tiempoUltimoDisparo = Time.time;
+            Shoot();
+            lastShootTime = Time.time;
         }
     }
 
-    void Disparar()
+    void Shoot()
     {
-        if (balaPrefab == null) return;
+        if (!balaPrefab) return;
 
-        GameObject bala = Instantiate(balaPrefab, puntoDisparo.position, Quaternion.identity);
-        Bala7 scriptBala = bala.GetComponent<Bala7>();
+        GameObject bullet = Instantiate(balaPrefab, puntoDisparo.position, Quaternion.identity);
+        Bala7 bulletScript = bullet.GetComponent<Bala7>();
 
-        if (scriptBala != null)
+        if (bulletScript)
         {
-            float damageFinal = damage;
-            bool esCritico = Random.Range(0f, 100f) <= critChance;
+            float finalDamage = damage;
 
-            if (esCritico)
-            {
-                damageFinal *= critMultiplier;
-                Debug.Log("¡DISPARO CRÍTICO!");
-            }
+            if (Random.Range(0f, 100f) <= critChance)
+                finalDamage *= critMultiplier;
 
-            scriptBala.SetDamage(damageFinal);
-            Vector2 direccion = (enemigoCercano.position - puntoDisparo.position).normalized;
-            scriptBala.direccion = direccion;
+            bulletScript.SetDamage(finalDamage);
+            bulletScript.direccion = (nearestEnemy.position - puntoDisparo.position).normalized;
         }
     }
 
-    void AplicarDamageArea()
+    void ApplyAreaDamage()
     {
-        if (areaDamage <= 0) return;
+        if (areaDamage <= 0 || Time.time - lastAreaDamageTime < areaCooldown) return;
 
-        if (Time.time - tiempoUltimoAreaDamage >= areaCooldown)
+        Collider2D[] enemiesInArea = Physics2D.OverlapCircleAll(transform.position, areaRange);
+
+        foreach (var col in enemiesInArea)
         {
-            Collider2D[] enemigosEnArea = Physics2D.OverlapCircleAll(transform.position, areaRange);
-
-            foreach (Collider2D col in enemigosEnArea)
-            {
-                if (col.CompareTag("Enemy"))
-                {
-                    Enemy7 enemy = col.GetComponent<Enemy7>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeDamage(areaDamage);
-                        Debug.Log($"Daño de área: {areaDamage} a {col.name}");
-                    }
-                }
-            }
-
-            tiempoUltimoAreaDamage = Time.time;
+            if (col.CompareTag("Enemy"))
+                col.GetComponent<Enemy7>()?.TakeDamage(areaDamage);
         }
+
+        lastAreaDamageTime = Time.time;
     }
 
-    // Métodos para que UPManager actualice las stats
-    public void ActualizarVelocidadDisparo(float nuevaCadencia)
+    void UpdateLights()
     {
-        cadenciaDisparo = nuevaCadencia;
-    }
-
-    public void ActualizarAreaDisparo(float nuevoRango)
-    {
-        rangoDeteccion = nuevoRango;
-        ActualizarLuces();
-    }
-
-    public void ActualizarCritico(float nuevoCritChance)
-    {
-        critChance = nuevoCritChance;
-    }
-
-    public void ActualizarDamageArea(float nuevoAreaDamage, float nuevoAreaRange)
-    {
-        areaDamage = nuevoAreaDamage;
-        areaRange = nuevoAreaRange;
-        ActualizarLuces();
-    }
-
-    void ActualizarLuces()
-    {
-        // Actualizar luz de visión (rango de disparo)
-        if (visionLight != null)
-        {
+        if (visionLight)
             visionLight.pointLightOuterRadius = rangoDeteccion;
-        }
 
-        // Actualizar luz de área de daño
-        if (areaLight != null)
+        if (areaLight)
         {
             areaLight.pointLightOuterRadius = areaRange;
             areaLight.gameObject.SetActive(areaDamage > 0);
         }
     }
 
-    void OnDrawGizmosSelected()
+    public void ActualizarVelocidadDisparo(float newRate)
     {
-        // Rango de detección (verde)
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, rangoDeteccion);
+        cadenciaDisparo = newRate;
+    }
 
-        // Área de daño (rojo)
-        if (areaDamage > 0)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, areaRange);
-        }
+    public void ActualizarAreaDisparo(float newRange)
+    {
+        rangoDeteccion = newRange;
+        UpdateLights();
+    }
+
+    public void ActualizarCritico(float newCritChance)
+    {
+        critChance = newCritChance;
+    }
+
+    public void ActualizarDamageArea(float newDamage, float newRange)
+    {
+        areaDamage = newDamage;
+        areaRange = newRange;
+        UpdateLights();
     }
 }

@@ -4,21 +4,21 @@ using System.Linq;
 
 public class SpawnerEnemy7 : MonoBehaviour
 {
-    [Header("Configuración")]
-    public GameObject enemyPrefab;
-    public GameObject bossPrefab;
-    public Transform[] spawnPoints;
+    [Header("Prefabs")]
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject bossPrefab;
+    [SerializeField] private Transform[] spawnPoints;
 
-    [Header("Spawn")]
-    public float spawnInterval = 3f;
-    public int minEnemies = 3;
-    public int maxEnemies = 50;
-    public int waveIncrement = 3;
-    public float minDistanceFromPlayer = 10f;
+    [Header("Wave Settings")]
+    [SerializeField] private float spawnInterval = 3f;
+    [SerializeField] private int minEnemies = 3;
+    [SerializeField] private int maxEnemies = 50;
+    [SerializeField] private int waveIncrement = 3;
+    [SerializeField] private float minDistanceFromPlayer = 10f;
 
-    [Header("Pooling")]
-    public int initialPoolSize = 20;
-    public int maxPoolSize = 100;
+    [Header("Pool Settings")]
+    [SerializeField] private int initialPoolSize = 20;
+    [SerializeField] private int maxPoolSize = 100;
 
     private Transform player;
     private GameManager7 gameManager;
@@ -37,38 +37,53 @@ public class SpawnerEnemy7 : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         currentSpawnCount = minEnemies;
 
-        for (int i = 0; i < initialPoolSize; i++) CreatePooledObject(enemyPrefab, enemyPool, false);
-        for (int i = 0; i < 10; i++) CreatePooledObject(bossPrefab ?? enemyPrefab, bossPool, true);
+        InitializePools();
     }
 
     void Update()
     {
         if (!player || !gameManager.CanSpawnEnemies()) return;
 
-        if ((spawnTimer -= Time.deltaTime) <= 0)
+        spawnTimer -= Time.deltaTime;
+        
+        if (spawnTimer <= 0)
         {
             SpawnWave();
             spawnTimer = spawnInterval;
-            if (++currentWave % waveIncrement == 0 && currentSpawnCount < maxEnemies) currentSpawnCount++;
+            
+            if (++currentWave % waveIncrement == 0 && currentSpawnCount < maxEnemies)
+                currentSpawnCount++;
         }
+    }
+
+    void InitializePools() // Inicializa las colas de objetos
+    {
+        for (int i = 0; i < initialPoolSize; i++)
+            CreatePooledObject(enemyPrefab, enemyPool, false);
+        
+        for (int i = 0; i < 10; i++)
+            CreatePooledObject(bossPrefab ?? enemyPrefab, bossPool, true);
     }
 
     void SpawnWave()
     {
-        var points = GetValidSpawnPoints();
-        int count = Mathf.Min(currentSpawnCount, points.Count);
+        var validPoints = GetValidSpawnPoints();
+        int spawnCount = Mathf.Min(currentSpawnCount, validPoints.Count);
 
-        for (int i = 0; i < count; i++)
-            SpawnFromPool(enemyPool, activeEnemies, points[Random.Range(0, points.Count)].position, false);
+        for (int i = 0; i < spawnCount; i++)
+            SpawnFromPool(enemyPool, activeEnemies, validPoints[Random.Range(0, validPoints.Count)].position, false);
     }
 
-    public void SpawnBossWave(int count)
+    public void SpawnBossWave(int count) 
     {
+        var validPoints = GetValidSpawnPoints();
+        Vector3 spawnPos = validPoints.FirstOrDefault()?.position ?? transform.position;
+
         for (int i = 0; i < count; i++)
-            SpawnFromPool(bossPool, activeBosses, GetValidSpawnPoints().FirstOrDefault()?.position ?? transform.position, true);
+            SpawnFromPool(bossPool, activeBosses, spawnPos, true);
     }
 
-    void CreatePooledObject(GameObject prefab, Queue<GameObject> pool, bool isBoss)
+    void CreatePooledObject(GameObject prefab, Queue<GameObject> pool, bool isBoss) // Agregar parametro 
     {
         if (!prefab) return;
 
@@ -85,7 +100,7 @@ public class SpawnerEnemy7 : MonoBehaviour
         pool.Enqueue(obj);
     }
 
-    void SpawnFromPool(Queue<GameObject> pool, List<GameObject> activeList, Vector3 position, bool isBoss)
+    void SpawnFromPool(Queue<GameObject> pool, List<GameObject> activeList, Vector3 position, bool isBoss) //Ver si es un boss
     {
         if (pool.Count == 0 && activeList.Count + pool.Count < maxPoolSize)
             CreatePooledObject(isBoss ? (bossPrefab ?? enemyPrefab) : enemyPrefab, pool, isBoss);
@@ -99,36 +114,22 @@ public class SpawnerEnemy7 : MonoBehaviour
         }
     }
 
-    void ReturnToPool(GameObject obj, List<GameObject> activeList, Queue<GameObject> pool)
+    void ReturnToPool(GameObject obj, List<GameObject> activeList, Queue<GameObject> pool) // Agregar parametro para saber si es boss
     {
         if (!obj) return;
+        
         obj.SetActive(false);
         activeList.Remove(obj);
         pool.Enqueue(obj);
     }
 
     public void ReturnEnemyToPool(GameObject enemy) => ReturnToPool(enemy, activeEnemies, enemyPool);
+    
     public void ReturnBossToPool(GameObject boss) => ReturnToPool(boss, activeBosses, bossPool);
+    
     public bool AreAllBossesDefeated() => activeBosses.Count == 0;
 
     List<Transform> GetValidSpawnPoints() =>
         spawnPoints?.Where(sp => sp && Vector2.Distance(player.position, sp.position) >= minDistanceFromPlayer).ToList()
         ?? new List<Transform>();
-
-    // GIZMOS PARA VISUALIZAR LA DISTANCIA MÍNIMA DEL PLAYER
-    void OnDrawGizmos()
-    {
-        if (spawnPoints == null) return;
-
-        // Dibujar área de exclusión alrededor de cada spawn point
-        Gizmos.color = new Color(1f, 0.5f, 0f, 0.3f); // Naranja semitransparente
-
-        foreach (var spawnPoint in spawnPoints)
-        {
-            if (spawnPoint != null)
-            {
-                Gizmos.DrawWireSphere(spawnPoint.position, minDistanceFromPlayer);
-            }
-        }
-    }
 }

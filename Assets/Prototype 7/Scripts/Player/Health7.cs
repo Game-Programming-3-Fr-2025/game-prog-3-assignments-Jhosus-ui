@@ -5,26 +5,24 @@ using UnityEngine.SceneManagement;
 
 public class Health7 : MonoBehaviour
 {
-    [Header("Configuración de Vida")]
-    public int maxHearts = 3;
-    public int currentHearts;
-    public float damageCooldown = 1f;
-    public float damageRange = 1.5f;
+    [Header("Health Settings")]
+    [SerializeField] private int maxHearts = 3;
+    [SerializeField] private float damageCooldown = 1f;
+    [SerializeField] private float damageRange = 1.5f;
 
-    [Header("UI de Corazones")]
-    public Image[] heartImages;
+    [Header("UI")]
+    [SerializeField] private Image[] heartImages;
 
-    [Header("Regeneración")]
-    public float regenerationRate = 0f;
+    [Header("Regeneration")]
+    [SerializeField] private float regenerationRate = 0f;
+
+    private int currentHearts;
     private float regenerationTimer;
-
     private bool canTakeDamage = true;
-    private UPManager7 upManager;
-    private bool isDead = false;
+    private bool isDead;
 
     void Start()
     {
-        upManager = FindObjectOfType<UPManager7>();
         currentHearts = maxHearts;
         UpdateHeartUI();
     }
@@ -34,18 +32,18 @@ public class Health7 : MonoBehaviour
         if (isDead) return;
 
         HandleRegeneration();
-        CheckForEnemyDamage();
+        CheckEnemyDamage();
     }
 
-    void CheckForEnemyDamage()
+    void CheckEnemyDamage()
     {
-        if (!canTakeDamage || isDead) return;
+        if (!canTakeDamage) return;
 
-        Collider2D[] enemiesInRange = Physics2D.OverlapCircleAll(transform.position, damageRange);
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, damageRange);
 
-        foreach (Collider2D collider in enemiesInRange)
+        foreach (var enemy in enemies)
         {
-            if (collider.CompareTag("Enemy"))
+            if (enemy.CompareTag("Enemy"))
             {
                 TakeDamage(1);
                 break;
@@ -53,35 +51,33 @@ public class Health7 : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damageAmount = 1)
+    public void TakeDamage(int amount = 1)
     {
         if (isDead) return;
 
-        currentHearts = Mathf.Max(0, currentHearts - damageAmount);
+        currentHearts = Mathf.Max(0, currentHearts - amount);
         UpdateHeartUI();
-
         StartCoroutine(DamageCooldown());
 
         if (currentHearts <= 0)
-        {
             Die();
-        }
     }
 
-    public void Heal(int healAmount = 1)
+    public void Heal(int amount = 1)
     {
         if (isDead) return;
 
-        currentHearts = Mathf.Min(maxHearts, currentHearts + healAmount);
+        currentHearts = Mathf.Min(maxHearts, currentHearts + amount);
         UpdateHeartUI();
     }
 
     void HandleRegeneration()
     {
-        if (regenerationRate <= 0 || isDead) return;
+        if (regenerationRate <= 0 || currentHearts >= maxHearts) return;
 
         regenerationTimer += Time.deltaTime;
-        if (regenerationTimer >= regenerationRate && currentHearts < maxHearts)
+
+        if (regenerationTimer >= regenerationRate)
         {
             Heal(1);
             regenerationTimer = 0f;
@@ -91,9 +87,7 @@ public class Health7 : MonoBehaviour
     void UpdateHeartUI()
     {
         for (int i = 0; i < heartImages.Length; i++)
-        {
             heartImages[i].gameObject.SetActive(i < currentHearts);
-        }
     }
 
     IEnumerator DamageCooldown()
@@ -106,43 +100,28 @@ public class Health7 : MonoBehaviour
     void Die()
     {
         if (isDead) return;
-
         isDead = true;
-        Debug.Log("Player murió! Reiniciando escena...");
-
-        // Reiniciar la escena después de un breve delay
-        StartCoroutine(ReiniciarEscena());
+        StartCoroutine(RestartScene());
     }
 
-    IEnumerator ReiniciarEscena()
+    IEnumerator RestartScene()
     {
-        // Pequeño delay para que se vea la muerte
         yield return new WaitForSeconds(0.5f);
-
-        // Reiniciar la escena actual
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Métodos para que UPManager actualice las stats
-    public void ActualizarVidaMaxima(int nuevaVidaMaxima)
+    public void ActualizarVidaMaxima(int newMaxHearts)
     {
         if (isDead) return;
 
-        maxHearts = nuevaVidaMaxima;
+        maxHearts = newMaxHearts;
         currentHearts = Mathf.Min(currentHearts, maxHearts);
         UpdateHeartUI();
     }
 
-    public void ActualizarRegeneracion(float nuevaRegeneracion)
+    public void ActualizarRegeneracion(float newRate)
     {
         if (isDead) return;
-
-        regenerationRate = nuevaRegeneracion;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, damageRange);
+        regenerationRate = newRate;
     }
 }

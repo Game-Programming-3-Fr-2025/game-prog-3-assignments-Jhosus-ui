@@ -1,53 +1,51 @@
 using UnityEngine;
+using UnityEngine.AI;
 using System;
 
 public class Enemy7 : MonoBehaviour
 {
-    [Header("Enemy Settings")]
-    public float moveSpeed = 3f;
-    public float stoppingDistance = 1f;
-    public bool isBoss = false;
+    [Header("Base Settings")]
+    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float stoppingDistance = 1f;
+    [SerializeField] private float maxHealth = 100f;
 
-    [Header("Health Settings")]
-    public float maxHealth = 100f;
-    public float currentHealth;
-
-    [Header("Boss Settings")]
-    public float bossHealthMultiplier = 5f;
-    public float bossSizeMultiplier = 1.5f;
-    public float bossSpeedMultiplier = 0.7f;
+    [Header("Boss Multipliers")]
+    [SerializeField] private float bossHealthMultiplier = 5f;
+    [SerializeField] private float bossSizeMultiplier = 1.5f;
+    [SerializeField] private float bossSpeedMultiplier = 0.7f;
 
     [Header("EXP Drop")]
-    public GameObject expPrefab;
-    public int expDropCount = 3;
-    public float expDropRadius = 2f;
+    [SerializeField] private GameObject expPrefab;
+    [SerializeField] private int expDropCount = 3;
+    [SerializeField] private float expDropRadius = 2f;
 
-    // Eventos para el pooling
     public event Action OnEnemyDeath;
 
     private Transform player;
-    private UnityEngine.AI.NavMeshAgent navMeshAgent;
+    private NavMeshAgent navMeshAgent;
     private SpawnerEnemy7 spawner;
-    private bool isInitialized = false;
+    private float currentHealth;
+    private bool isBoss;
+    private bool isInitialized;
 
-    // Método Initialize que falta
     public void Initialize(SpawnerEnemy7 spawnerRef, bool isBossEnemy)
     {
         spawner = spawnerRef;
         isBoss = isBossEnemy;
-        InitializeEnemy();
+        Setup();
     }
 
     void Start()
     {
         if (!isInitialized)
-        {
-            InitializeEnemy();
-        }
+            Setup();
     }
 
-    void InitializeEnemy()
+    void Setup()
     {
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
         if (isBoss)
         {
             maxHealth *= bossHealthMultiplier;
@@ -56,10 +54,8 @@ public class Enemy7 : MonoBehaviour
         }
 
         currentHealth = maxHealth;
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (navMeshAgent != null)
+        if (navMeshAgent)
         {
             navMeshAgent.speed = moveSpeed;
             navMeshAgent.stoppingDistance = stoppingDistance;
@@ -75,87 +71,55 @@ public class Enemy7 : MonoBehaviour
         if (isInitialized)
         {
             currentHealth = maxHealth;
-            if (navMeshAgent != null)
-            {
+            if (navMeshAgent)
                 navMeshAgent.isStopped = false;
-            }
         }
     }
 
     void Update()
     {
-        if (player != null && navMeshAgent != null && navMeshAgent.isActiveAndEnabled)
-        {
+        if (player && navMeshAgent && navMeshAgent.isActiveAndEnabled)
             navMeshAgent.SetDestination(player.position);
-        }
     }
 
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     void Die()
     {
-        SpawnEXP();
+        DropEXP();
         OnEnemyDeath?.Invoke();
 
-        if (spawner != null)
+        if (spawner)
         {
             if (isBoss)
-            {
                 spawner.ReturnBossToPool(gameObject);
-            }
             else
-            {
                 spawner.ReturnEnemyToPool(gameObject);
-            }
         }
         else
-        {
             Destroy(gameObject);
-        }
     }
 
-    void SpawnEXP()
+    void DropEXP()
     {
-        if (expPrefab == null) return;
+        if (!expPrefab) return;
 
         for (int i = 0; i < expDropCount; i++)
         {
-            Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * expDropRadius;
-            Vector3 spawnPosition = transform.position + new Vector3(randomOffset.x, randomOffset.y, 0);
-            GameObject exp = Instantiate(expPrefab, spawnPosition, Quaternion.identity);
+            Vector2 offset = UnityEngine.Random.insideUnitCircle * expDropRadius;
+            Vector3 spawnPos = transform.position + new Vector3(offset.x, offset.y, 0);
+            Instantiate(expPrefab, spawnPos, Quaternion.identity);
         }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Bullet"))
-        {
             TakeDamage(10f);
-        }
-    }
-
-    //void OnDisable()
-    //{
-    //    if (navMeshAgent != null)
-    //    {
-    //        navMeshAgent.isStopped = true;
-    //    }
-    //}
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = isBoss ? Color.red : Color.blue;
-        Gizmos.DrawWireSphere(transform.position, stoppingDistance);
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, expDropRadius);
     }
 }
