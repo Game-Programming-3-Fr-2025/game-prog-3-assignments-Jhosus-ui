@@ -35983,7 +35983,7 @@ Transform:
   m_GameObject: {fileID: 1212173612}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: -1.4, z: 0}
+  m_LocalPosition: {x: 25.4, y: 158.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36114,7 +36114,7 @@ MonoBehaviour:
   dashDuration: 0.2
   dashCooldown: 0.5
   maxDashes: 1
-  isDashUnlocked: 0
+  isDashUnlocked: 1
   dashActivatorObject: {fileID: 1359687802}
 --- !u!114 &1212173620
 MonoBehaviour:
@@ -36128,7 +36128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55cdc402b0988614a8fb2e57d6b733bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDoubleJumpUnlocked: 0
+  isDoubleJumpUnlocked: 1
   doubleJumpForce: 15
   doubleJumpActivatorObject: {fileID: 413207364}
   pointJumpForce: 15.4
