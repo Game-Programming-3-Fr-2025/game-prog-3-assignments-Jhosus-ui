@@ -27,6 +27,7 @@ public class Player2 : MonoBehaviour
     private AudioSource audioSource;
 
     private PJumps jumpComponent;
+    [SerializeField] private ParticleSystem particulas;
 
     void Start()
     {
@@ -76,6 +77,7 @@ public class Player2 : MonoBehaviour
             isJumping = true;
             jumpTimeCounter = jumpTime;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            particulas.Play();
             if (jumpSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(jumpSound);
@@ -97,6 +99,7 @@ public class Player2 : MonoBehaviour
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 jumpTimeCounter -= Time.deltaTime;
+                particulas.Play();
             }
             else isJumping = false;
         }
