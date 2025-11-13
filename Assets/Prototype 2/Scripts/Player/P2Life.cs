@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 
 public class P2Life : MonoBehaviour
 {
-    [Header("Configuración de Vida")]
+    [Header("Configuraciï¿½n de Vida")]
     public int maxHealth = 3;
     public int currentHealth;
 
@@ -13,75 +14,138 @@ public class P2Life : MonoBehaviour
     public Sprite fullHeart;
     public Sprite emptyHeart;
 
+    [Header("Efectos de Daï¿½o")]
+    public float invincibilityTime = 1.5f;
+    public float blinkInterval = 0.1f;
+
+    private bool isInvincible = false;
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+
     private void Start()
     {
-        // Inicializar la vida al máximo
         currentHealth = maxHealth;
-
-        // Actualizar la interfaz de corazones
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         UpdateHeartsUI();
     }
 
-    // Función para recibir daño
-    public void TakeDamage(int damageAmount)
+    // Funciï¿½n para recibir daï¿½o con knockback
+    public void TakeDamage(int damageAmount, Vector2 knockbackDirection = default, float knockbackForce = 0f)
     {
-        // Reducir la vida
-        currentHealth -= damageAmount;
 
-        // Asegurarse de que la vida no sea menor a 0
+        if (isInvincible) return;
+
+        currentHealth -= damageAmount;
         currentHealth = Mathf.Max(0, currentHealth);
 
-        // Actualizar la interfaz
         UpdateHeartsUI();
 
-        // Verificar si el jugador murió
+        if (knockbackForce > 0f && rb != null)
+        {
+            ApplyKnockback(knockbackDirection, knockbackForce);
+        }
+
+        StartCoroutine(DamageEffects());
+
         if (currentHealth <= 0)
         {
             Die();
         }
     }
 
-    // Función para curar/recuperar vida
+    // Funciï¿½n para recibir daï¿½o normal (sobrecarga para compatibilidad)
+    public void TakeDamage(int damageAmount)
+    {
+        TakeDamage(damageAmount, Vector2.zero, 0f);
+    }
+
+    // Aplicar efecto de knockback
+    private void ApplyKnockback(Vector2 direction, float force)
+    {
+        if (rb != null)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+        }
+    }
+
+    // Corrutina para efectos de daï¿½o
+    private IEnumerator DamageEffects()
+    {
+        isInvincible = true;
+
+        float timer = 0f;
+        bool isVisible = true;
+
+        while (timer < invincibilityTime)
+        {
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = isVisible;
+                isVisible = !isVisible;
+            }
+            yield return new WaitForSeconds(blinkInterval);
+            timer += blinkInterval;
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = true;
+        }
+
+        isInvincible = false;
+    }
+
+    // Funciï¿½n para curar/recuperar vida
     public void Heal(int healAmount)
     {
-        // Aumentar la vida
         currentHealth += healAmount;
-
-        // Asegurarse de que la vida no exceda el máximo
         currentHealth = Mathf.Min(currentHealth, maxHealth);
-
-        // Actualizar la interfaz
         UpdateHeartsUI();
     }
 
-    // Función para actualizar los corazones en la UI
+    // Funciï¿½n para actualizar los corazones en la UI
     private void UpdateHeartsUI()
     {
         for (int i = 0; i < heartImages.Count; i++)
         {
             if (i < currentHealth)
             {
-                // Mostrar corazón lleno
                 heartImages[i].sprite = fullHeart;
             }
             else
             {
-                // Mostrar corazón vacío
                 heartImages[i].sprite = emptyHeart;
             }
         }
     }
 
-    // Función que se llama cuando el jugador muere
+    // Funciï¿½n que se llama cuando el jugador muere
     private void Die()
     {
-        Debug.Log("¡Jugador 2 ha muerto!");
+        Debug.Log("ï¿½Jugador 2 ha muerto!");
     }
 
-    // Función para reiniciar la vida al máximo
+    // Funciï¿½n para reiniciar la vida al mï¿½ximo
     public void ResetHealth()
     {
         currentHealth = maxHealth;
         UpdateHeartsUI();
+
+        // Detener efectos de daï¿½o si estï¿½n activos
+        StopAllCoroutines();
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = true;
+        }
+        isInvincible = false;
+    }
+
+    // Propiedad pï¿½blica para verificar invencibilidad
+    public bool IsInvincible
+    {
+        get { return isInvincible; }
     }
 }
