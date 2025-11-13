@@ -30298,8 +30298,8 @@ GameObject:
   - component: {fileID: 1212173618}
   - component: {fileID: 1212173619}
   - component: {fileID: 1212173620}
-  - component: {fileID: 1212173621}
   - component: {fileID: 1212173622}
+  - component: {fileID: 1212173623}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -30467,6 +30467,9 @@ MonoBehaviour:
     m_Bits: 64
   animator: {fileID: 1212173618}
   jumpSound: {fileID: 8300000, guid: cb5684e0b05895f41a477b08781ed99b, type: 3}
+  smallJumpVibration: 0.07
+  bigJumpVibration: 0.17
+  vibrationDuration: 0.035
   isGrounded: 0
   particulas: {fileID: 1558820148}
 --- !u!95 &1212173618
@@ -30527,30 +30530,6 @@ MonoBehaviour:
   pointJumpForce: 15.4
   airJumpSound: {fileID: 8300000, guid: cb5684e0b05895f41a477b08781ed99b, type: 3}
   pointJumpSound: {fileID: 8300000, guid: 13786e72b14c53a4fa0674ce5f285cac, type: 3}
---- !u!114 &1212173621
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1212173612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa46a48b2dc4b4e45923559329df59df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxLives: 20
-  invulnerabilityTime: 1.6
-  knockbackForce: 5
-  livesText: {fileID: 961723670}
-  damageSound: {fileID: 8300000, guid: b746a88df75792a49b1df41fc0912b7a, type: 3}
-  currentLives: 0
-  isInvulnerable: 0
-  invulnerabilityTimer: 0
-  spriteRenderer: {fileID: 0}
-  rb: {fileID: 0}
-  cameraController: {fileID: 0}
-  audioSource: {fileID: 0}
 --- !u!82 &1212173622
 AudioSource:
   m_ObjectHideFlags: 0
@@ -30648,6 +30627,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1212173623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1212173612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6cd76cff6e314e4bb0506d7a3b17b97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 5
+  currentHealth: 0
+  heartImages:
+  - {fileID: 919933334}
+  - {fileID: 1553352326}
+  - {fileID: 2097625319}
+  - {fileID: 2033515309}
+  - {fileID: 1489395177}
+  fullHeart: {fileID: 4606908045521496030, guid: 8b8333efd9183464db717450e5ea753d, type: 3}
+  emptyHeart: {fileID: 4606908045521496030, guid: 8d0fd347fb662454b96194ee9018ec67, type: 3}
 --- !u!1 &1220400649
 GameObject:
   m_ObjectHideFlags: 0
@@ -40574,7 +40575,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000

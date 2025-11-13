@@ -19,6 +19,16 @@ public class Player2 : MonoBehaviour
     [Header("Sound")]
     public AudioClip jumpSound;
 
+    [Header("Vibration Settings")]
+    public float smallJumpVibration = 0.2f;
+    public float bigJumpVibration = 0.4f;
+    public float vibrationDuration = 0.2f;
+
+    // Variables para vibración
+    private bool wasGrounded;
+    private float jumpStartY;
+    private float jumpHeight;
+
     private PDash dashComponent;
     private Rigidbody2D rb;
     public bool isGrounded;
@@ -54,6 +64,8 @@ public class Player2 : MonoBehaviour
             rb.freezeRotation = true;
             rb.gravityScale = 4f;
         }
+
+        wasGrounded = isGrounded;
     }
 
     void Update()
@@ -62,6 +74,7 @@ public class Player2 : MonoBehaviour
         HandleJumpInput();
         HandleJumpHold();
         UpdateAnimations();
+        CheckLandingVibration();
     }
 
     void FixedUpdate()
@@ -106,6 +119,9 @@ public class Player2 : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             particulas.Play();
 
+            // Guardar posición inicial del salto <- AGREGAR ESTO
+            jumpStartY = transform.position.y;
+
             if (jumpSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(jumpSound);
@@ -119,6 +135,9 @@ public class Player2 : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * cutJumpHeight);
             isJumping = false;
+
+            // Calcular altura del salto <- AGREGAR ESTO
+            jumpHeight = transform.position.y - jumpStartY;
         }
     }
 
@@ -177,5 +196,55 @@ public class Player2 : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundCheckDistance);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position + Vector3.down * groundCheckDistance, 0.05f);
+    }
+
+    void CheckLandingVibration()
+    {
+        // Detectar cuando aterriza (cuando pasa de no estar grounded a estar grounded)
+        if (isGrounded && !wasGrounded)
+        {
+            // Calcular la altura final del salto si no se calculó antes
+            if (jumpHeight == 0)
+            {
+                jumpHeight = transform.position.y - jumpStartY;
+            }
+
+            // Aplicar vibración según la altura del salto
+            if (gamepad != null)
+            {
+                float vibrationIntensity = smallJumpVibration;
+
+                // Si el salto fue alto, usar vibración más fuerte
+                if (jumpHeight > 3f) // Ajusta este valor según tus necesidades
+                {
+                    vibrationIntensity = bigJumpVibration;
+                }
+
+                StartCoroutine(VibrateController(vibrationIntensity, vibrationDuration));
+            }
+
+            // Resetear altura del salto
+            jumpHeight = 0;
+        }
+
+        wasGrounded = isGrounded;
+    }
+
+    private System.Collections.IEnumerator VibrateController(float intensity, float duration)
+    {
+        if (gamepad != null)
+        {
+            gamepad.SetMotorSpeeds(intensity, intensity);
+            yield return new WaitForSeconds(duration);
+            gamepad.SetMotorSpeeds(0f, 0f);
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (gamepad != null)
+        {
+            gamepad.SetMotorSpeeds(0f, 0f);
+        }
     }
 }
