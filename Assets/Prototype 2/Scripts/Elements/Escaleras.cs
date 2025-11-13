@@ -1,12 +1,11 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 
 public class Escaleras : MonoBehaviour
 {
     [Header("Referencias")]
-    [SerializeField] private TextMeshPro textoInteraccion;
     [SerializeField] private Image fadeImage;
     [SerializeField] private Transform puntoDestino;
 
@@ -18,6 +17,9 @@ public class Escaleras : MonoBehaviour
     private bool jugadorEnRango;
     private bool enTransicion;
     private Transform jugador;
+    private Player2 playerController;
+    private Rigidbody2D playerRb;
+    private Vector2 velocidadAnterior;
 
     void Start()
     {
@@ -26,9 +28,10 @@ public class Escaleras : MonoBehaviour
 
     void Update()
     {
-        ActualizarTextoInteraccion();
+        bool inputInteraccion = Input.GetKeyDown(KeyCode.E) ||
+                              (Gamepad.current != null && Gamepad.current.yButton.wasPressedThisFrame);
 
-        if (jugadorEnRango && !enTransicion && Input.GetKeyDown(KeyCode.E))
+        if (jugadorEnRango && !enTransicion && inputInteraccion)
             StartCoroutine(RealizarTransicion());
     }
 
@@ -38,6 +41,8 @@ public class Escaleras : MonoBehaviour
         {
             jugadorEnRango = true;
             jugador = other.transform;
+            playerController = other.GetComponent<Player2>();
+            playerRb = other.GetComponent<Rigidbody2D>();
         }
     }
 
@@ -46,14 +51,7 @@ public class Escaleras : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             jugadorEnRango = false;
-            jugador = null;
         }
-    }
-
-    private void ActualizarTextoInteraccion()
-    {
-        if (textoInteraccion != null)
-            textoInteraccion.alpha = (jugadorEnRango && !enTransicion) ? 1f : 0f;
     }
 
     private IEnumerator RealizarTransicion()
@@ -61,6 +59,9 @@ public class Escaleras : MonoBehaviour
         if (puntoDestino == null || jugador == null) yield break;
 
         enTransicion = true;
+
+        // Bloquear movimiento del jugador
+        BloquearMovimientoJugador(true);
 
         // Oscurecer
         yield return AnimarFade(0f, 1f, duracionFadeIn);
@@ -74,10 +75,40 @@ public class Escaleras : MonoBehaviour
         // Aclarar
         yield return AnimarFade(1f, 0f, duracionFadeOut);
 
-        // Resetear
+        // Restaurar movimiento del jugador (GARANTIZADO)
+        BloquearMovimientoJugador(false);
+
+        // Resetear estado
         ConfigurarVisuales(0f);
         enTransicion = false;
-        jugadorEnRango = false;
+    }
+
+    private void BloquearMovimientoJugador(bool bloquear)
+    {
+        if (playerRb != null)
+        {
+            if (bloquear)
+            {
+                // Guardar velocidad anterior y congelar
+                velocidadAnterior = playerRb.linearVelocity;
+                playerRb.constraints = RigidbodyConstraints2D.FreezeAll;
+                playerRb.linearVelocity = Vector2.zero;
+
+                // Desactivar script de movimiento
+                if (playerController != null)
+                    playerController.enabled = false;
+            }
+            else
+            {
+                // Restaurar constraints y velocidad
+                playerRb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                playerRb.linearVelocity = velocidadAnterior;
+
+                // Reactivar script de movimiento
+                if (playerController != null)
+                    playerController.enabled = true;
+            }
+        }
     }
 
     private IEnumerator AnimarFade(float inicio, float fin, float duracion)
@@ -106,9 +137,15 @@ public class Escaleras : MonoBehaviour
 
     private void ConfigurarVisuales(float alpha)
     {
-        if (textoInteraccion != null)
-            textoInteraccion.alpha = alpha;
-
         SetearAlphaFade(alpha);
+    }
+
+    // Asegurar que se restaure el movimiento si el objeto se destruye
+    private void OnDestroy()
+    {
+        if (enTransicion)
+        {
+            BloquearMovimientoJugador(false);
+        }
     }
 }

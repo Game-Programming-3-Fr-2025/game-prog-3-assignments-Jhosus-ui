@@ -1,28 +1,32 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class P2Life : MonoBehaviour
 {
-    [Header("Configuraci�n de Vida")]
+    [Header("Vida")]
     public int maxHealth = 3;
     public int currentHealth;
-
-    [Header("Interfaz de Corazones")]
     public List<Image> heartImages;
-    public Sprite fullHeart;
-    public Sprite emptyHeart;
+    public Sprite fullHeart, emptyHeart;
 
-    [Header("Efectos de Da�o")]
+    [Header("Efectos")]
     public float invincibilityTime = 1.5f;
     public float blinkInterval = 0.1f;
+    public float damageVibrationIntensity = 0.6f;
+    public float damageVibrationDuration = 0.3f;
+
+    [Header("Knockback")]
+    public float knockbackForce = 10f; // Fuerza del knockback
+    public float knockbackIntensity = 1f; // Multiplicador de intensidad
 
     private bool isInvincible = false;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
 
-    private void Start()
+    void Start()
     {
         currentHealth = maxHealth;
         rb = GetComponent<Rigidbody2D>();
@@ -30,122 +34,119 @@ public class P2Life : MonoBehaviour
         UpdateHeartsUI();
     }
 
-    // Funci�n para recibir da�o con knockback
-    public void TakeDamage(int damageAmount, Vector2 knockbackDirection = default, float knockbackForce = 0f)
+    public void TakeDamage(int damageAmount, Vector2 damageSourcePosition)
     {
-
         if (isInvincible) return;
 
-        currentHealth -= damageAmount;
-        currentHealth = Mathf.Max(0, currentHealth);
-
+        currentHealth = Mathf.Max(0, currentHealth - damageAmount);
         UpdateHeartsUI();
 
-        if (knockbackForce > 0f && rb != null)
+        StartCoroutine(DamageVibration());
+
+        // Aplicar knockback automáticamente
+        if (rb != null)
         {
-            ApplyKnockback(knockbackDirection, knockbackForce);
+            Vector2 knockbackDir = ((Vector2)transform.position - damageSourcePosition).normalized;
+            knockbackDir = new Vector2(knockbackDir.x * 1.2f, Mathf.Clamp(knockbackDir.y + 0.3f, 0.4f, 0.8f)).normalized;
+            float finalKnockbackForce = knockbackForce * knockbackIntensity;
+            StartCoroutine(ApplyKnockback(knockbackDir, finalKnockbackForce));
         }
 
         StartCoroutine(DamageEffects());
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
     }
 
-    // Funci�n para recibir da�o normal (sobrecarga para compatibilidad)
-    public void TakeDamage(int damageAmount)
-    {
-        TakeDamage(damageAmount, Vector2.zero, 0f);
-    }
+    public void TakeDamage(int damageAmount) => TakeDamage(damageAmount, Vector2.zero);
 
-    // Aplicar efecto de knockback
-    private void ApplyKnockback(Vector2 direction, float force)
+    private IEnumerator ApplyKnockback(Vector2 direction, float force)
     {
         if (rb != null)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-            rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+            rb.linearVelocity = Vector2.zero;
+            rb.AddForce(direction * force, ForceMode2D.Impulse);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
-    // Corrutina para efectos de da�o
+    private IEnumerator DamageVibration()
+    {
+        if (Gamepad.current?.added != true) yield break;
+
+        // Vibración constante sin importar la dirección
+        float elapsed = 0f;
+
+        while (elapsed < damageVibrationDuration)
+        {
+            try
+            {
+                // Usar vibración completa constante
+                Gamepad.current.SetMotorSpeeds(damageVibrationIntensity, damageVibrationIntensity);
+            }
+            catch (System.InvalidOperationException)
+            {
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (Gamepad.current?.added != true) yield break;
+
+        try
+        {
+            Gamepad.current.SetMotorSpeeds(0f, 0f);
+        }
+        catch (System.InvalidOperationException) { }
+    }
+
     private IEnumerator DamageEffects()
     {
         isInvincible = true;
-
         float timer = 0f;
         bool isVisible = true;
 
         while (timer < invincibilityTime)
         {
-
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.enabled = isVisible;
-                isVisible = !isVisible;
-            }
+            if (spriteRenderer != null) spriteRenderer.enabled = isVisible;
+            isVisible = !isVisible;
             yield return new WaitForSeconds(blinkInterval);
             timer += blinkInterval;
         }
 
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.enabled = true;
-        }
-
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
         isInvincible = false;
     }
 
-    // Funci�n para curar/recuperar vida
     public void Heal(int healAmount)
     {
-        currentHealth += healAmount;
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        currentHealth = Mathf.Min(maxHealth, currentHealth + healAmount);
         UpdateHeartsUI();
     }
 
-    // Funci�n para actualizar los corazones en la UI
     private void UpdateHeartsUI()
     {
         for (int i = 0; i < heartImages.Count; i++)
-        {
-            if (i < currentHealth)
-            {
-                heartImages[i].sprite = fullHeart;
-            }
-            else
-            {
-                heartImages[i].sprite = emptyHeart;
-            }
-        }
+            heartImages[i].sprite = i < currentHealth ? fullHeart : emptyHeart;
     }
 
-    // Funci�n que se llama cuando el jugador muere
-    private void Die()
-    {
-        Debug.Log("�Jugador 2 ha muerto!");
-    }
+    private void Die() => Debug.Log("¡Jugador 2 ha muerto!");
 
-    // Funci�n para reiniciar la vida al m�ximo
     public void ResetHealth()
     {
         currentHealth = maxHealth;
         UpdateHeartsUI();
-
-        // Detener efectos de da�o si est�n activos
         StopAllCoroutines();
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.enabled = true;
-        }
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
         isInvincible = false;
+        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
 
-    // Propiedad p�blica para verificar invencibilidad
-    public bool IsInvincible
+    private void OnDestroy()
     {
-        get { return isInvincible; }
+        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
+
+    public bool IsInvincible => isInvincible;
 }
