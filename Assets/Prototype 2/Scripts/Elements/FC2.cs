@@ -1,133 +1,121 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class FC2 : MonoBehaviour
 {
-    [Header("Camera Settings")]
-    public Transform player;
-    public float smoothSpeed = 0.125f;
-    public float fallDistance = 10f;
-    public float lineLength = 10f;
-    public float shakeDuration = 0.2f;
-    public float shakeMagnitude = 0.3f;
+    [Header("Desplazamiento Horizontal")]
+    public float desplazamientoHorizontal = 2f;
+    public float suavizadoMovimiento = 0.1f;
+    public float suavizadoTransicion = 2f;
 
-    [Header("System Checkpoints")]
-    private float currentHighestY;
-    private float shakeTimer;
-    private float currentShakeMagnitude;
-    private Vector3 initialPlayerPosition;
-    private Teleport currentCheckpoint;
+    [Header("Control Manual Vertical")]
+    public float velocidadDesplazamientoVertical = 1f;
+    public float maxDesplazamientoVertical = 2f;
+
+    private Vector3 velocidadCamara;
+    private float desplazamientoActual;
+    private float velocidadDesplazamiento;
+    private float desplazamientoVerticalManual;
+    private float velocidadVerticalManual;
+    private Gamepad gamepad;
 
     void Start()
     {
-        if (player == null)
-            player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        initialPlayerPosition = player.position;
-        currentHighestY = player.position.y;
+        // Verificar si hay un mando conectado
+        gamepad = Gamepad.current;
     }
 
     void LateUpdate()
     {
-        if (player == null) return;
+        // Obtener la posición del padre (jugador)
+        Transform jugador = transform.parent;
 
-        UpdateHighestY();
-        FollowPlayer();
-        HandleScreenShake();
-        CheckFallDeath();
+        if (jugador == null) return;
+
+        ProcesarInputVertical();
+        ActualizarDesplazamientoAutomatico(jugador);
+        CalcularYActualizarPosicion(jugador);
     }
 
-    void UpdateHighestY()
+    void ProcesarInputVertical()
     {
-        if (player.position.y > currentHighestY)
+        float inputVertical = 0f;
+
+        // Input de teclado (W/S)
+        if (Input.GetKey(KeyCode.W))
+            inputVertical += 1f;
+        if (Input.GetKey(KeyCode.S))
+            inputVertical -= 1f;
+
+        // Input de mando (stick derecho vertical)
+        if (gamepad != null)
         {
-            currentHighestY = player.position.y;
+            float stickVertical = gamepad.rightStick.y.ReadValue();
+            // Aplicar deadzone para evitar drift
+            if (Mathf.Abs(stickVertical) > 0.1f)
+                inputVertical += stickVertical;
         }
-    }
 
-    void FollowPlayer()
-    {
-        Vector3 targetPosition = player.position;
-        targetPosition.z = -10f;
-
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, targetPosition, smoothSpeed);
-
-        if (shakeTimer > 0)
+        // Input alternativo con botones del mando (opcional)
+        if (gamepad != null)
         {
-            Vector3 shakeOffset = Random.insideUnitSphere * currentShakeMagnitude;
-            shakeOffset.z = 0f;
-            smoothedPosition += shakeOffset;
+            if (gamepad.dpad.up.isPressed)
+                inputVertical += 1f;
+            if (gamepad.dpad.down.isPressed)
+                inputVertical -= 1f;
         }
 
-        transform.position = smoothedPosition;
+        // Limitar el input a -1 a 1
+        inputVertical = Mathf.Clamp(inputVertical, -1f, 1f);
+
+        // Suavizar el desplazamiento vertical manual
+        desplazamientoVerticalManual = Mathf.SmoothDamp(
+            desplazamientoVerticalManual,
+            inputVertical * maxDesplazamientoVertical,
+            ref velocidadVerticalManual,
+            suavizadoMovimiento
+        );
     }
 
-    void HandleScreenShake()
+    void ActualizarDesplazamientoAutomatico(Transform jugador)
     {
-        if (shakeTimer > 0)
+        // Determinar dirección objetivo automática
+        bool mirandoDerecha = jugador.localScale.x >= 0;
+        float desplazamientoObjetivo = mirandoDerecha ? desplazamientoHorizontal : -desplazamientoHorizontal;
+
+        // Suavizar la transición del desplazamiento automático
+        desplazamientoActual = Mathf.SmoothDamp(
+            desplazamientoActual,
+            desplazamientoObjetivo,
+            ref velocidadDesplazamiento,
+            suavizadoTransicion
+        );
+    }
+
+    void CalcularYActualizarPosicion(Transform jugador)
+    {
+        // Calcular posición objetivo (horizontal automático + vertical manual)
+        Vector3 posicionObjetivo = jugador.position +
+                                 (Vector3.right * desplazamientoActual) +
+                                 (Vector3.up * desplazamientoVerticalManual);
+        posicionObjetivo.z = -10f;
+
+        // Aplicar movimiento suavizado de la cámara
+        transform.position = Vector3.SmoothDamp(
+            transform.position,
+            posicionObjetivo,
+            ref velocidadCamara,
+            suavizadoMovimiento
+        );
+    }
+
+    // Método para verificar si hay mando conectado (útil para debug)
+    void OnGUI()
+    {
+        if (gamepad != null)
         {
-            shakeTimer -= Time.deltaTime;
-            if (shakeTimer <= 0)
-            {
-                currentShakeMagnitude = 0f;
-            }
+            GUI.Label(new Rect(10, 10, 300, 20), $"Mando conectado: {gamepad.name}");
+            GUI.Label(new Rect(10, 30, 300, 20), $"Stick derecho Y: {gamepad.rightStick.y.ReadValue():F2}");
         }
-    }
-
-    void CheckFallDeath()
-    {
-        if (player.position.y < currentHighestY - fallDistance)
-        {
-            ResetToCheckpoint();
-        }
-    }
-
-    void ResetToCheckpoint()
-    {
-        if (currentCheckpoint != null)
-        {
-            player.position = currentCheckpoint.transform.position;
-            currentHighestY = currentCheckpoint.transform.position.y;
-            transform.position = new Vector3(currentCheckpoint.transform.position.x,
-                                            currentCheckpoint.transform.position.y, -10f);
-        }
-        else
-        {
-            player.position = initialPlayerPosition;
-            currentHighestY = initialPlayerPosition.y;
-            transform.position = new Vector3(initialPlayerPosition.x, initialPlayerPosition.y, -10f);
-        }
-    }
-
-    public void CameraShake()
-    {
-        shakeTimer = shakeDuration;
-        currentShakeMagnitude = shakeMagnitude;
-    }
-
-    public void SetCheckpoint(Teleport checkpoint)
-    {
-        currentCheckpoint = checkpoint;
-    }
-
-
-    void OnDrawGizmosSelected()
-    {
-        if (player != null)
-        {
-            float deathLineY = Application.isPlaying ? currentHighestY - fallDistance : player.position.y - fallDistance;
-
-            Gizmos.color = Color.red;
-            Vector3 lineStart = new Vector3(player.position.x - lineLength / 2, deathLineY, 0);
-            Vector3 lineEnd = new Vector3(player.position.x + lineLength / 2, deathLineY, 0);
-            Gizmos.DrawLine(lineStart, lineEnd);
-
-            Gizmos.DrawLine(lineStart, lineStart + Vector3.up * 0.5f);
-            Gizmos.DrawLine(lineEnd, lineEnd + Vector3.up * 0.5f);
-        }
-    }
-
-    public void ResetFallLine()
-    {
-        currentHighestY = player.position.y;
     }
 }

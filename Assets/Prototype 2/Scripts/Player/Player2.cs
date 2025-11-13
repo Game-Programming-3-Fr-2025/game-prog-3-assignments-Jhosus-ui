@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player2 : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class Player2 : MonoBehaviour
     public Animator animator;
 
     [Header("Sound")]
-    public AudioClip jumpSound; 
+    public AudioClip jumpSound;
 
     private PDash dashComponent;
     private Rigidbody2D rb;
@@ -29,6 +30,11 @@ public class Player2 : MonoBehaviour
     private PJumps jumpComponent;
     [SerializeField] private ParticleSystem particulas;
 
+    // Variables para el control con mando
+    private Gamepad gamepad;
+    private bool jumpButtonPressed;
+    private bool jumpButtonHeld;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -39,6 +45,9 @@ public class Player2 : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
+
+        // Inicializar detección de mando
+        gamepad = Gamepad.current;
 
         if (rb != null)
         {
@@ -61,7 +70,22 @@ public class Player2 : MonoBehaviour
         CheckGrounded();
     }
 
-    void GetInput() => horizontalInput = Input.GetAxisRaw("Horizontal");
+    void GetInput()
+    {
+        // Combinar input de teclado y mando para movimiento
+        float keyboardInput = Input.GetAxisRaw("Horizontal");
+        float gamepadInput = 0f;
+
+        if (gamepad != null)
+        {
+            // Leer el stick izquierdo con deadzone
+            gamepadInput = Mathf.Abs(gamepad.leftStick.x.ReadValue()) > 0.1f ? gamepad.leftStick.x.ReadValue() : 0f;
+        }
+
+        // Priorizar el input con mayor magnitud
+        horizontalInput = Mathf.Abs(keyboardInput) > Mathf.Abs(gamepadInput) ? keyboardInput : gamepadInput;
+    }
+
 
     void HandleMovement()
     {
@@ -72,19 +96,26 @@ public class Player2 : MonoBehaviour
 
     void HandleJumpInput()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !IsDashing())
+        // Detectar input de salto (teclado O mando)
+        bool jumpInput = Input.GetKeyDown(KeyCode.Space) || (gamepad != null && gamepad.aButton.wasPressedThisFrame);
+
+        if (jumpInput && isGrounded && !IsDashing())
         {
             isJumping = true;
             jumpTimeCounter = jumpTime;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             particulas.Play();
+
             if (jumpSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(jumpSound);
             }
         }
 
-        if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0)
+        // Detectar liberación de salto (teclado O mando)
+        bool jumpReleased = Input.GetKeyUp(KeyCode.Space) || (gamepad != null && gamepad.aButton.wasReleasedThisFrame);
+
+        if (jumpReleased && rb.linearVelocity.y > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * cutJumpHeight);
             isJumping = false;
@@ -93,7 +124,10 @@ public class Player2 : MonoBehaviour
 
     void HandleJumpHold()
     {
-        if (isJumping && !IsDashing())
+        // Para salto sostenido, usar tecla Space mantenida O botón A mantenido
+        bool jumpHeld = Input.GetKey(KeyCode.Space) || (gamepad != null && gamepad.aButton.isPressed);
+
+        if (isJumping && jumpHeld && !IsDashing())
         {
             if (jumpTimeCounter > 0)
             {
@@ -101,9 +135,16 @@ public class Player2 : MonoBehaviour
                 jumpTimeCounter -= Time.deltaTime;
                 particulas.Play();
             }
-            else isJumping = false;
+            else
+            {
+                isJumping = false;
+            }
         }
-        if (isGrounded) isJumping = false;
+
+        if (isGrounded)
+        {
+            isJumping = false;
+        }
     }
 
     public bool CanJumpDuringDash()
