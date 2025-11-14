@@ -21,6 +21,15 @@
                     "id": "aa17e1ef-fa94-400b-9e84-49fc495891fc",
                     "expectedControlType": "",
                     "processors": "",
+                    "interactions": "Hold(duration=0.3,pressPoint=0.1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Attack",
+                    "type": "PassThrough",
+                    "id": "a9d90b81-5d11-4663-a585-2a5b4907a21c",
+                    "expectedControlType": "Button",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 }
@@ -89,6 +98,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9622a456-5e8d-4eae-a818-201a3029b244",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -107,6 +107,15 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
                     ""id"": ""aa17e1ef-fa94-400b-9e84-49fc495891fc"",
                     ""expectedControlType"": """",
                     ""processors"": """",
+                    ""interactions"": ""Hold(duration=0.3,pressPoint=0.1)"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""a9d90b81-5d11-4663-a585-2a5b4907a21c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 }
@@ -177,6 +186,17 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9622a456-5e8d-4eae-a818-201a3029b244"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -187,6 +207,7 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
         m_Base = asset.FindActionMap("Base", throwIfNotFound: true);
         m_Base_Movement = m_Base.FindAction("Movement", throwIfNotFound: true);
         m_Base_Jump = m_Base.FindAction("Jump", throwIfNotFound: true);
+        m_Base_Attack = m_Base.FindAction("Attack", throwIfNotFound: true);
     }
 
     ~@Controlles()
@@ -269,6 +290,7 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
     private List<IBaseActions> m_BaseActionsCallbackInterfaces = new List<IBaseActions>();
     private readonly InputAction m_Base_Movement;
     private readonly InputAction m_Base_Jump;
+    private readonly InputAction m_Base_Attack;
     /// <summary>
     /// Provides access to input actions defined in input action map "Base".
     /// </summary>
@@ -288,6 +310,10 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Base/Jump".
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Base_Jump;
+        /// <summary>
+        /// Provides access to the underlying input action "Base/Attack".
+        /// </summary>
+        public InputAction @Attack => m_Wrapper.m_Base_Attack;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -320,6 +346,9 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @Attack.started += instance.OnAttack;
+            @Attack.performed += instance.OnAttack;
+            @Attack.canceled += instance.OnAttack;
         }
 
         /// <summary>
@@ -337,6 +366,9 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @Attack.started -= instance.OnAttack;
+            @Attack.performed -= instance.OnAttack;
+            @Attack.canceled -= instance.OnAttack;
         }
 
         /// <summary>
@@ -391,5 +423,12 @@ public partial class @Controlles: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAttack(InputAction.CallbackContext context);
     }
 }
