@@ -15,6 +15,8 @@ public class Blocks : MonoBehaviour
     private bool isBreaking;
     private bool isBroken;
 
+    [SerializeField] private ParticleSystem efecto;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -41,6 +43,7 @@ public class Blocks : MonoBehaviour
 
     void BreakBlock()
     {
+        efecto.Play();
         isBroken = true;
         isBreaking = false;
         spriteRenderer.enabled = false;
