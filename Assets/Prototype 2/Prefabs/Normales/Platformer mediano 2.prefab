@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 5179905353092260269}
   - component: {fileID: 1384995620078812662}
   - component: {fileID: 8986855230440834821}
-  - component: {fileID: 7660710342492857478}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Platformer mediano 2
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -135,21 +134,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 5.6905594, y: 1.6363533}
   m_EdgeRadius: 0
---- !u!114 &7660710342492857478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3799165924435992828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b6731ea7b3b7498d47768b2dc91f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalFace: {fileID: 0}
-  crackedFace: {fileID: 0}
-  breakTime: 0.5
-  respawnTime: 3
-  shakeIntensity: 0.1
-  efecto: {fileID: 0}

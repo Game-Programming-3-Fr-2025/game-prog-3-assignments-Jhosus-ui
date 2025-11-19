@@ -11,10 +11,9 @@ GameObject:
   - component: {fileID: 718225755323019066}
   - component: {fileID: 7641087684690889602}
   - component: {fileID: 7163982856067292763}
-  - component: {fileID: 4472991442270310047}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plataforma pequena -1.5 (1)
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 8682532260395670901}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 27.78, y: 7.05, z: 0}
-  m_LocalScale: {x: 0.63473177, y: 0.45760903, z: 0.61614}
+  m_LocalPosition: {x: 27.4303, y: 7.0957, z: 0}
+  m_LocalScale: {x: 0.8678688, y: 0.42013085, z: 0.61614}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -135,21 +134,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.796005, y: 1.3057245}
   m_EdgeRadius: 0
---- !u!114 &4472991442270310047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8682532260395670901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b6731ea7b3b7498d47768b2dc91f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  normalFace: {fileID: 0}
-  crackedFace: {fileID: 0}
-  breakTime: 0.5
-  respawnTime: 3
-  shakeIntensity: 0.1
-  efecto: {fileID: 0}
