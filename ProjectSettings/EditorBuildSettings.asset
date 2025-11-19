@@ -11,9 +11,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Prototype 1/PrototypeOneMain.unity
     guid: 91490392ea8e446eb9fef37d81379b3b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Prototype 2/PrototypeTwoMain.unity
     guid: d43423cfffa7e413db11e1550b09f6e4
+  - enabled: 1
+    path: Assets/Prototype 2/GP2.unity
+    guid: 735e4595c410d7a499283dcd28d01f7c
+  - enabled: 1
+    path: Assets/Prototype 2/GP2-1.unity
+    guid: c1fe7e4a525822a4d927099406c5ec94
   - enabled: 1
     path: Assets/Prototype 3/PrototypeThreeMain.unity
     guid: 214245533f3e84d04b8269391b42f7df

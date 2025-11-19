@@ -18,6 +18,8 @@ TagManager:
   - Modulo
   - Fathers
   - Wall
+  - SpawnPoint
+  - Fade
   layers:
   - Default
   - TransparentFX
