@@ -13,7 +13,7 @@ public class GeneradorLevel : MonoBehaviour
     private void Start()
     {
         // Buscar jugador de forma segura
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player 1");
         if (playerObj != null)
         {
             jugador = playerObj.transform;

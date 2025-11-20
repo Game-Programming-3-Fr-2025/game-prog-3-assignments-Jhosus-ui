@@ -22,6 +22,7 @@ TagManager:
   - Fade
   - PuntoFinal
   - Niveles
+  - Player 1
   layers:
   - Default
   - TransparentFX
