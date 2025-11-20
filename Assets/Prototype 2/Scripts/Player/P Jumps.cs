@@ -13,11 +13,11 @@ public class PJumps : MonoBehaviour
     private float pointBufferTimer = 0f;
 
     [Header("Jump Sounds")]
-    public AudioClip airJumpSound; 
-    public AudioClip pointJumpSound; 
+    public AudioClip airJumpSound;
+    public AudioClip pointJumpSound;
 
     private Rigidbody2D rb;
-    private Player2 player;
+    private PlayerController player;
     private PDash dashComponent;
     private AudioSource audioSource;
 
@@ -28,7 +28,7 @@ public class PJumps : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        player = GetComponent<Player2>();
+        player = GetComponent<PlayerController>();
         dashComponent = GetComponent<PDash>();
 
         audioSource = GetComponent<AudioSource>();
@@ -51,7 +51,27 @@ public class PJumps : MonoBehaviour
 
     void HandleAirJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // DETECCIÓN DE INPUT SEPARADO POR JUGADOR
+        bool jumpInput = false;
+
+        if (player.isPlayer1)
+        {
+            // Player 1: Tecla W
+            jumpInput = Input.GetKeyDown(KeyCode.W);
+        }
+        else
+        {
+            // Player 2: Flecha Arriba
+            jumpInput = Input.GetKeyDown(KeyCode.UpArrow);
+        }
+
+        // INPUT DE MANDO (Botón X de PlayStation)
+        if (player.gamepad != null && player.gamepad.buttonSouth.wasPressedThisFrame)
+        {
+            jumpInput = true;
+        }
+
+        if (jumpInput)
         {
             if (inPointTrigger || pointBufferTimer > 0f)
             {

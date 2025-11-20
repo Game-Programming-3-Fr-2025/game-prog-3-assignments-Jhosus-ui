@@ -15,10 +15,10 @@ EditorBuildSettings:
     path: Assets/Prototype 2/PrototypeTwoMain.unity
     guid: d43423cfffa7e413db11e1550b09f6e4
   - enabled: 1
-    path: Assets/Prototype 2/GP2.unity
+    path: Assets/Prototype 2/Descartado/GP2.unity
     guid: 735e4595c410d7a499283dcd28d01f7c
   - enabled: 1
-    path: Assets/Prototype 2/GP2-1.unity
+    path: Assets/Prototype 2/Descartado/GP2-1.unity
     guid: c1fe7e4a525822a4d927099406c5ec94
   - enabled: 1
     path: Assets/Prototype 3/PrototypeThreeMain.unity

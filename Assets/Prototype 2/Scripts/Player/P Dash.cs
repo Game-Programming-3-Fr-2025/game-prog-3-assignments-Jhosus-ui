@@ -13,7 +13,7 @@ public class PDash : MonoBehaviour
     public GameObject dashActivatorObject;
 
     private Rigidbody2D rb;
-    private Player2 player;
+    private PlayerController player;
     private Animator animator;
 
     private bool isDashing;
@@ -26,7 +26,7 @@ public class PDash : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        player = GetComponent<Player2>();
+        player = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
         dashesRemaining = maxDashes;
     }
@@ -35,8 +35,27 @@ public class PDash : MonoBehaviour
     {
         if (!isDashUnlocked) return;
 
-        if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.C)) &&
-            canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
+        // DETECCIÓN DE INPUT SEPARADO POR JUGADOR
+        bool dashInput = false;
+
+        if (player.isPlayer1)
+        {
+            // Player 1: Left Shift
+            dashInput = Input.GetKeyDown(KeyCode.LeftShift);
+        }
+        else
+        {
+            // Player 2: Comma (,)
+            dashInput = Input.GetKeyDown(KeyCode.Comma);
+        }
+
+        // INPUT DE MANDO (L1 de PlayStation)
+        if (player.gamepad != null && player.gamepad.leftShoulder.wasPressedThisFrame)
+        {
+            dashInput = true;
+        }
+
+        if (dashInput && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
         {
             StartDash();
         }
@@ -52,7 +71,8 @@ public class PDash : MonoBehaviour
         dashTimeCounter = dashDuration;
         dashCooldownTimer = dashCooldown;
 
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        // Usar el input horizontal del PlayerController
+        float horizontalInput = player.GetHorizontalInput();
         dashDirection = horizontalInput != 0 ?
             new Vector2(horizontalInput, 0) :
             new Vector2(transform.localScale.x, 0);
