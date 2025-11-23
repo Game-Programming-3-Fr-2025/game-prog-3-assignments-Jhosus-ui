@@ -28,9 +28,13 @@ public class Blocks : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player 1") && !isBreaking && !isBroken)
+        if (!isBreaking && !isBroken)
         {
-            StartBreaking();
+            string collisionTag = collision.gameObject.tag;
+            if (collisionTag == "Player 1" || collisionTag == "Player 2")
+            {
+                StartBreaking();
+            }
         }
     }
 
@@ -43,7 +47,9 @@ public class Blocks : MonoBehaviour
 
     void BreakBlock()
     {
-        efecto.Play();
+        if (efecto != null)
+            efecto.Play();
+
         isBroken = true;
         isBreaking = false;
         spriteRenderer.enabled = false;
