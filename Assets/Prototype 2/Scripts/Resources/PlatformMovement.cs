@@ -2,13 +2,10 @@ using UnityEngine;
 
 public class PlatformMovement : MonoBehaviour
 {
-    public enum Direction { Right, Left, Up, Down, UpRight, UpLeft, DownRight, DownLeft }
-
     [Header("Movement Settings")]
-    public Direction movementDirection = Direction.Right;
+    public Vector2 movementDirection = new Vector2(1, 0);
     public float movementDistance = 3f;
     public float movementSpeed = 2f;
-    public bool moveOnlyWithPlayer = true;
 
     [Header("Gizmo Settings")]
     public bool showGizmos = true;
@@ -17,17 +14,20 @@ public class PlatformMovement : MonoBehaviour
     private Vector3 startPos;
     private Vector3 targetPos;
     private bool movingToTarget = true;
+    private bool hasBeenActivated = false;
     private bool hasPlayer = false;
 
     void Start()
     {
         startPos = transform.position;
-        targetPos = startPos + GetDirectionVector() * movementDistance;
+        // Normalizamos la dirección para que tenga magnitud 1 y luego multiplicamos por la distancia
+        targetPos = startPos + (Vector3)movementDirection.normalized * movementDistance;
     }
 
     void Update()
     {
-        if (moveOnlyWithPlayer && !hasPlayer) return;
+        // Solo se mueve si ha sido activada por un jugador
+        if (!hasBeenActivated) return;
 
         Vector3 target = movingToTarget ? targetPos : startPos;
         transform.position = Vector3.MoveTowards(transform.position, target, movementSpeed * Time.deltaTime);
@@ -36,28 +36,18 @@ public class PlatformMovement : MonoBehaviour
             movingToTarget = !movingToTarget;
     }
 
-    Vector3 GetDirectionVector()
-    {
-        switch (movementDirection)
-        {
-            case Direction.Right: return Vector3.right;
-            case Direction.Left: return Vector3.left;
-            case Direction.Up: return Vector3.up;
-            case Direction.Down: return Vector3.down;
-            case Direction.UpRight: return new Vector3(1, 1, 0).normalized;
-            case Direction.UpLeft: return new Vector3(-1, 1, 0).normalized;
-            case Direction.DownRight: return new Vector3(1, -1, 0).normalized;
-            case Direction.DownLeft: return new Vector3(-1, -1, 0).normalized;
-            default: return Vector3.right;
-        }
-    }
-
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player 1") || collision.gameObject.CompareTag("Player 2"))
         {
             hasPlayer = true;
             collision.transform.SetParent(transform);
+
+            // Activar el movimiento solo la primera vez que un jugador pisa la plataforma
+            if (!hasBeenActivated)
+            {
+                hasBeenActivated = true;
+            }
         }
     }
 
@@ -75,7 +65,7 @@ public class PlatformMovement : MonoBehaviour
         if (!showGizmos) return;
 
         Vector3 start = Application.isPlaying ? startPos : transform.position;
-        Vector3 end = Application.isPlaying ? targetPos : transform.position + GetDirectionVector() * movementDistance;
+        Vector3 end = Application.isPlaying ? targetPos : transform.position + (Vector3)movementDirection.normalized * movementDistance;
 
         Gizmos.color = gizmoColor;
         Gizmos.DrawLine(start, end);
@@ -92,5 +82,15 @@ public class PlatformMovement : MonoBehaviour
         Vector3 arrowTip = start + dir;
         Gizmos.DrawRay(arrowTip, Quaternion.Euler(0, 0, 135) * dir * 0.6f);
         Gizmos.DrawRay(arrowTip, Quaternion.Euler(0, 0, -135) * dir * 0.6f);
+    }
+
+    // Método para validar y normalizar la dirección en el Inspector
+    void OnValidate()
+    {
+        // Asegurarnos de que la dirección no sea cero
+        if (movementDirection == Vector2.zero)
+        {
+            movementDirection = Vector2.right;
+        }
     }
 }
