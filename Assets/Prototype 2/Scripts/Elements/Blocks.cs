@@ -28,7 +28,7 @@ public class Blocks : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player") && !isBreaking && !isBroken)
+        if (collision.gameObject.CompareTag("Player 1") && !isBreaking && !isBroken)
         {
             StartBreaking();
         }

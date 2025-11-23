@@ -2,73 +2,95 @@ using UnityEngine;
 
 public class PlatformMovement : MonoBehaviour
 {
-    [Header("Movement")]
-    public bool moveX, moveY;
-    public bool positiveDirection = true;
-    public float distance = 3f;
-    public float speed = 2f;
+    public enum Direction { Right, Left, Up, Down, UpRight, UpLeft, DownRight, DownLeft }
 
-    [Header("Activation")]
-    public bool requirePlayer = true;
+    [Header("Movement Settings")]
+    public Direction movementDirection = Direction.Right;
+    public float movementDistance = 3f;
+    public float movementSpeed = 2f;
+    public bool moveOnlyWithPlayer = true;
+
+    [Header("Gizmo Settings")]
+    public bool showGizmos = true;
+    public Color gizmoColor = Color.cyan;
 
     private Vector3 startPos;
-    private Vector3 direction;
-    private float pingPong;
-    private bool hasPlayer;
+    private Vector3 targetPos;
+    private bool movingToTarget = true;
+    private bool hasPlayer = false;
 
     void Start()
     {
         startPos = transform.position;
-        int dir = positiveDirection ? 1 : -1;
-        direction = new Vector3(moveX ? dir : 0, moveY ? dir : 0, 0);
+        targetPos = startPos + GetDirectionVector() * movementDistance;
     }
 
     void Update()
     {
-        if (requirePlayer && !hasPlayer) return;
+        if (moveOnlyWithPlayer && !hasPlayer) return;
 
-        pingPong = Mathf.PingPong(Time.time * speed, distance);
-        transform.position = startPos + direction * pingPong;
+        Vector3 target = movingToTarget ? targetPos : startPos;
+        transform.position = Vector3.MoveTowards(transform.position, target, movementSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, target) < 0.01f)
+            movingToTarget = !movingToTarget;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    Vector3 GetDirectionVector()
     {
-        if (other.CompareTag("Player1") || other.CompareTag("Player2"))
+        switch (movementDirection)
         {
-            hasPlayer = true;
-            other.transform.SetParent(transform); // El jugador se mueve con la plataforma
+            case Direction.Right: return Vector3.right;
+            case Direction.Left: return Vector3.left;
+            case Direction.Up: return Vector3.up;
+            case Direction.Down: return Vector3.down;
+            case Direction.UpRight: return new Vector3(1, 1, 0).normalized;
+            case Direction.UpLeft: return new Vector3(-1, 1, 0).normalized;
+            case Direction.DownRight: return new Vector3(1, -1, 0).normalized;
+            case Direction.DownLeft: return new Vector3(-1, -1, 0).normalized;
+            default: return Vector3.right;
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (other.CompareTag("Player1") || other.CompareTag("Player2"))
+        if (collision.gameObject.CompareTag("Player 1") || collision.gameObject.CompareTag("Player 2"))
+        {
+            hasPlayer = true;
+            collision.transform.SetParent(transform);
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player 1") || collision.gameObject.CompareTag("Player 2"))
         {
             hasPlayer = false;
-            other.transform.SetParent(null); // El jugador deja de moverse con la plataforma
+            collision.transform.SetParent(null);
         }
     }
 
     void OnDrawGizmos()
     {
-        Gizmos.color = hasPlayer ? Color.green : Color.cyan;
-        Vector3 currentStart = Application.isPlaying ? startPos : transform.position;
-        int dir = positiveDirection ? 1 : -1;
-        Vector3 targetPos = currentStart + new Vector3(
-            moveX ? distance * dir : 0,
-            moveY ? distance * dir : 0, 0);
+        if (!showGizmos) return;
 
-        Gizmos.DrawLine(currentStart, targetPos);
-        Gizmos.DrawWireCube(currentStart, Vector3.one * 0.3f);
-        Gizmos.DrawWireCube(targetPos, Vector3.one * 0.3f);
+        Vector3 start = Application.isPlaying ? startPos : transform.position;
+        Vector3 end = Application.isPlaying ? targetPos : transform.position + GetDirectionVector() * movementDistance;
 
-        DrawArrow(currentStart, (targetPos - currentStart).normalized, 0.5f);
-    }
+        Gizmos.color = gizmoColor;
+        Gizmos.DrawLine(start, end);
 
-    void DrawArrow(Vector3 pos, Vector3 dir, float size)
-    {
-        Gizmos.DrawRay(pos, dir * size);
-        Gizmos.DrawRay(pos + dir * size, Quaternion.Euler(0, 0, 135) * dir * 0.3f);
-        Gizmos.DrawRay(pos + dir * size, Quaternion.Euler(0, 0, -135) * dir * 0.3f);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(start, Vector3.one * 0.3f);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(end, Vector3.one * 0.3f);
+
+        Vector3 dir = (end - start).normalized * 0.5f;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(start, dir);
+        Vector3 arrowTip = start + dir;
+        Gizmos.DrawRay(arrowTip, Quaternion.Euler(0, 0, 135) * dir * 0.6f);
+        Gizmos.DrawRay(arrowTip, Quaternion.Euler(0, 0, -135) * dir * 0.6f);
     }
 }
