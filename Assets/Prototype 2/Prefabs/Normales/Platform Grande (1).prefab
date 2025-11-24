@@ -338,9 +338,9 @@ GameObject:
   - component: {fileID: 1529667925707342150}
   - component: {fileID: 3897187602381009255}
   - component: {fileID: 2324862257637091032}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Assets aparte_12
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

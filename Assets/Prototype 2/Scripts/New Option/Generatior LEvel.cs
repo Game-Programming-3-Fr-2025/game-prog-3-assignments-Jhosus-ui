@@ -6,6 +6,7 @@ public class GeneratiorLEvel : MonoBehaviour
     [Header("Configuración de Niveles")]
     [SerializeField] private float distanciaActivacion = 10f;
     [SerializeField] private int cantidadInicial = 3;
+    [SerializeField] private int maxNivelesActivos = 3; // Nueva variable para limitar niveles
     [SerializeField] private Transform puntoFinal;
 
     [Header("Prefabs de Niveles")]
@@ -13,6 +14,7 @@ public class GeneratiorLEvel : MonoBehaviour
 
     private Transform jugador;
     private bool inicializado = false;
+    private Queue<GameObject> nivelesActivos = new Queue<GameObject>(); // Cola para gestionar niveles activos
 
     // Propiedad para acceder a los niveles de forma segura
     private GameObject[] Niveles
@@ -110,6 +112,9 @@ public class GeneratiorLEvel : MonoBehaviour
         // El nuevo nivel se genera en la posición del punto final actual
         GameObject nuevoNivel = Instantiate(prefabSeleccionado, puntoFinal.position, Quaternion.identity);
 
+        // Agregar el nuevo nivel a la cola de niveles activos
+        nivelesActivos.Enqueue(nuevoNivel);
+
         // Buscar nuevo punto final en el nivel recién generado
         Transform nuevoPuntoFinal = BuscarPuntoFinal(nuevoNivel, "PuntoFinal");
         if (nuevoPuntoFinal != null)
@@ -120,6 +125,23 @@ public class GeneratiorLEvel : MonoBehaviour
         else
         {
             Debug.LogError($"No se encontró PuntoFinal en el nivel generado: {nuevoNivel.name}");
+        }
+
+        // Eliminar niveles excedentes
+        EliminarNivelesExcedentes();
+    }
+
+    private void EliminarNivelesExcedentes()
+    {
+        // Si tenemos más niveles de los permitidos, eliminar los más antiguos
+        while (nivelesActivos.Count > maxNivelesActivos)
+        {
+            GameObject nivelAEliminar = nivelesActivos.Dequeue();
+            if (nivelAEliminar != null)
+            {
+                Destroy(nivelAEliminar);
+                Debug.Log($"Nivel eliminado: {nivelAEliminar.name}");
+            }
         }
     }
 
@@ -157,5 +179,18 @@ public class GeneratiorLEvel : MonoBehaviour
     public void LimpiarLista()
     {
         nivelesList.Clear();
+    }
+
+    // Método para limpiar todos los niveles activos (útil al reiniciar el juego)
+    public void LimpiarNivelesActivos()
+    {
+        while (nivelesActivos.Count > 0)
+        {
+            GameObject nivel = nivelesActivos.Dequeue();
+            if (nivel != null)
+            {
+                Destroy(nivel);
+            }
+        }
     }
 }

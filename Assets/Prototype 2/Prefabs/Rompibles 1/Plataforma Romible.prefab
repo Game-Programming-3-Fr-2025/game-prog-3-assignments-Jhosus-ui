@@ -4847,9 +4847,9 @@ GameObject:
   - component: {fileID: -7318219821458942954}
   - component: {fileID: 2747690361584423287}
   - component: {fileID: 1976357306797242230}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plataforma Romible
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

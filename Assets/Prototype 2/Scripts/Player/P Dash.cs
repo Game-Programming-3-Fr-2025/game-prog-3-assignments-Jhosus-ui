@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PDash : MonoBehaviour
 {
@@ -8,13 +9,21 @@ public class PDash : MonoBehaviour
     public float dashCooldown = 1f;
     public int maxDashes = 1;
 
+    [Header("Vibration Settings")]
+    public float vibrationIntensity = 0.8f;
+    public float vibrationDuration = 0.3f;
+
+    [Header("Trigger Settings")]
+    public float triggerThreshold = 0.7f;
+
     [Header("Dash Unlock System")]
-    public bool isDashUnlocked = false;
+    public bool isDashUnlocked = true;
     public GameObject dashActivatorObject;
 
     private Rigidbody2D rb;
     private PlayerController player;
     private Animator animator;
+    private Gamepad playerGamepad;
 
     private bool isDashing;
     private bool canDash = true;
@@ -22,6 +31,8 @@ public class PDash : MonoBehaviour
     private float dashTimeCounter;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
+    private float vibrationTimer;
+    private bool triggerReady = true;
 
     void Start()
     {
@@ -29,38 +40,84 @@ public class PDash : MonoBehaviour
         player = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
         dashesRemaining = maxDashes;
+
+        FindGamepad();
+    }
+
+    void FindGamepad()
+    {
+        if (Gamepad.all.Count > 0)
+        {
+            if (player.isPlayer1)
+            {
+                playerGamepad = Gamepad.all[0];
+            }
+            else
+            {
+                playerGamepad = Gamepad.all.Count > 1 ? Gamepad.all[1] : Gamepad.all[0];
+            }
+            Debug.Log($"Mando asignado: {playerGamepad.name}");
+        }
     }
 
     void Update()
     {
         if (!isDashUnlocked) return;
 
-        // DETECCIÓN DE INPUT SEPARADO POR JUGADOR
-        bool dashInput = false;
-
-        if (player.isPlayer1)
+        if (playerGamepad == null)
         {
-            // Player 1: Left Shift
-            dashInput = Input.GetKeyDown(KeyCode.LeftShift);
-        }
-        else
-        {
-            // Player 2: Comma (,)
-            dashInput = Input.GetKeyDown(KeyCode.Comma);
+            FindGamepad();
+            return;
         }
 
-        // INPUT DE MANDO (L1 de PlayStation)
-        if (player.gamepad != null && player.gamepad.leftShoulder.wasPressedThisFrame)
-        {
-            dashInput = true;
-        }
-
-        if (dashInput && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
+        // Detectar input de dash - VERSIÓN SIMPLIFICADA
+        if (CheckDashInput() && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
         {
             StartDash();
         }
 
         UpdateDash();
+        UpdateVibration();
+    }
+
+    bool CheckDashInput()
+    {
+        // Input de teclado
+        if (player.isPlayer1 && Input.GetKeyDown(KeyCode.LeftShift))
+            return true;
+
+        if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.Comma))
+            return true;
+
+        // Input de mando - DETECCIÓN DIRECTA
+        if (playerGamepad != null)
+        {
+            float triggerValue = playerGamepad.rightTrigger.ReadValue();
+
+            // Si el gatillo supera el umbral Y está listo para detectar
+            if (triggerValue >= triggerThreshold && triggerReady)
+            {
+                triggerReady = false; // Prevenir múltiples activaciones
+                Debug.Log($"Dash por R2: {triggerValue:F2}");
+                return true;
+            }
+
+            // Resetear cuando el gatillo se suelta
+            if (triggerValue < 0.2f)
+            {
+                triggerReady = true;
+            }
+
+            // También detectar R1 por si acaso
+            if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady)
+            {
+                triggerReady = false;
+                Debug.Log("Dash por R1");
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void StartDash()
@@ -71,35 +128,39 @@ public class PDash : MonoBehaviour
         dashTimeCounter = dashDuration;
         dashCooldownTimer = dashCooldown;
 
-        // Usar el input horizontal del PlayerController
+        // Dirección del dash
         float horizontalInput = player.GetHorizontalInput();
         dashDirection = horizontalInput != 0 ?
             new Vector2(horizontalInput, 0) :
             new Vector2(transform.localScale.x, 0);
 
+        // Aplicar dash
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
+        rb.linearVelocity = dashDirection * dashSpeed;
 
-        if (animator != null) animator.SetTrigger("Sprint");
+        // Vibración
+        StartVibration();
+
+        // Animación
+        if (animator != null)
+            animator.SetTrigger("Sprint");
     }
 
     void UpdateDash()
     {
         if (isDashing)
         {
-            if (dashTimeCounter > 0)
-            {
-                rb.linearVelocity = dashDirection * dashSpeed;
-                dashTimeCounter -= Time.deltaTime;
-            }
-            else
+            dashTimeCounter -= Time.deltaTime;
+            if (dashTimeCounter <= 0)
             {
                 isDashing = false;
                 rb.gravityScale = 4f;
             }
         }
 
-        if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
+        if (dashCooldownTimer > 0)
+            dashCooldownTimer -= Time.deltaTime;
 
         if (player.isGrounded && dashesRemaining < maxDashes)
         {
@@ -108,13 +169,38 @@ public class PDash : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void StartVibration()
     {
-        if (!isDashUnlocked && other.gameObject == dashActivatorObject)
+        if (playerGamepad != null)
         {
-            isDashUnlocked = true;
-            dashActivatorObject.SetActive(false);
+            vibrationTimer = vibrationDuration;
+            playerGamepad.SetMotorSpeeds(vibrationIntensity, vibrationIntensity);
         }
+    }
+
+    void UpdateVibration()
+    {
+        if (vibrationTimer > 0)
+        {
+            vibrationTimer -= Time.deltaTime;
+            if (vibrationTimer <= 0)
+            {
+                StopVibration();
+            }
+        }
+    }
+
+    void StopVibration()
+    {
+        if (playerGamepad != null)
+        {
+            playerGamepad.SetMotorSpeeds(0f, 0f);
+        }
+    }
+
+    void OnDisable()
+    {
+        StopVibration();
     }
 
     public bool IsDashing() => isDashing;

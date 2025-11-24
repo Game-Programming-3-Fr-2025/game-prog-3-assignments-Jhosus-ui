@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3189117403170795996}
   - component: {fileID: 212310386700323515}
   - component: {fileID: 4734252410644718720}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Platform Pequeno
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
