@@ -24,6 +24,7 @@ TagManager:
   - Niveles
   - Player 1
   - Player 2
+  - Horizontal
   layers:
   - Default
   - TransparentFX

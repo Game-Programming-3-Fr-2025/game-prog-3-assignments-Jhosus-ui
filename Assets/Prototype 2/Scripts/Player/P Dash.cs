@@ -64,13 +64,13 @@ public class PDash : MonoBehaviour
     {
         if (!isDashUnlocked) return;
 
-        if (playerGamepad == null)
+        // Solo buscar mando si no tenemos uno asignado
+        if (playerGamepad == null && Gamepad.all.Count > 0)
         {
             FindGamepad();
-            return;
         }
 
-        // Detectar input de dash - VERSIÓN SIMPLIFICADA
+        // Detectar input de dash
         if (CheckDashInput() && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
         {
             StartDash();
@@ -82,14 +82,14 @@ public class PDash : MonoBehaviour
 
     bool CheckDashInput()
     {
-        // Input de teclado
+        // INPUT DE TECLADO - SIEMPRE DISPONIBLE
         if (player.isPlayer1 && Input.GetKeyDown(KeyCode.LeftShift))
             return true;
 
         if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.Comma))
             return true;
 
-        // Input de mando - DETECCIÓN DIRECTA
+        // INPUT DE MANDO - SOLO SI HAY MANDO CONECTADO
         if (playerGamepad != null)
         {
             float triggerValue = playerGamepad.rightTrigger.ReadValue();
@@ -97,7 +97,7 @@ public class PDash : MonoBehaviour
             // Si el gatillo supera el umbral Y está listo para detectar
             if (triggerValue >= triggerThreshold && triggerReady)
             {
-                triggerReady = false; // Prevenir múltiples activaciones
+                triggerReady = false;
                 Debug.Log($"Dash por R2: {triggerValue:F2}");
                 return true;
             }
@@ -108,7 +108,7 @@ public class PDash : MonoBehaviour
                 triggerReady = true;
             }
 
-            // También detectar R1 por si acaso
+            // También detectar R1
             if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady)
             {
                 triggerReady = false;
