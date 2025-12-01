@@ -5,19 +5,25 @@ public class FC2 : MonoBehaviour
     [Header("Configuración Cámara")]
     public float velocidadBajada = 2f;
     public float velocidadDerecha = 2f;
+    public float velocidadSubida = 2f;
     public float posicionXFija = 0f;
 
     [Header("Estado Cámara")]
     public bool modoHorizontal = false;
+    public bool modoVerticalArriba = false;
 
     private float alturaInicial;
     private float posicionXInicial;
     private Transform jugador;
     private bool seguirJugadorHorizontal = false;
     private float tiempoInicioHorizontal;
+    private float tiempoInicioVerticalArriba;
     private Camera camaraComponent;
-    private float mitadAlturaCamara; // Mitad de la altura de la cámara
+    private float mitadAlturaCamara;
+    private float mitadAnchoCamara;
     private float posicionYFijaHorizontal;
+    private float posicionYInicialArriba;
+    private float posicionXFijaArriba;
 
     void Start()
     {
@@ -27,12 +33,13 @@ public class FC2 : MonoBehaviour
         camaraComponent = GetComponent<Camera>();
         if (camaraComponent != null)
         {
-            // Calcular la mitad de la altura de la cámara
             mitadAlturaCamara = camaraComponent.orthographicSize;
+            mitadAnchoCamara = camaraComponent.orthographicSize * camaraComponent.aspect;
         }
         else
         {
-            mitadAlturaCamara = 5f; // Valor por defecto
+            mitadAlturaCamara = 5f;
+            mitadAnchoCamara = 8f;
         }
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player 1");
@@ -44,7 +51,11 @@ public class FC2 : MonoBehaviour
 
     void Update()
     {
-        if (modoHorizontal)
+        if (modoVerticalArriba)
+        {
+            MoverCamaraVerticalArriba();
+        }
+        else if (modoHorizontal)
         {
             MoverCamaraHorizontal();
         }
@@ -70,7 +81,7 @@ public class FC2 : MonoBehaviour
     void MoverCamaraHorizontal()
     {
         float nuevaX;
-        float nuevaY = posicionYFijaHorizontal; // Siempre usar Y fija
+        float nuevaY = posicionYFijaHorizontal;
 
         if (seguirJugadorHorizontal && jugador != null)
         {
@@ -86,53 +97,83 @@ public class FC2 : MonoBehaviour
         transform.position = posicion;
     }
 
+    void MoverCamaraVerticalArriba()
+    {
+        // CORREGIDO: Usar Time.time - tiempoInicio, igual que en MoverCamaraHorizontal
+        float tiempoVertical = Time.time - tiempoInicioVerticalArriba;
+        float nuevaY = posicionYInicialArriba + (velocidadSubida * tiempoVertical);
+
+        Vector3 posicion = new Vector3(
+            posicionXFijaArriba,
+            nuevaY,
+            transform.position.z
+        );
+
+        transform.position = posicion;
+    }
+
     public void CambiarAModoHorizontal(Vector3 posicionAjuste)
     {
         if (!modoHorizontal)
         {
             modoHorizontal = true;
+            modoVerticalArriba = false;
             posicionXInicial = transform.position.x;
             tiempoInicioHorizontal = Time.time;
 
-            // Calcular la posición Y para que el BORDE INFERIOR de la cámara esté en posicionAjuste.y
-            // Centro de la cámara = posición del borde inferior + mitad de la altura
+            // Ajustar Y para que el BORDE INFERIOR esté en posicionAjuste.y
             posicionYFijaHorizontal = posicionAjuste.y + mitadAlturaCamara;
 
-            // Aplicar la nueva posición inmediatamente
             Vector3 nuevaPosicion = new Vector3(transform.position.x, posicionYFijaHorizontal, transform.position.z);
             transform.position = nuevaPosicion;
 
-            Debug.Log($"Borde inferior de cámara posicionado en Y: {posicionAjuste.y}");
+            Debug.Log($"Horizontal: Ajustado a Y={posicionYFijaHorizontal} (borde inferior en {posicionAjuste.y})");
         }
     }
 
-    public void CambiarAModoHorizontal()
+    public void CambiarAModoVerticalArriba(Vector3 puntoAjuste)
     {
-        CambiarAModoHorizontal(transform.position);
+        if (modoHorizontal && !modoVerticalArriba)
+        {
+            modoHorizontal = false;
+            modoVerticalArriba = true;
+
+            // Guardar la posición Y ACTUAL como punto de inicio
+            posicionYInicialArriba = transform.position.y;
+
+            // Inicializar el tiempo de inicio
+            tiempoInicioVerticalArriba = Time.time;
+
+            
+            // El centro de la cámara debe estar a mitadAnchoCamara a la IZQUIERDA del borde derecho
+            posicionXFijaArriba = puntoAjuste.x - mitadAnchoCamara;
+
+            // Aplicar la posición inmediatamente
+            Vector3 nuevaPosicion = new Vector3(
+                posicionXFijaArriba,
+                posicionYInicialArriba,
+                transform.position.z
+            );
+            transform.position = nuevaPosicion;
+
+            Debug.Log($"Vertical Arriba: Y={posicionYInicialArriba}, Centro X={posicionXFijaArriba}, Borde derecho en {puntoAjuste.x} (mitad ancho={mitadAnchoCamara})");
+        }
     }
 
     public void CambiarAModoVertical()
     {
-        if (modoHorizontal)
+        if (modoHorizontal || modoVerticalArriba)
         {
             modoHorizontal = false;
+            modoVerticalArriba = false;
             alturaInicial = transform.position.y;
             Debug.Log("Cámara cambió a modo vertical");
         }
     }
 
-    public void SetSeguirJugador(bool seguir)
-    {
-        seguirJugadorHorizontal = seguir;
-    }
-
-    public void SetVelocidadBajada(float nuevaVelocidad)
-    {
-        velocidadBajada = nuevaVelocidad;
-    }
-
-    public void SetVelocidadDerecha(float nuevaVelocidad)
-    {
-        velocidadDerecha = nuevaVelocidad;
-    }
+    // Métodos originales
+    public void SetSeguirJugador(bool seguir) => seguirJugadorHorizontal = seguir;
+    public void SetVelocidadBajada(float nuevaVelocidad) => velocidadBajada = nuevaVelocidad;
+    public void SetVelocidadDerecha(float nuevaVelocidad) => velocidadDerecha = nuevaVelocidad;
+    public void SetVelocidadSubida(float nuevaVelocidad) => velocidadSubida = nuevaVelocidad;
 }

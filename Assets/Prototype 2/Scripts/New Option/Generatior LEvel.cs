@@ -1,29 +1,37 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System.Collections.Generic;
 
 public class GeneratiorLEvel : MonoBehaviour
 {
-    [Header("ConfiguraciÛn de Niveles")]
+    [Header("Configuraci√≥n de Niveles")]
     [SerializeField] private float distanciaActivacion = 10f;
     [SerializeField] private int cantidadInicial = 3;
     [SerializeField] private int maxNivelesActivos = 3;
     [SerializeField] private Transform puntoFinal;
 
-    [Header("TransiciÛn a Horizontal")]
+    [Header("Transici√≥n a Horizontal")]
     [SerializeField] private int nivelesAntesDeTransicion = 5;
     [SerializeField] private GameObject prefabTransicion;
+
+    [Header("Nueva: Transici√≥n a Arriba")]
+    [SerializeField] private int nivelesHorizontalesAntesDeArriba = 5;
+    [SerializeField] private GameObject prefabTransicionArriba;
 
     [Header("Prefabs de Niveles")]
     [SerializeField] private List<GameObject> nivelesVerticales = new List<GameObject>();
     [SerializeField] private List<GameObject> nivelesHorizontales = new List<GameObject>();
+    [SerializeField] private List<GameObject> nivelesVerticalesArriba = new List<GameObject>();
 
     private Transform jugador;
     private bool inicializado = false;
     private bool transicionRealizada = false;
+    private bool transicionArribaRealizada = false;
     private bool usarHorizontal = false;
+    private bool usarArriba = false;
     private Queue<GameObject> nivelesActivos = new Queue<GameObject>();
     private List<GameObject> nivelesListActual;
     private int contadorNivelesGenerados = 0;
+    private Vector3 puntoBaseArriba; // Para calcular desde arriba
 
     private void Start()
     {
@@ -40,20 +48,20 @@ public class GeneratiorLEvel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No se encontrÛ objeto con tag 'Player 1'");
+            Debug.LogError("No se encontr√≥ objeto con tag 'Player 1'");
             return;
         }
 
         if (puntoFinal == null)
         {
-            Debug.LogError("puntoFinal no est· asignado en el inspector");
+            Debug.LogError("puntoFinal no est√° asignado en el inspector");
             return;
         }
 
         nivelesListActual.RemoveAll(item => item == null);
         if (nivelesListActual.Count == 0)
         {
-            Debug.LogError("No hay prefabs v·lidos en la lista de niveles");
+            Debug.LogError("No hay prefabs v√°lidos en la lista de niveles");
             return;
         }
 
@@ -63,7 +71,7 @@ public class GeneratiorLEvel : MonoBehaviour
         }
 
         inicializado = true;
-        Debug.Log($"Generador inicializado. Niveles verticales: {nivelesVerticales.Count}, horizontales: {nivelesHorizontales.Count}");
+        Debug.Log($"Generador inicializado. Niveles verticales: {nivelesVerticales.Count}, horizontales: {nivelesHorizontales.Count}, arriba: {nivelesVerticalesArriba.Count}");
     }
 
     private void Update()
@@ -78,15 +86,25 @@ public class GeneratiorLEvel : MonoBehaviour
 
     private void GenerarNivel()
     {
+        // Primera transici√≥n: Vertical ‚Üí Horizontal
         if (!transicionRealizada && contadorNivelesGenerados >= nivelesAntesDeTransicion && prefabTransicion != null)
         {
-            GenerarTransicion();
+            GenerarTransicionHorizontal();
+            return;
+        }
+
+        // Segunda transici√≥n: Horizontal ‚Üí Vertical Arriba
+        if (transicionRealizada && !transicionArribaRealizada &&
+            contadorNivelesGenerados >= nivelesAntesDeTransicion + nivelesHorizontalesAntesDeArriba &&
+            prefabTransicionArriba != null)
+        {
+            GenerarTransicionArriba();
             return;
         }
 
         if (nivelesListActual == null || nivelesListActual.Count == 0)
         {
-            Debug.LogError("Lista de niveles est· vacÌa");
+            Debug.LogError("Lista de niveles est√° vac√≠a");
             return;
         }
 
@@ -98,16 +116,38 @@ public class GeneratiorLEvel : MonoBehaviour
 
         if (prefabsValidos.Count == 0)
         {
-            Debug.LogError("No hay prefabs v·lidos disponibles");
+            Debug.LogError("No hay prefabs v√°lidos disponibles");
             return;
         }
 
         int indiceNivel = Random.Range(0, prefabsValidos.Count);
         GameObject prefabSeleccionado = prefabsValidos[indiceNivel];
 
-        // Los prefabs horizontales ya est·n diseÒados correctamente, sin rotaciÛn necesaria
+        // Calcular posici√≥n seg√∫n la etapa
+        Vector3 posicionGeneracion = puntoFinal.position;
         Quaternion rotacionGeneracion = Quaternion.identity;
-        GameObject nuevoNivel = Instantiate(prefabSeleccionado, puntoFinal.position, rotacionGeneracion);
+
+        // Si estamos en la etapa "arriba", generar m√°s arriba
+        if (usarArriba)
+        {
+            // Guardar punto base para calcular desde arriba
+            if (puntoBaseArriba == Vector3.zero)
+            {
+                puntoBaseArriba = puntoFinal.position;
+            }
+
+            // Generar m√°s arriba del punto base
+            posicionGeneracion = new Vector3(
+                puntoFinal.position.x,
+                puntoBaseArriba.y + 15f, // Altura fija para niveles de arriba
+                puntoFinal.position.z
+            );
+
+            // Rotar 180 grados para que el nivel "baje"
+            rotacionGeneracion = Quaternion.Euler(0, 0, 180f);
+        }
+
+        GameObject nuevoNivel = Instantiate(prefabSeleccionado, posicionGeneracion, rotacionGeneracion);
 
         nivelesActivos.Enqueue(nuevoNivel);
         contadorNivelesGenerados++;
@@ -116,19 +156,19 @@ public class GeneratiorLEvel : MonoBehaviour
         if (nuevoPuntoFinal != null)
         {
             puntoFinal = nuevoPuntoFinal;
-            Debug.Log($"Nivel generado: {prefabSeleccionado.name} ({contadorNivelesGenerados}/{(transicionRealizada ? "Horizontal" : "Vertical")})");
+            Debug.Log($"Nivel generado: {prefabSeleccionado.name} ({contadorNivelesGenerados}/{(usarArriba ? "Arriba" : (usarHorizontal ? "Horizontal" : "Vertical"))})");
         }
         else
         {
-            Debug.LogError($"No se encontrÛ PuntoFinal en el nivel generado: {nuevoNivel.name}");
+            Debug.LogError($"No se encontr√≥ PuntoFinal en el nivel generado: {nuevoNivel.name}");
         }
 
         EliminarNivelesExcedentes();
     }
 
-    private void GenerarTransicion()
+    private void GenerarTransicionHorizontal()
     {
-        Debug.Log("Generando nivel de transiciÛn a horizontal");
+        Debug.Log("Generando nivel de transici√≥n a horizontal");
 
         GameObject transicion = Instantiate(prefabTransicion, puntoFinal.position, Quaternion.identity);
         nivelesActivos.Enqueue(transicion);
@@ -143,11 +183,39 @@ public class GeneratiorLEvel : MonoBehaviour
             nivelesListActual = new List<GameObject>(nivelesHorizontales);
             nivelesListActual.RemoveAll(item => item == null);
 
-            Debug.Log($"TransiciÛn completada. Ahora generando niveles horizontales");
+            Debug.Log($"Transici√≥n a Horizontal completada. Ahora generando niveles horizontales");
         }
         else
         {
-            Debug.LogError("No se encontrÛ PuntoFinal en el nivel de transiciÛn");
+            Debug.LogError("No se encontr√≥ PuntoFinal en el nivel de transici√≥n");
+        }
+
+        EliminarNivelesExcedentes();
+    }
+
+    private void GenerarTransicionArriba()
+    {
+        Debug.Log("Generando nivel de transici√≥n a vertical arriba");
+
+        GameObject transicion = Instantiate(prefabTransicionArriba, puntoFinal.position, Quaternion.identity);
+        nivelesActivos.Enqueue(transicion);
+        contadorNivelesGenerados++;
+
+        Transform nuevoPuntoFinal = BuscarPuntoFinal(transicion, "PuntoFinal");
+        if (nuevoPuntoFinal != null)
+        {
+            puntoFinal = nuevoPuntoFinal;
+            usarArriba = true;
+            transicionArribaRealizada = true;
+            usarHorizontal = false;
+            nivelesListActual = new List<GameObject>(nivelesVerticalesArriba);
+            nivelesListActual.RemoveAll(item => item == null);
+
+            Debug.Log($"Transici√≥n a Arriba completada. Ahora generando niveles verticales desde arriba");
+        }
+        else
+        {
+            Debug.LogError("No se encontr√≥ PuntoFinal en el nivel de transici√≥n arriba");
         }
 
         EliminarNivelesExcedentes();
@@ -206,7 +274,19 @@ public class GeneratiorLEvel : MonoBehaviour
         if (nuevoNivel != null && !nivelesHorizontales.Contains(nuevoNivel))
         {
             nivelesHorizontales.Add(nuevoNivel);
-            if (transicionRealizada)
+            if (transicionRealizada && !transicionArribaRealizada)
+            {
+                nivelesListActual.Add(nuevoNivel);
+            }
+        }
+    }
+
+    public void AgregarNivelVerticalArriba(GameObject nuevoNivel)
+    {
+        if (nuevoNivel != null && !nivelesVerticalesArriba.Contains(nuevoNivel))
+        {
+            nivelesVerticalesArriba.Add(nuevoNivel);
+            if (transicionArribaRealizada)
             {
                 nivelesListActual.Add(nuevoNivel);
             }
@@ -225,8 +305,11 @@ public class GeneratiorLEvel : MonoBehaviour
         }
 
         transicionRealizada = false;
+        transicionArribaRealizada = false;
         usarHorizontal = false;
+        usarArriba = false;
         contadorNivelesGenerados = 0;
+        puntoBaseArriba = Vector3.zero;
         nivelesListActual = new List<GameObject>(nivelesVerticales);
 
         for (int i = 0; i < cantidadInicial; i++)
