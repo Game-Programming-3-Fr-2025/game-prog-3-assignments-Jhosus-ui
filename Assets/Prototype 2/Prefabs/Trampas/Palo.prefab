@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 813819816774920665}
   - component: {fileID: 2467626253129378030}
   - component: {fileID: 74347993072490178}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Palo
-  m_TagString: Untagged
+  m_TagString: FF
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
