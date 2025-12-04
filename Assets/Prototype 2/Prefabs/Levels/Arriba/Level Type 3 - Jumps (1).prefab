@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 9042934756636084806}
   m_Layer: 6
   m_Name: ParteFinal
-  m_TagString: PuntoFinal
+  m_TagString: PuntoFinalP1
   m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -237,6 +237,7 @@ Transform:
   - {fileID: 7526129490400413452}
   - {fileID: 4900757630343487208}
   - {fileID: 9042934756636084806}
+  - {fileID: 3393852783242116033}
   - {fileID: 5641924963780875139}
   - {fileID: 1983047333870992792}
   - {fileID: 3228777953440057375}
@@ -672,6 +673,37 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &8113279708488681757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3393852783242116033}
+  m_Layer: 6
+  m_Name: ParteFinal (1)
+  m_TagString: PuntoFinalP2
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3393852783242116033
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8113279708488681757}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 30.67, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2425416882803467977}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &933015335262072012
 PrefabInstance:
   m_ObjectHideFlags: 0

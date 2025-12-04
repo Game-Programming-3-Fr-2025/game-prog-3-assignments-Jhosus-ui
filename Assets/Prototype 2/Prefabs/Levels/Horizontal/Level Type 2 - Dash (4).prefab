@@ -585,6 +585,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &5964669686097936773
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1742062902644364310}
+  m_Layer: 6
+  m_Name: ParteFinal (1)
+  m_TagString: PuntoFinalP2
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1742062902644364310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5964669686097936773}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 43.01, y: 0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5986089502377984018}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6072056062904736530
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,7 +627,7 @@ GameObject:
   - component: {fileID: 651915156532404873}
   m_Layer: 6
   m_Name: ParteFinal
-  m_TagString: PuntoFinal
+  m_TagString: PuntoFinalP1
   m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -648,6 +679,7 @@ Transform:
   - {fileID: 4999704745363485591}
   - {fileID: 4022070778674800599}
   - {fileID: 651915156532404873}
+  - {fileID: 1742062902644364310}
   - {fileID: 2526352178437764039}
   - {fileID: 3310952239100894235}
   - {fileID: 377582292959968182}

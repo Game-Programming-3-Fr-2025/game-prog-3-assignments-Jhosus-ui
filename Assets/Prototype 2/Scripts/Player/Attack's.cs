@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System;
 
 public class Attacks : MonoBehaviour
@@ -13,11 +14,19 @@ public class Attacks : MonoBehaviour
     private KeyCode player1Key = KeyCode.E;
     private KeyCode player2Key = KeyCode.Slash;
 
+    [Header("Vibración")]
+    public float vibrationLowFrequency = 0.3f;
+    public float vibrationHighFrequency = 0.1f;
+    public float vibrationDuration = 0.1f;
+
     [Header("Referencias")]
     public Animator animator;
 
     private bool canAttack = true;
     private bool isPlayer1;
+    private float vibrationTimer = 0f;
+    private bool isVibrating = false;
+    private Gamepad playerGamepad;
 
     void Start()
     {
@@ -30,10 +39,12 @@ public class Attacks : MonoBehaviour
             if (parentTag == "Player 1")
             {
                 isPlayer1 = true;
+                playerGamepad = GetGamepadForPlayer(0);
             }
             else if (parentTag == "Player 2")
             {
                 isPlayer1 = false;
+                playerGamepad = GetGamepadForPlayer(1);
             }
         }
 
@@ -45,11 +56,37 @@ public class Attacks : MonoBehaviour
 
     void Update()
     {
-        KeyCode attackKey = isPlayer1 ? player1Key : player2Key;
+        // Actualizar temporizador de vibración
+        if (isVibrating)
+        {
+            vibrationTimer -= Time.deltaTime;
+            if (vibrationTimer <= 0f)
+            {
+                StopVibration();
+            }
+        }
 
-        if (Input.GetKeyDown(attackKey) && canAttack)
+        // Verificar ataque por teclado
+        KeyCode attackKey = isPlayer1 ? player1Key : player2Key;
+        bool keyboardAttack = Input.GetKeyDown(attackKey);
+
+        // Verificar ataque por mando (si hay mando conectado)
+        bool controllerAttack = false;
+        if (playerGamepad != null)
+        {
+            controllerAttack = playerGamepad.buttonWest.wasPressedThisFrame;
+        }
+
+        // Atacar si está disponible y se presiona alguna entrada
+        if (canAttack && (keyboardAttack || controllerAttack))
         {
             Attack();
+
+            // Activar vibración si se usó el mando
+            if (controllerAttack)
+            {
+                TriggerVibration();
+            }
         }
     }
 
@@ -126,9 +163,51 @@ public class Attacks : MonoBehaviour
         canAttack = true;
     }
 
+    // Métodos para manejar el mando
+    Gamepad GetGamepadForPlayer(int playerIndex)
+    {
+        if (Gamepad.all.Count > playerIndex)
+        {
+            return Gamepad.all[playerIndex];
+        }
+        return null;
+    }
+
+    void TriggerVibration()
+    {
+        if (playerGamepad != null)
+        {
+            playerGamepad.SetMotorSpeeds(vibrationLowFrequency, vibrationHighFrequency);
+            vibrationTimer = vibrationDuration;
+            isVibrating = true;
+        }
+    }
+
+    void StopVibration()
+    {
+        if (playerGamepad != null)
+        {
+            playerGamepad.SetMotorSpeeds(0f, 0f);
+            isVibrating = false;
+        }
+    }
+
+    void OnDisable()
+    {
+        // Asegurarse de detener la vibración al desactivar el script
+        StopVibration();
+    }
+
+    void OnDestroy()
+    {
+        // Asegurarse de detener la vibración al destruir el objeto
+        StopVibration();
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
+    
 }

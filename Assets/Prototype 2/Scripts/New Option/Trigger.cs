@@ -1,29 +1,107 @@
 using UnityEngine;
+using System.Collections;
 
 public class Trigger : MonoBehaviour
 {
     public bool esModoArriba = false;
     public Transform puntoAjuste;
 
+    [Header("Configuración por Jugador")]
+    public string nombreCamaraPlayer1 = "MainCameraP1";
+    public string nombreCamaraPlayer2 = "MainCameraP2";
+
+    private bool player1Activado = false;
+    private bool player2Activado = false;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Player 1")) return;
+        bool isPlayer1 = other.CompareTag("Player 1");
+        bool isPlayer2 = other.CompareTag("Player 2");
 
-        FC2 camara = FindObjectOfType<FC2>();
-        if (camara == null) return;
+        if (!isPlayer1 && !isPlayer2) return;
+
+        // Verificar si este jugador ya activó el trigger
+        if ((isPlayer1 && player1Activado) || (isPlayer2 && player2Activado))
+        {
+            Debug.Log($"{(isPlayer1 ? "Player 1" : "Player 2")} ya activó este trigger");
+            return;
+        }
+
+        // Marcar como activado para este jugador
+        if (isPlayer1) player1Activado = true;
+        if (isPlayer2) player2Activado = true;
+
+        // Buscar la cámara correcta por nombre
+        string nombreCamaraBuscada = isPlayer1 ? nombreCamaraPlayer1 : nombreCamaraPlayer2;
+        GameObject camaraObj = GameObject.Find(nombreCamaraBuscada);
+
+        if (camaraObj == null)
+        {
+            Debug.LogError($"No se encontró cámara: {nombreCamaraBuscada}");
+            return;
+        }
+
+        FC2 camara = camaraObj.GetComponent<FC2>();
+        if (camara == null)
+        {
+            Debug.LogError($"La cámara {nombreCamaraBuscada} no tiene componente FC2");
+            return;
+        }
 
         Vector3 posicion = puntoAjuste != null ? puntoAjuste.position : transform.position;
 
         if (esModoArriba)
         {
             camara.CambiarAModoVerticalArriba(posicion);
-            Debug.Log($"Trigger Arriba activado en Y={transform.position.y}");
+            Debug.Log($"Trigger Arriba activado por {(isPlayer1 ? "Player 1" : "Player 2")}");
         }
         else
         {
             camara.CambiarAModoHorizontal(posicion);
+            Debug.Log($"Trigger Horizontal activado por {(isPlayer1 ? "Player 1" : "Player 2")}");
         }
 
-        gameObject.SetActive(false);
+        // Desactivar visualmente solo para este jugador (opcional)
+        StartCoroutine(DesactivarTemporalmenteParaJugador(other));
+
+        // Si ambos jugadores ya activaron, desactivar completamente
+        if (player1Activado && player2Activado)
+        {
+            Debug.Log("Ambos jugadores activaron el trigger - desactivando completamente");
+            gameObject.SetActive(false);
+        }
+    }
+
+    IEnumerator DesactivarTemporalmenteParaJugador(Collider2D playerCollider)
+    {
+        // Desactivar collider temporalmente para evitar múltiples activaciones
+        Collider2D triggerCollider = GetComponent<Collider2D>();
+        if (triggerCollider != null)
+        {
+            triggerCollider.enabled = false;
+
+            // Esperar un momento antes de reactivar (para que el otro jugador pueda usarlo)
+            yield return new WaitForSeconds(0.5f);
+
+            // Solo reactivar si no ambos jugadores han activado
+            if (!(player1Activado && player2Activado))
+            {
+                triggerCollider.enabled = true;
+            }
+        }
+    }
+
+    // Para debug visual
+    void OnDrawGizmos()
+    {
+        Gizmos.color = esModoArriba ? Color.cyan : Color.yellow;
+        Gizmos.DrawWireCube(transform.position, GetComponent<BoxCollider2D>().size);
+
+        if (puntoAjuste != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, puntoAjuste.position);
+            Gizmos.DrawWireSphere(puntoAjuste.position, 0.3f);
+        }
     }
 }

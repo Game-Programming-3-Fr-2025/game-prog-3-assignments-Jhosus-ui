@@ -26,6 +26,9 @@ TagManager:
   - Player 2
   - Horizontal
   - PuntoFinalInicial
+  - PuntoFinalP1
+  - PuntoFinalP2
+  - RespawnPoint
   layers:
   - Default
   - TransparentFX

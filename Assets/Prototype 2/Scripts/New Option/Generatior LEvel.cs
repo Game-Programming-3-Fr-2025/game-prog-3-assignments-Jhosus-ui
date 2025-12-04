@@ -1,320 +1,267 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using static Falling;
 
 public class GeneratiorLEvel : MonoBehaviour
 {
-    [Header("Configuración de Niveles")]
+    [Header("Configuración")]
     [SerializeField] private float distanciaActivacion = 10f;
     [SerializeField] private int cantidadInicial = 3;
     [SerializeField] private int maxNivelesActivos = 3;
-    [SerializeField] private Transform puntoFinal;
 
-    [Header("Transición a Horizontal")]
+    [Header("Puntos Finales")]
+    [SerializeField] private Transform puntoFinalPlayer1;
+    [SerializeField] private Transform puntoFinalPlayer2;
+
+    [Header("Transiciones")]
     [SerializeField] private int nivelesAntesDeTransicion = 5;
     [SerializeField] private GameObject prefabTransicion;
-
-    [Header("Nueva: Transición a Arriba")]
     [SerializeField] private int nivelesHorizontalesAntesDeArriba = 5;
     [SerializeField] private GameObject prefabTransicionArriba;
 
-    [Header("Prefabs de Niveles")]
-    [SerializeField] private List<GameObject> nivelesVerticales = new List<GameObject>();
-    [SerializeField] private List<GameObject> nivelesHorizontales = new List<GameObject>();
-    [SerializeField] private List<GameObject> nivelesVerticalesArriba = new List<GameObject>();
+    [Header("Prefabs")]
+    [SerializeField] private List<GameObject> nivelesVerticales;
+    [SerializeField] private List<GameObject> nivelesHorizontales;
+    [SerializeField] private List<GameObject> nivelesVerticalesArriba;
 
-    private Transform jugador;
+    [Header("Referencias")]
+    [SerializeField] private Transform jugador1;
+    [SerializeField] private Transform jugador2;
+
+    private Queue<GameObject> nivelesActivosP1 = new Queue<GameObject>();
+    private Queue<GameObject> nivelesActivosP2 = new Queue<GameObject>();
+    private List<GameObject> nivelesActuales;
+    private int contadorNiveles = 0;
+    private bool transicionHorizontal = false;
+    private bool transicionArriba = false;
     private bool inicializado = false;
-    private bool transicionRealizada = false;
-    private bool transicionArribaRealizada = false;
-    private bool usarHorizontal = false;
-    private bool usarArriba = false;
-    private Queue<GameObject> nivelesActivos = new Queue<GameObject>();
-    private List<GameObject> nivelesListActual;
-    private int contadorNivelesGenerados = 0;
-    private Vector3 puntoBaseArriba; // Para calcular desde arriba
 
-    private void Start()
+    void Start()
     {
-        nivelesListActual = new List<GameObject>(nivelesVerticales);
-        InicializarGenerador();
-    }
+        BuscarJugadores();
 
-    private void InicializarGenerador()
-    {
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player 1");
-        if (playerObj != null)
+        if (puntoFinalPlayer1 == null || puntoFinalPlayer2 == null)
         {
-            jugador = playerObj.transform;
-        }
-        else
-        {
-            Debug.LogError("No se encontró objeto con tag 'Player 1'");
+            Debug.LogError("Puntos finales no asignados");
             return;
         }
 
-        if (puntoFinal == null)
-        {
-            Debug.LogError("puntoFinal no está asignado en el inspector");
-            return;
-        }
+        nivelesActuales = new List<GameObject>(nivelesVerticales);
+        nivelesActuales.RemoveAll(n => n == null);
 
-        nivelesListActual.RemoveAll(item => item == null);
-        if (nivelesListActual.Count == 0)
+        if (nivelesActuales.Count == 0)
         {
-            Debug.LogError("No hay prefabs válidos en la lista de niveles");
+            Debug.LogError("No hay niveles válidos");
             return;
         }
 
         for (int i = 0; i < cantidadInicial; i++)
-        {
-            GenerarNivel();
-        }
+            GenerarNivelesParaAmbos();
 
         inicializado = true;
-        Debug.Log($"Generador inicializado. Niveles verticales: {nivelesVerticales.Count}, horizontales: {nivelesHorizontales.Count}, arriba: {nivelesVerticalesArriba.Count}");
     }
 
-    private void Update()
+    void Update()
     {
-        if (!inicializado || jugador == null || puntoFinal == null) return;
+        if (!inicializado) return;
 
-        if (Vector2.Distance(jugador.position, puntoFinal.position) < distanciaActivacion)
-        {
-            GenerarNivel();
-        }
+        bool p1Cerca = jugador1 != null &&
+            Vector2.Distance(jugador1.position, puntoFinalPlayer1.position) < distanciaActivacion;
+
+        bool p2Cerca = jugador2 != null &&
+            Vector2.Distance(jugador2.position, puntoFinalPlayer2.position) < distanciaActivacion;
+
+        // 🔥 Si CUALQUIERA está cerca, genera para AMBOS
+        if (p1Cerca || p2Cerca)
+            GenerarNivelesParaAmbos();
     }
 
-    private void GenerarNivel()
+    void GenerarNivelesParaAmbos()
     {
-        // Primera transición: Vertical → Horizontal
-        if (!transicionRealizada && contadorNivelesGenerados >= nivelesAntesDeTransicion && prefabTransicion != null)
+        // Primera transición
+        if (!transicionHorizontal && contadorNiveles >= nivelesAntesDeTransicion && prefabTransicion != null)
         {
-            GenerarTransicionHorizontal();
+            GenerarTransicionParaAmbos(prefabTransicion, nivelesHorizontales, ref transicionHorizontal);
             return;
         }
 
-        // Segunda transición: Horizontal → Vertical Arriba
-        if (transicionRealizada && !transicionArribaRealizada &&
-            contadorNivelesGenerados >= nivelesAntesDeTransicion + nivelesHorizontalesAntesDeArriba &&
+        // Segunda transición
+        if (transicionHorizontal && !transicionArriba &&
+            contadorNiveles >= nivelesAntesDeTransicion + nivelesHorizontalesAntesDeArriba &&
             prefabTransicionArriba != null)
         {
-            GenerarTransicionArriba();
+            GenerarTransicionParaAmbos(prefabTransicionArriba, nivelesVerticalesArriba, ref transicionArriba);
             return;
         }
 
-        if (nivelesListActual == null || nivelesListActual.Count == 0)
+        if (nivelesActuales.Count == 0) return;
+
+        GameObject prefab = nivelesActuales[Random.Range(0, nivelesActuales.Count)];
+        Quaternion rotacion = transicionArriba ? Quaternion.Euler(0, 0, 0f) : Quaternion.identity;
+
+        // 🔥 Generar nivel para Player 1
+        GameObject nivelP1 = Instantiate(prefab, puntoFinalPlayer1.position, rotacion);
+        nivelesActivosP1.Enqueue(nivelP1);
+
+        // 🔥 Generar nivel para Player 2
+        GameObject nivelP2 = Instantiate(prefab, puntoFinalPlayer2.position, rotacion);
+        nivelesActivosP2.Enqueue(nivelP2);
+
+        contadorNiveles++;
+
+        // Actualizar puntos finales de cada jugador
+        ActualizarPuntoFinal(nivelP1, ref puntoFinalPlayer1, "PuntoFinalP1");
+        ActualizarPuntoFinal(nivelP2, ref puntoFinalPlayer2, "PuntoFinalP2");
+
+        LimpiarNivelesViejos();
+    }
+
+    void GenerarTransicionParaAmbos(GameObject prefab, List<GameObject> nuevaLista, ref bool flag)
+    {
+        // Transición para Player 1
+        GameObject transicionP1 = Instantiate(prefab, puntoFinalPlayer1.position, Quaternion.identity);
+        nivelesActivosP1.Enqueue(transicionP1);
+
+        // Transición para Player 2
+        GameObject transicionP2 = Instantiate(prefab, puntoFinalPlayer2.position, Quaternion.identity);
+        nivelesActivosP2.Enqueue(transicionP2);
+
+        contadorNiveles++;
+
+        ActualizarPuntoFinal(transicionP1, ref puntoFinalPlayer1, "PuntoFinalP1");
+        ActualizarPuntoFinal(transicionP2, ref puntoFinalPlayer2, "PuntoFinalP2");
+
+        flag = true;
+        nivelesActuales = new List<GameObject>(nuevaLista);
+        nivelesActuales.RemoveAll(n => n == null);
+
+        LimpiarNivelesViejos();
+    }
+
+    void ActualizarPuntoFinal(GameObject nivel, ref Transform puntoFinal, string tagEspecifico)
+    {
+        // Buscar punto específico primero
+        Transform puntoEspecifico = BuscarEnHijos(nivel.transform, tagEspecifico);
+
+        if (puntoEspecifico != null)
         {
-            Debug.LogError("Lista de niveles está vacía");
+            puntoFinal = puntoEspecifico;
             return;
         }
 
-        List<GameObject> prefabsValidos = new List<GameObject>();
-        foreach (var prefab in nivelesListActual)
+        // Si no existe, buscar punto genérico
+        Transform puntoGeneral = BuscarEnHijos(nivel.transform, "PuntoFinal");
+        if (puntoGeneral != null)
         {
-            if (prefab != null) prefabsValidos.Add(prefab);
-        }
-
-        if (prefabsValidos.Count == 0)
-        {
-            Debug.LogError("No hay prefabs válidos disponibles");
-            return;
-        }
-
-        int indiceNivel = Random.Range(0, prefabsValidos.Count);
-        GameObject prefabSeleccionado = prefabsValidos[indiceNivel];
-
-        // Calcular posición según la etapa
-        Vector3 posicionGeneracion = puntoFinal.position;
-        Quaternion rotacionGeneracion = Quaternion.identity;
-
-        // Si estamos en la etapa "arriba", generar más arriba
-        if (usarArriba)
-        {
-            // Guardar punto base para calcular desde arriba
-            if (puntoBaseArriba == Vector3.zero)
-            {
-                puntoBaseArriba = puntoFinal.position;
-            }
-
-            // Generar más arriba del punto base
-            posicionGeneracion = new Vector3(
-                puntoFinal.position.x,
-                puntoBaseArriba.y + 15f, // Altura fija para niveles de arriba
-                puntoFinal.position.z
-            );
-
-            // Rotar 180 grados para que el nivel "baje"
-            rotacionGeneracion = Quaternion.Euler(0, 0, 180f);
-        }
-
-        GameObject nuevoNivel = Instantiate(prefabSeleccionado, posicionGeneracion, rotacionGeneracion);
-
-        nivelesActivos.Enqueue(nuevoNivel);
-        contadorNivelesGenerados++;
-
-        Transform nuevoPuntoFinal = BuscarPuntoFinal(nuevoNivel, "PuntoFinal");
-        if (nuevoPuntoFinal != null)
-        {
-            puntoFinal = nuevoPuntoFinal;
-            Debug.Log($"Nivel generado: {prefabSeleccionado.name} ({contadorNivelesGenerados}/{(usarArriba ? "Arriba" : (usarHorizontal ? "Horizontal" : "Vertical"))})");
-        }
-        else
-        {
-            Debug.LogError($"No se encontró PuntoFinal en el nivel generado: {nuevoNivel.name}");
-        }
-
-        EliminarNivelesExcedentes();
-    }
-
-    private void GenerarTransicionHorizontal()
-    {
-        Debug.Log("Generando nivel de transición a horizontal");
-
-        GameObject transicion = Instantiate(prefabTransicion, puntoFinal.position, Quaternion.identity);
-        nivelesActivos.Enqueue(transicion);
-        contadorNivelesGenerados++;
-
-        Transform nuevoPuntoFinal = BuscarPuntoFinal(transicion, "PuntoFinal");
-        if (nuevoPuntoFinal != null)
-        {
-            puntoFinal = nuevoPuntoFinal;
-            usarHorizontal = true;
-            transicionRealizada = true;
-            nivelesListActual = new List<GameObject>(nivelesHorizontales);
-            nivelesListActual.RemoveAll(item => item == null);
-
-            Debug.Log($"Transición a Horizontal completada. Ahora generando niveles horizontales");
-        }
-        else
-        {
-            Debug.LogError("No se encontró PuntoFinal en el nivel de transición");
-        }
-
-        EliminarNivelesExcedentes();
-    }
-
-    private void GenerarTransicionArriba()
-    {
-        Debug.Log("Generando nivel de transición a vertical arriba");
-
-        GameObject transicion = Instantiate(prefabTransicionArriba, puntoFinal.position, Quaternion.identity);
-        nivelesActivos.Enqueue(transicion);
-        contadorNivelesGenerados++;
-
-        Transform nuevoPuntoFinal = BuscarPuntoFinal(transicion, "PuntoFinal");
-        if (nuevoPuntoFinal != null)
-        {
-            puntoFinal = nuevoPuntoFinal;
-            usarArriba = true;
-            transicionArribaRealizada = true;
-            usarHorizontal = false;
-            nivelesListActual = new List<GameObject>(nivelesVerticalesArriba);
-            nivelesListActual.RemoveAll(item => item == null);
-
-            Debug.Log($"Transición a Arriba completada. Ahora generando niveles verticales desde arriba");
-        }
-        else
-        {
-            Debug.LogError("No se encontró PuntoFinal en el nivel de transición arriba");
-        }
-
-        EliminarNivelesExcedentes();
-    }
-
-    private void EliminarNivelesExcedentes()
-    {
-        while (nivelesActivos.Count > maxNivelesActivos)
-        {
-            GameObject nivelAEliminar = nivelesActivos.Dequeue();
-            if (nivelAEliminar != null)
-            {
-                Destroy(nivelAEliminar);
-            }
+            puntoFinal = puntoGeneral;
         }
     }
 
-    private Transform BuscarPuntoFinal(GameObject nivel, string etiqueta)
+    Transform BuscarEnHijos(Transform parent, string tag)
     {
-        if (nivel == null) return null;
-        return BuscarPuntoFinalRecursivo(nivel.transform, etiqueta);
-    }
+        if (parent.CompareTag(tag)) return parent;
 
-    private Transform BuscarPuntoFinalRecursivo(Transform parent, string etiqueta)
-    {
         foreach (Transform child in parent)
         {
-            if (child.CompareTag(etiqueta))
-            {
-                return child;
-            }
-
-            Transform resultado = BuscarPuntoFinalRecursivo(child, etiqueta);
-            if (resultado != null)
-            {
-                return resultado;
-            }
+            Transform result = BuscarEnHijos(child, tag);
+            if (result != null) return result;
         }
         return null;
     }
 
-    public void AgregarNivelVertical(GameObject nuevoNivel)
+    void LimpiarNivelesViejos()
     {
-        if (nuevoNivel != null && !nivelesVerticales.Contains(nuevoNivel))
+        // Limpiar niveles viejos de Player 1
+        while (nivelesActivosP1.Count > maxNivelesActivos)
         {
-            nivelesVerticales.Add(nuevoNivel);
-            if (!transicionRealizada)
+            GameObject viejo = nivelesActivosP1.Dequeue();
+            if (viejo != null) Destroy(viejo);
+        }
+
+        // Limpiar niveles viejos de Player 2
+        while (nivelesActivosP2.Count > maxNivelesActivos)
+        {
+            GameObject viejo = nivelesActivosP2.Dequeue();
+            if (viejo != null) Destroy(viejo);
+        }
+    }
+
+    void BuscarJugadores()
+    {
+        if (jugador1 == null)
+        {
+            GameObject p1 = GameObject.FindGameObjectWithTag("Player 1");
+            if (p1 != null) jugador1 = p1.transform;
+        }
+
+        if (jugador2 == null)
+        {
+            GameObject p2 = GameObject.FindGameObjectWithTag("Player 2");
+            if (p2 != null) jugador2 = p2.transform;
+        }
+    }
+
+    public void OnPhaseChanged(bool isHorizontal, bool isUpPhase)
+    {
+        Falling[] fallingScripts = FindObjectsOfType<Falling>();
+
+        foreach (Falling falling in fallingScripts)
+        {
+            if (isHorizontal)
             {
-                nivelesListActual.Add(nuevoNivel);
+                falling.SetLevelDirection(LevelDirection.HorizontalRight);
+            }
+            else if (isUpPhase)
+            {
+                falling.SetLevelDirection(LevelDirection.VerticalUp);
+            }
+            else
+            {
+                falling.SetLevelDirection(LevelDirection.VerticalDown);
             }
         }
     }
 
-    public void AgregarNivelHorizontal(GameObject nuevoNivel)
+    void OnDrawGizmosSelected()
     {
-        if (nuevoNivel != null && !nivelesHorizontales.Contains(nuevoNivel))
+        if (!Application.isPlaying) return;
+
+        if (puntoFinalPlayer1 != null)
         {
-            nivelesHorizontales.Add(nuevoNivel);
-            if (transicionRealizada && !transicionArribaRealizada)
-            {
-                nivelesListActual.Add(nuevoNivel);
-            }
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(puntoFinalPlayer1.position, distanciaActivacion);
+        }
+
+        if (puntoFinalPlayer2 != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(puntoFinalPlayer2.position, distanciaActivacion);
         }
     }
 
-    public void AgregarNivelVerticalArriba(GameObject nuevoNivel)
-    {
-        if (nuevoNivel != null && !nivelesVerticalesArriba.Contains(nuevoNivel))
-        {
-            nivelesVerticalesArriba.Add(nuevoNivel);
-            if (transicionArribaRealizada)
-            {
-                nivelesListActual.Add(nuevoNivel);
-            }
-        }
-    }
+    // Métodos públicos
+    public void ForzarGeneracionNivel() => GenerarNivelesParaAmbos();
 
-    public void LimpiarNivelesActivos()
+    public void LimpiarTodo()
     {
-        while (nivelesActivos.Count > 0)
+        while (nivelesActivosP1.Count > 0)
         {
-            GameObject nivel = nivelesActivos.Dequeue();
-            if (nivel != null)
-            {
-                Destroy(nivel);
-            }
+            GameObject nivel = nivelesActivosP1.Dequeue();
+            if (nivel != null) Destroy(nivel);
         }
 
-        transicionRealizada = false;
-        transicionArribaRealizada = false;
-        usarHorizontal = false;
-        usarArriba = false;
-        contadorNivelesGenerados = 0;
-        puntoBaseArriba = Vector3.zero;
-        nivelesListActual = new List<GameObject>(nivelesVerticales);
+        while (nivelesActivosP2.Count > 0)
+        {
+            GameObject nivel = nivelesActivosP2.Dequeue();
+            if (nivel != null) Destroy(nivel);
+        }
+
+        transicionHorizontal = false;
+        transicionArriba = false;
+        contadorNiveles = 0;
+        nivelesActuales = new List<GameObject>(nivelesVerticales);
 
         for (int i = 0; i < cantidadInicial; i++)
-        {
-            GenerarNivel();
-        }
+            GenerarNivelesParaAmbos();
     }
 }
