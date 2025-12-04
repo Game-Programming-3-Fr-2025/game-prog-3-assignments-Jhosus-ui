@@ -30,7 +30,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Players
   - Water
   - UI
   - Ground
@@ -38,7 +38,7 @@ TagManager:
   - Enemy
   - Player
   - Wall
-  - 
+  - Dangers
   - 
   - 
   - 

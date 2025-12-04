@@ -29,7 +29,7 @@ public class ObjectD : MonoBehaviour
 
     void ApplyDamage(GameObject player)
     {
-        P2Life playerLife = player.GetComponent<P2Life>();
+        LifeSystem playerLife = player.GetComponent<LifeSystem>();
         if (playerLife != null && !playerLife.IsInvincible)
         {
             // Solo notificar el daño, P2Life maneja el knockback

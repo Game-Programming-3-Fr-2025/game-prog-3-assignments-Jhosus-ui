@@ -11,12 +11,12 @@ public class Falling : MonoBehaviour
     private float fallTimer = 0f;
     private bool isFalling = false;
     private Vector3 lastGroundedPos;
-    private P2Life playerLife;
+    private LifeSystem playerLife;
     private int fallCount = 0; // Contador de ca�das
 
     void Start()
     {
-        playerLife = GetComponent<P2Life>();
+        playerLife = GetComponent<LifeSystem>();
         lastGroundedPos = transform.position;
     }
 

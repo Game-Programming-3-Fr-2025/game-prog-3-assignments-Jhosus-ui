@@ -62,7 +62,7 @@ public class CastigFloor : MonoBehaviour
     void HurtPlayer(GameObject player)
     {
         // Quitar vida
-        P2Life life = player.GetComponent<P2Life>();
+        LifeSystem life = player.GetComponent<LifeSystem>();
         if (life != null)
         {
             life.TakeDamage(1);
