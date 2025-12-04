@@ -724,6 +724,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Balance
       objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -848,6 +860,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Plataforma pequena -1.5 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -917,6 +941,18 @@ PrefabInstance:
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
       objectReference: {fileID: 0}
     - target: {fileID: 5244529807561430147, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_Name
@@ -1090,6 +1126,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Platform Grande (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1151,6 +1199,18 @@ PrefabInstance:
     - target: {fileID: 374372935348985007, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
       propertyPath: m_Name
       value: Platform Grande
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428511014019718488, guid: 0abc8eaae86df59458caf71c7ae08387, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1292,6 +1352,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Balance (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 5520035761471891968, guid: 40891aead72cae041bf3f0d665d2b9e1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1361,6 +1433,18 @@ PrefabInstance:
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190840124214169724, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
       objectReference: {fileID: 0}
     - target: {fileID: 5244529807561430147, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_Name
@@ -1497,6 +1581,18 @@ PrefabInstance:
     - target: {fileID: 5367066378543418340, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
       propertyPath: m_Name
       value: Plataforma pequena -1.5 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 6926524584264484965, guid: aae32dd6f5a5acc4986180934c175b3b, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1666,6 +1762,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7390939589331151969, guid: 5c158ee3ecec0244395ddc926bcafff4, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 7390939589331151969, guid: 5c158ee3ecec0244395ddc926bcafff4, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 7390939589331151969, guid: 5c158ee3ecec0244395ddc926bcafff4, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1758,6 +1866,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2425416882803467977}
     m_Modifications:
+    - target: {fileID: 1649394486068099762, guid: b4d3b83b87475d747bb4b848ccdaacc2, type: 3}
+      propertyPath: m_Color.b
+      value: 0.8235294
+      objectReference: {fileID: 0}
+    - target: {fileID: 1649394486068099762, guid: b4d3b83b87475d747bb4b848ccdaacc2, type: 3}
+      propertyPath: m_Color.g
+      value: 0.654902
+      objectReference: {fileID: 0}
+    - target: {fileID: 1649394486068099762, guid: b4d3b83b87475d747bb4b848ccdaacc2, type: 3}
+      propertyPath: m_Color.r
+      value: 0.5176471
+      objectReference: {fileID: 0}
     - target: {fileID: 7551891065251604892, guid: b4d3b83b87475d747bb4b848ccdaacc2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.0600052
