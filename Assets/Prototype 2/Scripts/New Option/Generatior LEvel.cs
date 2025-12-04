@@ -201,26 +201,26 @@ public class GeneratiorLEvel : MonoBehaviour
         }
     }
 
-    public void OnPhaseChanged(bool isHorizontal, bool isUpPhase)
-    {
-        Falling[] fallingScripts = FindObjectsOfType<Falling>();
+    //public void OnPhaseChanged(bool isHorizontal, bool isUpPhase)
+    //{
+    //    Falling[] fallingScripts = FindObjectsOfType<Falling>();
 
-        foreach (Falling falling in fallingScripts)
-        {
-            if (isHorizontal)
-            {
-                falling.SetLevelDirection(LevelDirection.HorizontalRight);
-            }
-            else if (isUpPhase)
-            {
-                falling.SetLevelDirection(LevelDirection.VerticalUp);
-            }
-            else
-            {
-                falling.SetLevelDirection(LevelDirection.VerticalDown);
-            }
-        }
-    }
+    //    foreach (Falling falling in fallingScripts)
+    //    {
+    //        if (isHorizontal)
+    //        {
+    //            falling.SetLevelDirection(LevelDirection.HorizontalRight);
+    //        }
+    //        else if (isUpPhase)
+    //        {
+    //            falling.SetLevelDirection(LevelDirection.VerticalUp);
+    //        }
+    //        else
+    //        {
+    //            falling.SetLevelDirection(LevelDirection.VerticalDown);
+    //        }
+    //    }
+    //}
 
     void OnDrawGizmosSelected()
     {

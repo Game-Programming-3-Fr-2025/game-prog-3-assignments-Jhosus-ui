@@ -952,6 +952,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Trampa Abajo
       objectReference: {fileID: 0}
+    - target: {fileID: 5992842836131883454, guid: 612211d11258961448c36f5638d31f2c, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7648195485207233426, guid: 612211d11258961448c36f5638d31f2c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20.99
@@ -991,6 +995,10 @@ PrefabInstance:
     - target: {fileID: 7648195485207233426, guid: 612211d11258961448c36f5638d31f2c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089434794504610277, guid: 612211d11258961448c36f5638d31f2c, type: 3}
+      propertyPath: movementDistance
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

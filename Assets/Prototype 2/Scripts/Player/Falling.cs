@@ -1,398 +1,347 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class Falling : MonoBehaviour
 {
-    [Header("Configuración de Límites")]
-    public float margin = 0.5f;
-
-    [Header("Detección de Respawn Points")]
+    [Header("Configuración")]
+    public float margin = 0.5f, respawnDelay = 0.5f;
     public string respawnTag = "RespawnPoint";
-
-    [Header("Cámaras")]
     public Camera playerCamera;
+    public bool mostrarGizmos = true;
 
-    [Header("Dirección de Nivel")]
-    public LevelDirection levelDirection = LevelDirection.VerticalUp;
+    [Header("Efectos Visuales")]
+    public float parpadeoDuracion = 1.5f;
+    public float parpadeoVelocidad = 0.1f;
+    public Color parpadeoColor = new Color(1, 1, 1, 0.5f);
+
+    [Header("Efectos de Vibración (Mando)")]
+    public bool usarVibracion = true;
+    public float vibracionFuerza = 0.7f;
+    public float vibracionDuracion = 0.3f;
+    public int vibracionCantidad = 3;
 
     private LifeSystem playerLife;
-    private int outOfBoundsCount = 0;
-    private Vector3 lastSafePosition;
-    private bool isPlayer1;
+    private Rigidbody2D rb;
     private List<Transform> respawnPoints = new List<Transform>();
+    private Vector3 cameraBoundsMin, cameraBoundsMax;
+    private float lastOutOfBoundsTime = -10f, halfCameraHeight, halfCameraWidth;
+    private int outOfBoundsCount, frameCounter;
+    private bool isRespawning, isPlayer1;
 
-    public enum LevelDirection
-    {
-        VerticalUp,     // Cámara sube (niveles normales)
-        VerticalDown,   // Cámara baja (niveles rotados 180°)
-        HorizontalRight,// Cámara va a la derecha
-        HorizontalLeft  // Cámara va a la izquierda
-    }
+    // Referencias para efectos
+    private SpriteRenderer spriteRenderer;
+    private Color colorOriginal;
+    private bool tieneMandoConectado;
+    private int playerIndex;
 
     void Start()
     {
         playerLife = GetComponent<LifeSystem>();
-        lastSafePosition = transform.position;
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer) colorOriginal = spriteRenderer.color;
 
-        isPlayer1 = gameObject.CompareTag("Player 1");
+        isPlayer1 = CompareTag("Player 1");
+        playerIndex = isPlayer1 ? 0 : 1;
+
         FindPlayerCamera();
+        CalculateCameraBounds();
         FindAllRespawnPoints();
 
-        Debug.Log($"{GetPlayerName()} - Dirección: {levelDirection}, Respawns: {respawnPoints.Count}");
+        // Detectar si hay mando conectado
+        CheckMandoConectado();
+    }
+
+    void CheckMandoConectado()
+    {
+        // Detectar si hay mandos conectados
+        string[] joystickNames = Input.GetJoystickNames();
+        tieneMandoConectado = joystickNames.Length > playerIndex &&
+                              !string.IsNullOrEmpty(joystickNames[playerIndex]);
+
+        Debug.Log($"{gameObject.name} - Mando conectado: {tieneMandoConectado}");
     }
 
     void FindPlayerCamera()
     {
-        if (playerCamera == null)
+        if (playerCamera) return;
+        var camObj = GameObject.Find(isPlayer1 ? "MainCameraP1" : "MainCameraP2");
+        if (playerCamera = camObj ? camObj.GetComponent<Camera>() : Camera.main)
         {
-            string cameraName = isPlayer1 ? "MainCameraP1" : "MainCameraP2";
-            GameObject camObj = GameObject.Find(cameraName);
-            if (camObj != null) playerCamera = camObj.GetComponent<Camera>();
-
-            if (playerCamera == null) playerCamera = Camera.main;
+            halfCameraHeight = playerCamera.orthographicSize;
+            halfCameraWidth = halfCameraHeight * playerCamera.aspect;
         }
     }
+
+    void CalculateCameraBounds() => halfCameraWidth = (halfCameraHeight = playerCamera.orthographicSize) * playerCamera.aspect;
 
     void FindAllRespawnPoints()
     {
-        GameObject[] respawnObjects = GameObject.FindGameObjectsWithTag(respawnTag);
         respawnPoints.Clear();
-
-        foreach (GameObject obj in respawnObjects)
-        {
+        foreach (var obj in GameObject.FindGameObjectsWithTag(respawnTag))
             respawnPoints.Add(obj.transform);
-        }
-
-        // Ordenar según dirección del nivel
-        SortRespawnsByDirection();
-    }
-
-    void SortRespawnsByDirection()
-    {
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp:
-                // Ordenar por Y ascendente (de abajo hacia arriba)
-                respawnPoints.Sort((a, b) => a.position.y.CompareTo(b.position.y));
-                break;
-
-            case LevelDirection.VerticalDown:
-                // Ordenar por Y descendente (de arriba hacia abajo)
-                respawnPoints.Sort((a, b) => b.position.y.CompareTo(a.position.y));
-                break;
-
-            case LevelDirection.HorizontalRight:
-                // Ordenar por X ascendente (de izquierda a derecha)
-                respawnPoints.Sort((a, b) => a.position.x.CompareTo(b.position.x));
-                break;
-
-            case LevelDirection.HorizontalLeft:
-                // Ordenar por X descendente (de derecha a izquierda)
-                respawnPoints.Sort((a, b) => b.position.x.CompareTo(a.position.x));
-                break;
-        }
     }
 
     void Update()
     {
-        if (playerCamera == null) return;
+        if (!playerCamera) { FindPlayerCamera(); return; }
+        if (isRespawning) return;
 
-        // Detectar si está fuera de límites basado en dirección
-        bool isOutOfBounds = CheckOutOfBoundsByDirection();
-
-        if (isOutOfBounds)
+        UpdateCameraBounds();
+        if (++frameCounter >= 120)
         {
-            HandleOutOfBounds();
+            frameCounter = 0;
+            FindAllRespawnPoints();
+            CheckMandoConectado(); // Revisar periódicamente si se conectó/desconectó mando
         }
-        else
-        {
-            lastSafePosition = transform.position;
 
-            // Actualizar respawn points ocasionalmente
-            if (Time.frameCount % 60 == 0)
+        var pos = transform.position;
+        if (pos.x < cameraBoundsMin.x || pos.x > cameraBoundsMax.x ||
+            pos.y < cameraBoundsMin.y || pos.y > cameraBoundsMax.y)
+        {
+            if (Time.time - lastOutOfBoundsTime > respawnDelay)
             {
-                FindAllRespawnPoints();
+                HandleOutOfBounds();
+                lastOutOfBoundsTime = Time.time;
             }
         }
+        else outOfBoundsCount = 0;
     }
 
-    bool CheckOutOfBoundsByDirection()
+    void UpdateCameraBounds()
     {
-        Vector3 screenPos = playerCamera.WorldToViewportPoint(transform.position);
-
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp:
-                // Fuera si está muy abajo o a los lados
-                return screenPos.y < -margin ||
-                       screenPos.x < -margin || screenPos.x > 1 + margin;
-
-            case LevelDirection.VerticalDown:
-                // Fuera si está muy arriba o a los lados
-                return screenPos.y > 1 + margin ||
-                       screenPos.x < -margin || screenPos.x > 1 + margin;
-
-            case LevelDirection.HorizontalRight:
-                // Fuera si está muy a la izquierda o arriba/abajo
-                return screenPos.x < -margin ||
-                       screenPos.y < -margin || screenPos.y > 1 + margin;
-
-            case LevelDirection.HorizontalLeft:
-                // Fuera si está muy a la derecha o arriba/abajo
-                return screenPos.x > 1 + margin ||
-                       screenPos.y < -margin || screenPos.y > 1 + margin;
-
-            default:
-                // Check general como fallback
-                return screenPos.x < -margin || screenPos.x > 1 + margin ||
-                       screenPos.y < -margin || screenPos.y > 1 + margin;
-        }
+        var camPos = playerCamera.transform.position;
+        cameraBoundsMin = new Vector3(camPos.x - halfCameraWidth - margin, camPos.y - halfCameraHeight - margin, transform.position.z);
+        cameraBoundsMax = new Vector3(camPos.x + halfCameraWidth + margin, camPos.y + halfCameraHeight + margin, transform.position.z);
     }
 
     void HandleOutOfBounds()
     {
-        Debug.Log($"{GetPlayerName()} salió de límites en dirección {levelDirection}");
-
-        outOfBoundsCount++;
-
-        if (outOfBoundsCount >= 2 && playerLife != null)
+        isRespawning = true;
+        if (++outOfBoundsCount >= 2 && playerLife)
         {
             playerLife.TakeDamage(1);
             outOfBoundsCount = 0;
         }
 
-        // Encontrar respawn adecuado según dirección
-        Transform bestRespawn = FindAppropriateRespawn();
-
-        if (bestRespawn != null)
+        var bestRespawn = FindClosestRespawnToCenter();
+        if (bestRespawn)
         {
-            transform.position = bestRespawn.position;
-            Debug.Log($"{GetPlayerName()} respawneado en: {bestRespawn.name}");
+            StartCoroutine(EfectoRespawnCompleto(bestRespawn.position));
         }
         else
         {
-            transform.position = lastSafePosition;
+            ResetPhysics();
+            isRespawning = false;
         }
-
-        // Resetear física
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null) rb.linearVelocity = Vector2.zero;
     }
 
-    Transform FindAppropriateRespawn()
+    IEnumerator EfectoRespawnCompleto(Vector3 targetPosition)
+    {
+        // 1. Vibrar si hay mando conectado
+        if (usarVibracion && tieneMandoConectado)
+        {
+            StartCoroutine(EfectoVibracionMando());
+        }
+
+        // 2. Parpadear durante el movimiento
+        StartCoroutine(EfectoParpadeo());
+
+        // 3. Esperar un momento antes de teletransportar
+        yield return new WaitForSeconds(0.1f);
+
+        // 4. Mover al jugador
+        transform.position = targetPosition;
+        ResetPhysics();
+
+        // 5. Continuar parpadeando después del respawn
+        yield return new WaitForSeconds(parpadeoDuracion);
+
+        // 6. Restaurar color normal
+        if (spriteRenderer)
+        {
+            spriteRenderer.color = colorOriginal;
+        }
+
+        isRespawning = false;
+    }
+
+    IEnumerator EfectoParpadeo()
+    {
+        if (!spriteRenderer) yield break;
+
+        float tiempoInicio = Time.time;
+        bool visible = true;
+
+        while (Time.time - tiempoInicio < parpadeoDuracion)
+        {
+            if (visible)
+            {
+                spriteRenderer.color = parpadeoColor;
+            }
+            else
+            {
+                spriteRenderer.color = colorOriginal;
+            }
+
+            visible = !visible;
+            yield return new WaitForSeconds(parpadeoVelocidad);
+        }
+
+        spriteRenderer.color = colorOriginal;
+    }
+
+    IEnumerator EfectoVibracionMando()
+    {
+        if (!tieneMandoConectado) yield break;
+
+        for (int i = 0; i < vibracionCantidad; i++)
+        {
+            // Usar InputSystem si está disponible, si no usar el sistema antiguo
+#if ENABLE_INPUT_SYSTEM
+            // Para el nuevo Input System
+            var gamepad = UnityEngine.InputSystem.Gamepad.current;
+            if (gamepad != null)
+            {
+                gamepad.SetMotorSpeeds(vibracionFuerza, vibracionFuerza * 0.8f);
+                yield return new WaitForSeconds(vibracionDuracion / vibracionCantidad);
+                gamepad.SetMotorSpeeds(0, 0);
+            }
+#else
+            // Para el Input Manager tradicional (Unity viejo)
+            try
+            {
+                // Vibrar el mando específico del jugador
+                if (playerIndex < Input.GetJoystickNames().Length)
+                {
+                    // Nota: SetVibration solo funciona en algunas plataformas
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+                    // Para PC
+                    StartCoroutine(VibrarPC());
+#elif UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH
+                    // Para consolas (requiere APIs específicas)
+                    Debug.Log("Vibración en consola - implementación específica requerida");
+#endif
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Error en vibración: {e.Message}");
+            }
+#endif
+
+            yield return new WaitForSeconds(vibracionDuracion / vibracionCantidad);
+        }
+    }
+
+#if !ENABLE_INPUT_SYSTEM && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX)
+    IEnumerator VibrarPC()
+    {
+        // Método alternativo para PC usando transform shaking si no hay API de vibración
+        float shakeDuration = vibracionDuracion / 3f;
+        float shakeMagnitude = 0.1f;
+        Vector3 originalPos = transform.localPosition;
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            float x = originalPos.x + Random.Range(-shakeMagnitude, shakeMagnitude);
+            float y = originalPos.y + Random.Range(-shakeMagnitude, shakeMagnitude);
+            transform.localPosition = new Vector3(x, y, originalPos.z);
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        transform.localPosition = originalPos;
+    }
+#endif
+
+    Transform FindClosestRespawnToCenter()
     {
         if (respawnPoints.Count == 0) return null;
 
-        Transform bestRespawn = null;
-        float bestScore = Mathf.Infinity;
-
-        foreach (Transform respawn in respawnPoints)
-        {
-            // Solo considerar respawns que estén "atrás" según la dirección
-            if (IsRespawnBehind(respawn))
-            {
-                float score = CalculateRespawnScore(respawn);
-
-                if (score < bestScore)
-                {
-                    bestScore = score;
-                    bestRespawn = respawn;
-                }
-            }
-        }
-
-        // Si no hay respawns atrás, usar el más cercano en general
-        if (bestRespawn == null)
-        {
-            Debug.Log("No hay respawns atrás, usando el más cercano");
-            bestRespawn = FindClosestRespawnInGeneral();
-        }
-
-        return bestRespawn;
-    }
-
-    bool IsRespawnBehind(Transform respawn)
-    {
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp:
-                // Respawn atrás = está ABAJO del jugador
-                return respawn.position.y <= lastSafePosition.y;
-
-            case LevelDirection.VerticalDown:
-                // Respawn atrás = está ARRIBA del jugador
-                return respawn.position.y >= lastSafePosition.y;
-
-            case LevelDirection.HorizontalRight:
-                // Respawn atrás = está a la IZQUIERDA del jugador
-                return respawn.position.x <= lastSafePosition.x;
-
-            case LevelDirection.HorizontalLeft:
-                // Respawn atrás = está a la DERECHA del jugador
-                return respawn.position.x >= lastSafePosition.x;
-
-            default:
-                return true;
-        }
-    }
-
-    float CalculateRespawnScore(Transform respawn)
-    {
-        float baseDistance = Vector3.Distance(lastSafePosition, respawn.position);
-
-        // Ajustar score según dirección
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp:
-                // Priorizar respawns que no estén muy abajo
-                float verticalBonus = Mathf.Abs(lastSafePosition.y - respawn.position.y) * 0.7f;
-                float horizontalBonus = Mathf.Abs(lastSafePosition.x - respawn.position.x) * 0.3f;
-                return verticalBonus + horizontalBonus;
-
-            case LevelDirection.VerticalDown:
-                // Priorizar respawns que no estén muy arriba
-                verticalBonus = Mathf.Abs(lastSafePosition.y - respawn.position.y) * 0.7f;
-                horizontalBonus = Mathf.Abs(lastSafePosition.x - respawn.position.x) * 0.3f;
-                return verticalBonus + horizontalBonus;
-
-            case LevelDirection.HorizontalRight:
-                // Priorizar respawns que no estén muy a la izquierda
-                float horizontalPenalty = Mathf.Abs(lastSafePosition.x - respawn.position.x) * 0.7f;
-                float verticalPenalty = Mathf.Abs(lastSafePosition.y - respawn.position.y) * 0.3f;
-                return horizontalPenalty + verticalPenalty;
-
-            case LevelDirection.HorizontalLeft:
-                // Priorizar respawns que no estén muy a la derecha
-                horizontalPenalty = Mathf.Abs(lastSafePosition.x - respawn.position.x) * 0.7f;
-                verticalPenalty = Mathf.Abs(lastSafePosition.y - respawn.position.y) * 0.3f;
-                return horizontalPenalty + verticalPenalty;
-
-            default:
-                return baseDistance;
-        }
-    }
-
-    Transform FindClosestRespawnInGeneral()
-    {
+        var cameraCenter = new Vector2(playerCamera.transform.position.x, playerCamera.transform.position.y);
         Transform closest = null;
-        float closestDistance = Mathf.Infinity;
+        float minDist = Mathf.Infinity;
 
-        foreach (Transform respawn in respawnPoints)
+        foreach (var respawn in respawnPoints)
         {
-            float distance = Vector3.Distance(lastSafePosition, respawn.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closest = respawn;
-            }
+            if (!respawn) continue;
+            float dist = Vector2.Distance(new Vector2(respawn.position.x, respawn.position.y), cameraCenter);
+            if (dist < minDist) { minDist = dist; closest = respawn; }
         }
 
         return closest;
     }
 
-    // Método para cambiar dirección dinámicamente (desde triggers)
-    public void SetLevelDirection(LevelDirection newDirection)
+    void ResetPhysics()
     {
-        levelDirection = newDirection;
-        SortRespawnsByDirection();
-        Debug.Log($"{GetPlayerName()} cambió dirección a: {levelDirection}");
-    }
-
-    string GetPlayerName()
-    {
-        return isPlayer1 ? "Player 1" : "Player 2";
-    }
-
-    // Gizmos para debug
-    void OnDrawGizmosSelected()
-    {
-        if (!Application.isPlaying) return;
-
-        // Dibujar límites según dirección
-        if (playerCamera != null)
+        if (rb)
         {
-            Gizmos.color = GetDirectionColor();
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
 
-            Vector3[] bounds = GetDirectionBounds();
-            if (bounds.Length >= 2)
+            // También resetear cualquier movimiento residual
+            rb.linearVelocity = Vector2.zero;
+            rb.Sleep();
+            rb.WakeUp();
+        }
+    }
+
+    public void ForceRespawnTest() => HandleOutOfBounds();
+
+    void OnDrawGizmos()
+    {
+        if (!mostrarGizmos || !Application.isPlaying || !playerCamera) return;
+
+        var center = playerCamera.transform.position;
+
+        // Dibujar límites de la cámara
+        Gizmos.color = isPlayer1 ? new Color(0, 0, 1, 0.3f) : new Color(1, 0, 0, 0.3f);
+        Gizmos.DrawWireCube(center, new Vector3(halfCameraWidth * 2, halfCameraHeight * 2, 0.1f));
+
+        // Dibujar límites con margen (área segura)
+        Gizmos.color = isPlayer1 ? new Color(0, 1, 1, 0.5f) : new Color(1, 1, 0, 0.5f);
+        Gizmos.DrawWireCube(center, new Vector3((halfCameraWidth + margin) * 2, (halfCameraHeight + margin) * 2, 0.1f));
+
+        // Dibujar posición del jugador
+        Gizmos.color = isPlayer1 ? Color.blue : Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.3f);
+
+        // Indicador de mando conectado
+        if (tieneMandoConectado)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position + Vector3.up * 0.5f, 0.2f);
+        }
+
+        // Centro de la cámara
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(center, 0.2f);
+
+        // Puntos de respawn
+        foreach (var respawn in respawnPoints)
+        {
+            if (!respawn) continue;
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(respawn.position, 0.5f);
+            Gizmos.color = new Color(0, 1, 0, 0.3f);
+            Gizmos.DrawLine(center, respawn.position);
+        }
+    }
+
+    // Método público para probar efectos
+    public void ProbarEfectos()
+    {
+        if (!isRespawning)
+        {
+            StartCoroutine(EfectoParpadeo());
+            if (tieneMandoConectado)
             {
-                Gizmos.DrawLine(bounds[0], bounds[1]);
-                Gizmos.DrawLine(bounds[1], bounds[2]);
-                Gizmos.DrawLine(bounds[2], bounds[3]);
-                Gizmos.DrawLine(bounds[3], bounds[0]);
+                StartCoroutine(EfectoVibracionMando());
             }
         }
-
-        // Dibujar respawns
-        Gizmos.color = new Color(0, 1, 0, 0.3f);
-        foreach (Transform respawn in respawnPoints)
-        {
-            Gizmos.DrawWireSphere(respawn.position, 0.3f);
-
-            // Mostrar si está "atrás" o "adelante"
-            Gizmos.color = IsRespawnBehind(respawn) ? Color.green : Color.red;
-            Gizmos.DrawLine(transform.position, respawn.position);
-            Gizmos.color = new Color(0, 1, 0, 0.3f);
-        }
-
-        // Mostrar dirección actual
-#if UNITY_EDITOR
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.white;
-        UnityEditor.Handles.Label(transform.position + Vector3.up * 2,
-            $"{GetPlayerName()}\nDir: {levelDirection}", style);
-#endif
-    }
-
-    Color GetDirectionColor()
-    {
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp: return Color.green;
-            case LevelDirection.VerticalDown: return Color.blue;
-            case LevelDirection.HorizontalRight: return Color.yellow;
-            case LevelDirection.HorizontalLeft: return Color.magenta;
-            default: return Color.white;
-        }
-    }
-
-    Vector3[] GetDirectionBounds()
-    {
-        if (playerCamera == null) return new Vector3[0];
-
-        Vector3[] bounds = new Vector3[4];
-
-        switch (levelDirection)
-        {
-            case LevelDirection.VerticalUp:
-                bounds[0] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, -margin, playerCamera.nearClipPlane));
-                bounds[1] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, -margin, playerCamera.nearClipPlane));
-                bounds[2] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, 1, playerCamera.nearClipPlane));
-                bounds[3] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, 1, playerCamera.nearClipPlane));
-                break;
-
-            case LevelDirection.VerticalDown:
-                bounds[0] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, 0, playerCamera.nearClipPlane));
-                bounds[1] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, 0, playerCamera.nearClipPlane));
-                bounds[2] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, 1 + margin, playerCamera.nearClipPlane));
-                bounds[3] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, 1 + margin, playerCamera.nearClipPlane));
-                break;
-
-            case LevelDirection.HorizontalRight:
-                bounds[0] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, -margin, playerCamera.nearClipPlane));
-                bounds[1] = playerCamera.ViewportToWorldPoint(new Vector3(1, -margin, playerCamera.nearClipPlane));
-                bounds[2] = playerCamera.ViewportToWorldPoint(new Vector3(1, 1 + margin, playerCamera.nearClipPlane));
-                bounds[3] = playerCamera.ViewportToWorldPoint(new Vector3(-margin, 1 + margin, playerCamera.nearClipPlane));
-                break;
-
-            case LevelDirection.HorizontalLeft:
-                bounds[0] = playerCamera.ViewportToWorldPoint(new Vector3(0, -margin, playerCamera.nearClipPlane));
-                bounds[1] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, -margin, playerCamera.nearClipPlane));
-                bounds[2] = playerCamera.ViewportToWorldPoint(new Vector3(1 + margin, 1 + margin, playerCamera.nearClipPlane));
-                bounds[3] = playerCamera.ViewportToWorldPoint(new Vector3(0, 1 + margin, playerCamera.nearClipPlane));
-                break;
-        }
-
-        return bounds;
     }
 }
