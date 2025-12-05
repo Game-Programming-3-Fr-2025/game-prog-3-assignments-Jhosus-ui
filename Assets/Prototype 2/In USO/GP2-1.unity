@@ -1133,7 +1133,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &454055494
 Transform:
   m_ObjectHideFlags: 0
@@ -8734,6 +8734,7 @@ GameObject:
   - component: {fileID: 1035062595}
   - component: {fileID: 1035062596}
   - component: {fileID: 1035062597}
+  - component: {fileID: 1035062598}
   m_Layer: 3
   m_Name: Player 1
   m_TagString: Player 1
@@ -9029,6 +9030,26 @@ MonoBehaviour:
   vibracionFuerza: 0.7
   vibracionDuracion: 0.3
   vibracionCantidad: 3
+--- !u!114 &1035062598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035062587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d09a7a14e531c48acee118608abb68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  miCamara: {fileID: 1229941195}
+  arriba: {fileID: 1647081037}
+  izquierda: {fileID: 224854928}
+  abajo: {fileID: 1113739664}
+  tiempoFadeOut: 3
+  tiempoEspera: 5
+  tiempoFadeIn: 3
+  tiempoEsperaEntreCambios: 20
 --- !u!1 &1042225877
 GameObject:
   m_ObjectHideFlags: 0
@@ -9806,7 +9827,6 @@ GameObject:
   - component: {fileID: 1229941194}
   - component: {fileID: 1229941193}
   - component: {fileID: 1229941196}
-  - component: {fileID: 1229941197}
   m_Layer: 0
   m_Name: MainCameraP1
   m_TagString: Untagged
@@ -9953,21 +9973,6 @@ MonoBehaviour:
   posicionXFija: -12.5
   modoHorizontal: 0
   modoVerticalArriba: 0
---- !u!114 &1229941197
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1229941191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9d09a7a14e531c48acee118608abb68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  arriba: {fileID: 1647081037}
-  izquierda: {fileID: 224854928}
-  abajo: {fileID: 1113739664}
 --- !u!1 &1254523870
 GameObject:
   m_ObjectHideFlags: 0
@@ -9986,6 +9991,7 @@ GameObject:
   - component: {fileID: 1254523877}
   - component: {fileID: 1254523879}
   - component: {fileID: 1254523880}
+  - component: {fileID: 1254523881}
   m_Layer: 3
   m_Name: Player 2
   m_TagString: Player 2
@@ -10281,6 +10287,26 @@ MonoBehaviour:
   vibracionFuerza: 0.7
   vibracionDuracion: 0.3
   vibracionCantidad: 3
+--- !u!114 &1254523881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1254523870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d09a7a14e531c48acee118608abb68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  miCamara: {fileID: 481564670}
+  arriba: {fileID: 1466773625}
+  izquierda: {fileID: 700878649}
+  abajo: {fileID: 1689762605}
+  tiempoFadeOut: 3
+  tiempoEspera: 5
+  tiempoFadeIn: 3
+  tiempoEsperaEntreCambios: 20
 --- !u!1 &1288566329
 GameObject:
   m_ObjectHideFlags: 0
