@@ -1,109 +1,77 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class CastigFloor : MonoBehaviour
 {
-    [Header("Configuración Trampa")]
-    public float riseSpeed = 2f;
-    public float maxHeight = 3f;
+    [Header("Sprites de Amenaza")]
+    [SerializeField] private SpriteRenderer arriba;
+    [SerializeField] private SpriteRenderer izquierda;
+    [SerializeField] private SpriteRenderer abajo;
 
-    [Header("Punto de Respawn")]
-    public Transform respawnPoint;
-
-    private Vector3 startPos;
-    private bool isActive = false;
+    private Camera cam;
+    private int estado = 0; // 0=arriba, 1=izquierda, 2=abajo
+    private float tiempoUltimoTrigger = -100f;
 
     void Start()
     {
-        startPos = transform.position;
-        // Ocultar la trampa al inicio
-        GetComponent<SpriteRenderer>().enabled = false;
+        cam = GetComponent<Camera>();
+        CambiarSprite(0); // Empezar con arriba
     }
 
     void Update()
     {
-        if (isActive)
-        {
-            // Mover hacia arriba
-            transform.Translate(Vector3.up * riseSpeed * Time.deltaTime);
+        ActualizarPosiciones();
+    }
 
-            // Detener si llega a la altura máxima
-            if (transform.position.y >= startPos.y + maxHeight)
-            {
-                isActive = false;
-            }
+    void ActualizarPosiciones()
+    {
+        if (cam == null) return;
+
+        Vector3 pos = transform.position;
+        float altura = cam.orthographicSize;
+        float ancho = altura * cam.aspect;
+
+        if (arriba)
+            arriba.transform.position = new Vector3(pos.x, pos.y + altura, arriba.transform.position.z);
+
+        if (izquierda)
+            izquierda.transform.position = new Vector3(pos.x - ancho, pos.y, izquierda.transform.position.z);
+
+        if (abajo)
+            abajo.transform.position = new Vector3(pos.x, pos.y - altura, abajo.transform.position.z);
+    }
+
+    void CambiarSprite(int nuevoEstado)
+    {
+        estado = nuevoEstado;
+
+        // Apagar todos
+        if (arriba) arriba.enabled = false;
+        if (izquierda) izquierda.enabled = false;
+        if (abajo) abajo.enabled = false;
+
+        // Encender solo el actual
+        switch (estado)
+        {
+            case 0: if (arriba) arriba.enabled = true; break;
+            case 1: if (izquierda) izquierda.enabled = true; break;
+            case 2: if (abajo) abajo.enabled = true; break;
         }
     }
 
-    // Trigger para activar la trampa
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !isActive)
+        if (other.CompareTag("Horizontal"))
         {
-            ActivateTrap();
+            // Si pasaron mÃ¡s de 20 segundos desde el Ãºltimo trigger
+            if (Time.time - tiempoUltimoTrigger > 20f)
+            {
+                // Cambiar al siguiente estado
+                int nuevoEstado = (estado + 1) % 3; // 0â†’1â†’2â†’0
+                CambiarSprite(nuevoEstado);
+                tiempoUltimoTrigger = Time.time;
+
+                Debug.Log($"{gameObject.name}: CambiÃ³ a {(nuevoEstado == 0 ? "ARRIBA" : nuevoEstado == 1 ? "IZQUIERDA" : "ABAJO")}");
+            }
         }
-    }
-
-    // Colisión cuando la trampa toca al jugador
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            HurtPlayer(collision.gameObject);
-        }
-    }
-
-    void ActivateTrap()
-    {
-        // Mostrar y activar la trampa
-        GetComponent<SpriteRenderer>().enabled = true;
-        isActive = true;
-    }
-
-    void HurtPlayer(GameObject player)
-    {
-        // Quitar vida
-        LifeSystem life = player.GetComponent<LifeSystem>();
-        if (life != null)
-        {
-            life.TakeDamage(1);
-        }
-
-        // Mover al punto de respawn
-        if (respawnPoint != null)
-        {
-            player.transform.position = respawnPoint.position;
-        }
-
-        // Resetear la trampa
-        ResetTrap();
-    }
-
-    void ResetTrap()
-    {
-        // Volver a posición inicial y ocultar
-        transform.position = startPos;
-        GetComponent<SpriteRenderer>().enabled = false;
-        isActive = false;
-    }
-
-    // Dibujar gizmos en el editor
-    void OnDrawGizmosSelected()
-    {
-        // Posición inicial (si no estamos en play mode, usar posición actual)
-        Vector3 currentStartPos = Application.isPlaying ? startPos : transform.position;
-
-        // Dibujar línea desde la posición inicial hasta la altura máxima
-        Vector3 maxHeightPos = currentStartPos + Vector3.up * maxHeight;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(currentStartPos, maxHeightPos);
-
-        // Dibujar esfera en la altura máxima
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(maxHeightPos, 0.3f);
-
-        // Dibujar caja en la posición inicial
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(currentStartPos, GetComponent<Collider2D>().bounds.size);
     }
 }
