@@ -743,6 +743,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &16846200
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2060,6 +2061,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &44134078
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2378,6 +2380,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &67745266
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2530,6 +2533,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &68294252
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2816,6 +2820,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &75250206
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3551,6 +3556,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &111441519
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3893,6 +3899,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &140476804
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4881,6 +4888,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &210781286
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7523,6 +7531,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &269631643
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7951,12 +7960,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb995a0d8764fb4e9063acbf835d895, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1212173614}
-  smoothSpeed: 0.125
-  fallDistance: 15
-  lineLength: 20
-  shakeDuration: 0.2
-  shakeMagnitude: 0.3
+  velocidadBajada: 2
+  velocidadDerecha: 2
+  velocidadSubida: 2
+  posicionXFija: 0
+  modoHorizontal: 0
+  modoVerticalArriba: 0
 --- !u!82 &277360990
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8105,6 +8114,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &281359941
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8257,6 +8267,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &291255247
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8496,6 +8507,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &311143340
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9020,6 +9032,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &330815853
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9440,6 +9453,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &351024787
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9782,6 +9796,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &368812508
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10575,6 +10590,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &429966079
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10984,6 +11000,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &471463053
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -11575,6 +11592,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &483663635
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -11806,6 +11824,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &492417076
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -11958,6 +11977,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &493367803
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12583,6 +12603,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &517158531
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13012,6 +13033,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &537472025
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13309,6 +13331,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &551337431
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13461,6 +13484,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &559157973
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14209,6 +14233,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &595401586
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14673,6 +14698,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &626653261
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14825,6 +14851,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &628806638
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -15516,6 +15543,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &643453149
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -15668,6 +15696,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &645077938
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -15820,6 +15849,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &662312507
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16541,6 +16571,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &690126009
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -21070,6 +21101,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &753338041
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -21757,9 +21789,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c7c767d7e51d3140b000ab016032ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destination: {fileID: 1928275966}
-  cameraController: {fileID: 277360989}
-  isCheckpoint: 0
 --- !u!1 &814882024
 GameObject:
   m_ObjectHideFlags: 0
@@ -21811,6 +21840,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &814882028
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -22080,6 +22110,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &824896120
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -22507,6 +22538,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &873749430
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -22707,6 +22739,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &875675085
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -22859,6 +22892,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &876415522
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23011,6 +23045,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &882145191
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23329,6 +23364,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &897637278
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23481,6 +23517,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &920750894
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -23823,6 +23860,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &951368885
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -24054,6 +24092,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &953969347
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -24834,6 +24873,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &985060287
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -27712,6 +27752,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &992978024
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -28085,6 +28126,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1016449568
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -28654,6 +28696,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1038925940
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -31486,6 +31529,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1077119424
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -31725,6 +31769,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1086678008
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -32540,6 +32585,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1113622455
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -34350,6 +34396,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1164422476
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -34951,6 +34998,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1179849346
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -35103,6 +35151,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1181551791
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -35334,6 +35383,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1183821501
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -36065,6 +36115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7775404bfee2e1548b17be2aa9fc1d07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayer1: 1
   moveSpeed: 5
   jumpForce: 15.57
   jumpTime: 0.35
@@ -36075,7 +36126,11 @@ MonoBehaviour:
     m_Bits: 64
   animator: {fileID: 1212173618}
   jumpSound: {fileID: 8300000, guid: cb5684e0b05895f41a477b08781ed99b, type: 3}
+  smallJumpVibration: 0.2
+  bigJumpVibration: 0.4
+  vibrationDuration: 0.2
   isGrounded: 0
+  particulas: {fileID: 0}
 --- !u!95 &1212173618
 Animator:
   serializedVersion: 7
@@ -36114,6 +36169,9 @@ MonoBehaviour:
   dashDuration: 0.2
   dashCooldown: 0.5
   maxDashes: 1
+  vibrationIntensity: 0.8
+  vibrationDuration: 0.3
+  triggerThreshold: 0.7
   isDashUnlocked: 1
   dashActivatorObject: {fileID: 1359687802}
 --- !u!114 &1212173620
@@ -36146,11 +36204,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa46a48b2dc4b4e45923559329df59df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLives: 20
-  invulnerabilityTime: 1.6
-  knockbackForce: 5
-  livesText: {fileID: 961723670}
-  damageSound: {fileID: 8300000, guid: b746a88df75792a49b1df41fc0912b7a, type: 3}
 --- !u!82 &1212173622
 AudioSource:
   m_ObjectHideFlags: 0
@@ -36299,6 +36352,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1213086676
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -36451,6 +36505,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1219922129
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -36779,6 +36834,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1222348062
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -37766,6 +37822,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1312596490
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -38596,6 +38653,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1381713372
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -38800,6 +38858,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1404449123
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -39427,6 +39486,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1434635893
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -40323,6 +40383,69 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1001 &1454568451
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1354874436679625722, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_Name
+      value: Player (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.83
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.83
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502405440156230610, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6488730821533102681, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6488730821533102681, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 340808358278969943, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fbe7a5b00326e1c459af3fc832bbc15d, type: 3}
 --- !u!1 &1456824921
 GameObject:
   m_ObjectHideFlags: 0
@@ -40374,6 +40497,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1456824924
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -40692,6 +40816,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1484574648
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -40978,6 +41103,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1500561236
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -41130,6 +41256,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1515152924
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -41282,6 +41409,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1517731087
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -41734,6 +41862,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1556038783
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -42274,6 +42403,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1578186923
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -42560,6 +42690,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1609690828
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -42712,6 +42843,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1612374782
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -42951,6 +43083,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1613570718
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -43103,6 +43236,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1615233155
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -43255,6 +43389,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1634631377
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -43407,6 +43542,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1644731140
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -43609,9 +43745,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c7c767d7e51d3140b000ab016032ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destination: {fileID: 1933294200}
-  cameraController: {fileID: 277360989}
-  isCheckpoint: 0
 --- !u!61 &1647479518
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -43709,6 +43842,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1662120636
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -44463,6 +44597,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1715289121
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -44694,6 +44829,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1736066082
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -45247,6 +45383,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &1759755369
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -45399,6 +45536,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1764367903
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -45685,6 +45823,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1783902559
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -45837,6 +45976,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1795844916
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -46193,6 +46333,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1803470284
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -46988,6 +47129,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1832354080
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -47274,6 +47416,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1840541023
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -47752,6 +47895,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1858927137
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -47904,6 +48048,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1872960166
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -48135,6 +48280,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1891261108
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -48287,6 +48433,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1895415306
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53405,6 +53552,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1927667044
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53607,9 +53755,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c7c767d7e51d3140b000ab016032ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destination: {fileID: 1928275966}
-  cameraController: {fileID: 277360989}
-  isCheckpoint: 1
 --- !u!61 &1928275969
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53757,9 +53902,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c7c767d7e51d3140b000ab016032ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destination: {fileID: 1933294200}
-  cameraController: {fileID: 277360989}
-  isCheckpoint: 1
 --- !u!61 &1933294203
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53857,6 +53999,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &1951341572
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -54889,6 +55032,7 @@ MonoBehaviour:
   breakTime: 0.65
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &2044914411
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -55160,6 +55304,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &2072382705
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -55580,6 +55725,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &2091512964
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -56692,6 +56838,7 @@ MonoBehaviour:
   breakTime: 1.5
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &2120558249
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -56844,6 +56991,7 @@ MonoBehaviour:
   breakTime: 0
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!61 &2129125112
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -57087,6 +57235,7 @@ MonoBehaviour:
   breakTime: 0.4
   respawnTime: 3
   shakeIntensity: 0.05
+  efecto: {fileID: 0}
 --- !u!212 &2139827806
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -57370,3 +57519,4 @@ SceneRoots:
   - {fileID: 1359687805}
   - {fileID: 413207367}
   - {fileID: 1381934107}
+  - {fileID: 1454568451}

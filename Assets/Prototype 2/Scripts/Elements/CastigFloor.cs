@@ -13,7 +13,7 @@ public class CastigFloor : MonoBehaviour
 
     [Header("Transiciones")]
     [SerializeField] private float tiempoFadeOut = 0.5f;
-    [SerializeField] private float tiempoEspera = 2f; // Tiempo entre desaparecer y aparecer
+    [SerializeField] private float tiempoEspera = 2f; 
     [SerializeField] private float tiempoFadeIn = 0.5f;
     [SerializeField] private float tiempoEsperaEntreCambios = 20f;
 

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2366254005220103823}
   - component: {fileID: 3055746450622476010}
   - component: {fileID: 7294172190781268464}
+  - component: {fileID: 2879422561939300245}
   m_Layer: 0
   m_Name: Shooter_Arrow_Trap_2
   m_TagString: Untagged
@@ -157,3 +158,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2879422561939300245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8009004138237504301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aad4df6221da9f469a23ca614f926cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageAmount: 1
+  damageCooldown: 0.5
+  continuousDamage: 0
+  damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
+  damageAreaRadius: 0.25
