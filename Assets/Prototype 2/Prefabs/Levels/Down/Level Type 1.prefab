@@ -5478,6 +5478,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1501048560316307177}
     m_Modifications:
+    - target: {fileID: 745231884012452063, guid: 977a454ec3b386c47b2f4bec2a1aef87, type: 3}
+      propertyPath: damageAmount
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1992859530241314982, guid: 977a454ec3b386c47b2f4bec2a1aef87, type: 3}
       propertyPath: m_Name
       value: 'Enemy '
@@ -5544,7 +5548,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8074225877319255350, guid: 977a454ec3b386c47b2f4bec2a1aef87, type: 3}
       propertyPath: maxHealth
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

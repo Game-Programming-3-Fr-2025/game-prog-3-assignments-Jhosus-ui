@@ -3181,19 +3181,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.82
+      value: -4.54
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.51
+      value: -8.44
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.33066514
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9999504
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalRotation.x
@@ -3201,7 +3201,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -0.0099589145
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalRotation.z
@@ -3213,7 +3213,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -1.141
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -3237,7 +3237,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6541778272754953109, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: movementDirection.y
-      value: 0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7079962194932127508, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_Material
