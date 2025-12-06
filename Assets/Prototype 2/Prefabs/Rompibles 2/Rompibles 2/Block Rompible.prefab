@@ -178,8 +178,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalFace: {fileID: 1516185479, guid: 3e37d0e073907e04db39529716fad24c, type: 3}
   crackedFace: {fileID: 1516185479, guid: 3e37d0e073907e04db39529716fad24c, type: 3}
-  breakTime: 0.5
-  respawnTime: 3
+  breakTime: 0.8
+  respawnTime: 1.7
   shakeIntensity: 0.1
   efecto: {fileID: 4731716050624245277}
 --- !u!1 &8282795851262555193

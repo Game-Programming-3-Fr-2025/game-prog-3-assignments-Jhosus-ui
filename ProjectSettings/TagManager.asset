@@ -29,6 +29,7 @@ TagManager:
   - PuntoFinalP1
   - PuntoFinalP2
   - RespawnPoint
+  - Coin
   layers:
   - Default
   - TransparentFX
