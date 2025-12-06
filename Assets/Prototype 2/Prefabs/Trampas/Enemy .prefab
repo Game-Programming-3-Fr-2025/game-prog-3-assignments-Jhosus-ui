@@ -109,7 +109,7 @@ MonoBehaviour:
   damageCooldown: 0.5
   continuousDamage: 0
   damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
-  damageAreaRadius: 0.3
+  damageAreaSize: {x: 0.6, y: 0.6}
 --- !u!61 &326057499288443761
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -7,9 +7,9 @@ public class DamageSource : MonoBehaviour
     public float damageCooldown = 0.5f; // Tiempo entre daños
     public bool continuousDamage = false; // Si hace daño continuo
 
-    [Header("Visualización")]
+    [Header("Área de Daño Rectangular")]
     public Color damageAreaColor = new Color(1f, 0f, 0f, 0.3f);
-    public float damageAreaRadius = 1f;
+    public Vector2 damageAreaSize = new Vector2(1f, 1f); // Ancho (X) y Alto (Y)
 
     private float lastDamageTime = 0f;
 
@@ -18,7 +18,6 @@ public class DamageSource : MonoBehaviour
         // Configurar layer si no está en "Dangers"
         if (gameObject.layer != LayerMask.NameToLayer("Dangers"))
         {
-            // Intentar asignar layer Dangers
             int dangersLayer = LayerMask.NameToLayer("Dangers");
             if (dangersLayer != -1)
             {
@@ -46,19 +45,40 @@ public class DamageSource : MonoBehaviour
         lastDamageTime = Time.time;
     }
 
-    // Dibujar gizmo para visualizar el área de daño
+    // Método para verificar si un punto está dentro del área de daño
+    public bool IsPointInDamageArea(Vector2 point)
+    {
+        Vector2 halfSize = damageAreaSize * 0.5f;
+        Rect damageRect = new Rect(
+            transform.position.x - halfSize.x,
+            transform.position.y - halfSize.y,
+            damageAreaSize.x,
+            damageAreaSize.y
+        );
+
+        return damageRect.Contains(point);
+    }
+
+    // Dibujar gizmo para visualizar el área de daño rectangular
     private void OnDrawGizmos()
     {
         // Área de daño (siempre visible)
         Gizmos.color = damageAreaColor;
-        Gizmos.DrawWireSphere(transform.position, damageAreaRadius);
-        Gizmos.DrawSphere(transform.position, damageAreaRadius * 0.1f);
+
+        // Dibujar rectángulo
+        Vector3 size = new Vector3(damageAreaSize.x, damageAreaSize.y, 0.1f);
+        Gizmos.DrawWireCube(transform.position, size);
+
+        // Pequeño cubo central para referencia
+        Gizmos.DrawCube(transform.position, Vector3.one * 0.1f);
     }
 
     private void OnDrawGizmosSelected()
     {
         // Resaltar cuando está seleccionado
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, damageAreaRadius * 1.2f);
+
+        Vector3 size = new Vector3(damageAreaSize.x * 1.2f, damageAreaSize.y * 1.2f, 0.1f);
+        Gizmos.DrawWireCube(transform.position, size);
     }
 }

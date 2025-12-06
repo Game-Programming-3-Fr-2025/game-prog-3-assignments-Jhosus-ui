@@ -1,23 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering.Universal;
 
 public class CastigFloor : MonoBehaviour
 {
     [Header("Referencia Cámara")]
     [SerializeField] private Camera miCamara;
 
-    [Header("Sprites de Amenaza")]
-    [SerializeField] private SpriteRenderer arriba;
-    [SerializeField] private SpriteRenderer izquierda;
-    [SerializeField] private SpriteRenderer abajo;
+    [Header("Elementos de Amenaza (Orden: Arriba, Izquierda, Abajo)")]
+    [SerializeField] private SpriteRenderer[] sprites = new SpriteRenderer[3];
+    [SerializeField] private Light2D[] luces = new Light2D[3];
 
-    [Header("Transiciones")]
+    [Header("Tiempos")]
     [SerializeField] private float tiempoFadeOut = 0.5f;
-    [SerializeField] private float tiempoEspera = 2f; 
+    [SerializeField] private float tiempoEspera = 2f;
     [SerializeField] private float tiempoFadeIn = 0.5f;
     [SerializeField] private float tiempoEsperaEntreCambios = 20f;
 
-    private int estado = 0;
+    private int estadoActual = 0;
     private float tiempoUltimoCambio = -100f;
     private bool estaTransicionando = false;
 
@@ -25,174 +25,119 @@ public class CastigFloor : MonoBehaviour
     {
         if (miCamara == null)
         {
-            bool esPlayer1 = gameObject.CompareTag("Player 1");
-            string nombreCam = esPlayer1 ? "MainCameraP1" : "MainCameraP2";
-            GameObject camObj = GameObject.Find(nombreCam);
-            if (camObj) miCamara = camObj.GetComponent<Camera>();
+            // Busca la cámara como hijo del jugador
+            miCamara = GetComponentInChildren<Camera>();
+
+            // Si no está como hijo, busca por tag
+            if (miCamara == null)
+            {
+                string nombreCam = gameObject.CompareTag("Player 1") ? "MainCameraP1" : "MainCameraP2";
+                GameObject camObj = GameObject.Find(nombreCam);
+                if (camObj) miCamara = camObj.GetComponent<Camera>();
+            }
         }
 
-        IniciarConSpriteArriba();
+        InicializarEstado();
     }
 
-    void IniciarConSpriteArriba()
+    void InicializarEstado()
     {
-        SetAlpha(arriba, 0f);
-        SetAlpha(izquierda, 0f);
-        SetAlpha(abajo, 0f);
-
-        if (arriba)
+        for (int i = 0; i < 3; i++)
         {
-            arriba.enabled = true;
-            StartCoroutine(FadeIn(arriba, tiempoFadeIn));
+            SetAlpha(i, 0f);
+            if (sprites[i]) sprites[i].enabled = (i == 0);
+            if (luces[i]) luces[i].enabled = (i == 0);
         }
 
-        estado = 0;
+        StartCoroutine(Fade(0, 0f, 1f, tiempoFadeIn));
     }
 
     void Update()
     {
         if (miCamara == null) return;
-        ActualizarPosiciones();
-    }
 
-    void ActualizarPosiciones()
-    {
-        Vector3 pos = miCamara.transform.position;
         float altura = miCamara.orthographicSize;
         float ancho = altura * miCamara.aspect;
+        Vector3 pos = miCamara.transform.position;
+        Vector3[] posiciones = {
+            new Vector3(pos.x, pos.y + altura, 0),
+            new Vector3(pos.x - ancho, pos.y, 0),
+            new Vector3(pos.x, pos.y - altura, 0)
+        };
 
-        if (arriba) arriba.transform.position = new Vector3(pos.x, pos.y + altura, arriba.transform.position.z);
-        if (izquierda) izquierda.transform.position = new Vector3(pos.x - ancho, pos.y, izquierda.transform.position.z);
-        if (abajo) abajo.transform.position = new Vector3(pos.x, pos.y - altura, abajo.transform.position.z);
+        for (int i = 0; i < 3; i++)
+        {
+            if (sprites[i]) sprites[i].transform.position = posiciones[i] + Vector3.forward * sprites[i].transform.position.z;
+            if (luces[i]) luces[i].transform.position = posiciones[i] + Vector3.forward * luces[i].transform.position.z;
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Horizontal") && !estaTransicionando)
+        if (other.CompareTag("Horizontal") && !estaTransicionando &&
+            Time.time - tiempoUltimoCambio > tiempoEsperaEntreCambios)
         {
-            if (Time.time - tiempoUltimoCambio > tiempoEsperaEntreCambios)
-            {
-                int siguienteEstado = (estado + 1) % 3;
-                StartCoroutine(TransicionCompleta(siguienteEstado));
-                tiempoUltimoCambio = Time.time;
-            }
+            CambiarEstado((estadoActual + 1) % 3);
+            tiempoUltimoCambio = Time.time;
         }
     }
 
-    IEnumerator TransicionCompleta(int nuevoEstado)
+    void CambiarEstado(int nuevoEstado)
+    {
+        StartCoroutine(TransicionEstado(nuevoEstado));
+    }
+
+    IEnumerator TransicionEstado(int nuevoEstado)
     {
         estaTransicionando = true;
 
-        // 1. Ocultar sprite actual (Fade Out)
-        SpriteRenderer spriteActual = GetSpriteActual();
-        if (spriteActual != null)
-        {
-            yield return StartCoroutine(FadeOut(spriteActual, tiempoFadeOut));
-            spriteActual.enabled = false;
-        }
+        // Fade Out actual
+        yield return Fade(estadoActual, 1f, 0f, tiempoFadeOut);
+        if (sprites[estadoActual]) sprites[estadoActual].enabled = false;
+        if (luces[estadoActual]) luces[estadoActual].enabled = false;
 
-        // 2. ESPERAR X TIEMPO ANTES DE APARECER EL NUEVO
+        // Espera
         yield return new WaitForSeconds(tiempoEspera);
 
-        // 3. Mostrar nuevo sprite (Fade In)
-        SpriteRenderer nuevoSprite = GetSpritePorEstado(nuevoEstado);
-        if (nuevoSprite != null)
-        {
-            nuevoSprite.enabled = true;
-            yield return StartCoroutine(FadeIn(nuevoSprite, tiempoFadeIn));
-        }
+        // Fade In nuevo
+        if (sprites[nuevoEstado]) sprites[nuevoEstado].enabled = true;
+        if (luces[nuevoEstado]) luces[nuevoEstado].enabled = true;
+        yield return Fade(nuevoEstado, 0f, 1f, tiempoFadeIn);
 
-        // 4. Actualizar estado
-        estado = nuevoEstado;
+        estadoActual = nuevoEstado;
         estaTransicionando = false;
-
-        Debug.Log($"{gameObject.name}: Cambió a {GetNombreEstado(nuevoEstado)}");
     }
 
-    IEnumerator FadeOut(SpriteRenderer sprite, float duracion)
+    IEnumerator Fade(int indice, float alphaInicio, float alphaFin, float duracion)
     {
-        if (sprite == null) yield break;
-
-        float tiempo = 0f;
-        Color colorOriginal = sprite.color;
-
-        while (tiempo < duracion)
+        float t = 0f;
+        while (t < duracion)
         {
-            tiempo += Time.deltaTime;
-            float t = tiempo / duracion;
-            float alpha = Mathf.Lerp(colorOriginal.a, 0f, t);
-
-            SetAlpha(sprite, alpha);
+            t += Time.deltaTime;
+            SetAlpha(indice, Mathf.Lerp(alphaInicio, alphaFin, t / duracion));
             yield return null;
         }
-
-        SetAlpha(sprite, 0f);
+        SetAlpha(indice, alphaFin);
     }
 
-    IEnumerator FadeIn(SpriteRenderer sprite, float duracion)
+    void SetAlpha(int indice, float alpha)
     {
-        if (sprite == null) yield break;
-
-        float tiempo = 0f;
-        SetAlpha(sprite, 0f); // Empezar invisible
-
-        while (tiempo < duracion)
+        if (sprites[indice])
         {
-            tiempo += Time.deltaTime;
-            float t = tiempo / duracion;
-            float alpha = Mathf.Lerp(0f, 1f, t);
-
-            SetAlpha(sprite, alpha);
-            yield return null;
+            Color c = sprites[indice].color;
+            c.a = alpha;
+            sprites[indice].color = c;
         }
-
-        SetAlpha(sprite, 1f);
-    }
-
-    SpriteRenderer GetSpriteActual()
-    {
-        switch (estado)
+        if (luces[indice])
         {
-            case 0: return arriba;
-            case 1: return izquierda;
-            case 2: return abajo;
-            default: return null;
+            Color c = luces[indice].color;
+            c.a = alpha;
+            luces[indice].color = c;
         }
     }
 
-    SpriteRenderer GetSpritePorEstado(int estadoIndex)
-    {
-        switch (estadoIndex)
-        {
-            case 0: return arriba;
-            case 1: return izquierda;
-            case 2: return abajo;
-            default: return null;
-        }
-    }
-
-    string GetNombreEstado(int estadoIndex)
-    {
-        return estadoIndex switch
-        {
-            0 => "ARRIBA",
-            1 => "IZQUIERDA",
-            2 => "ABAJO",
-            _ => "DESCONOCIDO"
-        };
-    }
-
-    void SetAlpha(SpriteRenderer sprite, float alpha)
-    {
-        if (sprite == null) return;
-
-        Color color = sprite.color;
-        color.a = alpha;
-        sprite.color = color;
-    }
-
-    // Métodos para control manual
-    public void CambiarAArriba() => StartCoroutine(TransicionCompleta(0));
-    public void CambiarAIzquierda() => StartCoroutine(TransicionCompleta(1));
-    public void CambiarAAbajo() => StartCoroutine(TransicionCompleta(2));
+    // Métodos públicos para control manual
+    public void CambiarAArriba() => CambiarEstado(0);
+    public void CambiarAIzquierda() => CambiarEstado(1);
+    public void CambiarAAbajo() => CambiarEstado(2);
 }
