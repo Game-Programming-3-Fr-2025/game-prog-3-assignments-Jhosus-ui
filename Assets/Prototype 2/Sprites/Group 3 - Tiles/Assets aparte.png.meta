@@ -1,0 +1,1035 @@
+fileFormatVersion: 2
+guid: 64a1ab070a8de76438b030574ae07b61
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2347532270071011419
+    second: Assets_0
+  - first:
+      213: 3052182395561689994
+    second: Assets_1
+  - first:
+      213: 7918522965169776436
+    second: Assets_2
+  - first:
+      213: -7383382961532566217
+    second: Assets_3
+  - first:
+      213: 5799697062963633374
+    second: Assets_4
+  - first:
+      213: 6113260494978225853
+    second: Assets_5
+  - first:
+      213: 7040758548717563640
+    second: Assets_6
+  - first:
+      213: -465877756999394448
+    second: Assets_7
+  - first:
+      213: 5463075118845396717
+    second: Assets_8
+  - first:
+      213: -8042527737740088811
+    second: Assets_9
+  - first:
+      213: 1271722272082522542
+    second: Assets_10
+  - first:
+      213: -8320370864325541224
+    second: Assets_11
+  - first:
+      213: 3947119145969700431
+    second: Assets_12
+  - first:
+      213: 3015349953525394795
+    second: Assets_13
+  - first:
+      213: -1995460991893864797
+    second: Assets_14
+  - first:
+      213: 7517093957741376349
+    second: Assets_15
+  - first:
+      213: -3876643576250633040
+    second: Assets_16
+  - first:
+      213: -7850777724529354880
+    second: Assets_17
+  - first:
+      213: 7383687467945488379
+    second: Assets_18
+  - first:
+      213: 4235741550493736194
+    second: Assets_19
+  - first:
+      213: -8398203410244654453
+    second: Assets_20
+  - first:
+      213: -5862563868047421946
+    second: Assets_21
+  - first:
+      213: 1695197506848084587
+    second: Assets_22
+  - first:
+      213: 5970421392418554270
+    second: Assets_23
+  - first:
+      213: 1577558282020170000
+    second: Assets_24
+  - first:
+      213: 709985767948143870
+    second: Assets_25
+  - first:
+      213: 8602224738383351024
+    second: Assets_26
+  - first:
+      213: -7869784530853970168
+    second: Assets_27
+  - first:
+      213: -5854084365824013164
+    second: Assets_28
+  - first:
+      213: 2187011968806798870
+    second: Assets_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Assets aparte_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 384
+        width: 46
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c78ebeeb6daac34ea3db35d0467179d
+      internalID: -1030479104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_1
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 384
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01c48366a662acc40b3bbdd09179b8ef
+      internalID: 1097156291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_2
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 384
+        width: 7
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58acd408a82ccf44d82c1fc06e9f554f
+      internalID: 701935036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_3
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 384
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b2b872d01d744c43bd7c6d8715692ea
+      internalID: 1368254251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_4
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 384
+        width: 8
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad3d3d8d7baf4a242bd3bb47c56ffa67
+      internalID: -850093589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_5
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 368
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ed2cb0b756a10a47a00419851368202
+      internalID: -527859440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_6
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 368
+        width: 25
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4fd39f50d24bcf409d282c05053bf8c
+      internalID: 972018036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_7
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 352
+        width: 29
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8540df9961c76184a8f2b717250de7db
+      internalID: -1354630082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_8
+      rect:
+        serializedVersion: 2
+        x: 275
+        y: 352
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 333f06d957330c346a80c1dcb7ad93a7
+      internalID: -1956776745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_9
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 352
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ca06a78bb912584e89365cc9fae1b2b
+      internalID: -675841584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_10
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 352
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 034b90c8c8542104daf5c22e634f3781
+      internalID: -1071575973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_11
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 336
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d637958c2069d784682192aea9693218
+      internalID: -1689879569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_12
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 341
+        width: 48
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4aec63996ae23534a8300befc62b0d39
+      internalID: 1844320684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_13
+      rect:
+        serializedVersion: 2
+        x: 275
+        y: 336
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6aa7523807d08b240b563a790ed76c3a
+      internalID: -1709036194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_14
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 336
+        width: 4
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e24b8714defa72644861cddea550487d
+      internalID: -696098587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_15
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 336
+        width: 4
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1a38e9cf012cf8488be02d8832746c9
+      internalID: 1786509409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_16
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 336
+        width: 4
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6795afb05c7f754eaa03de124011159
+      internalID: 2127122797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_17
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 288
+        width: 6
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05cdee5a5359e944e993d113f3f81be6
+      internalID: -265915060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_18
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 325
+        width: 48
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d553e624959ea644bb2af65860a4b00a
+      internalID: -1742669543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_19
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 256
+        width: 78
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1aafe2b5d316b74e87b25755c90f609
+      internalID: -2069045297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_20
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 273
+        width: 27
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fef7068982ece1b458e9a14cfa9d33e7
+      internalID: 1026563629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_21
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 278
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a3645f488054a44390b76e7b57e089e
+      internalID: -1950207559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_22
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 224
+        width: 27
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b691170b93775214092e2f53059e4e04
+      internalID: -518910042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_23
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 230
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42359800deb127d49a3a6b7b2b9e9f45
+      internalID: -484378642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_29
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 1
+        width: 64
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca850bc9572570c46b5746a40a298b49
+      internalID: -649749497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_30
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 344
+        width: 62
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 603cc448bcbdbb84c8b83d9b6f095158
+      internalID: 1318890271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_31
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 320
+        width: 56
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65802322f97279d439101faef3b36649
+      internalID: 1040248697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_24
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 67
+        width: 33
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47fe3ac0fb84e8b459c8b14fbb8ea4d4
+      internalID: 2111144377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_25
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 224
+        width: 45
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e17fec7efd1e2a2468ce6cefbb3e4796
+      internalID: -1761377636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_26
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 336
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b4a0217ca27ab324abc62a1ed1ee3246
+      internalID: 1343624386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_27
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 336
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 958c1427c8426354daa77caaf7021069
+      internalID: 2059900551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_28
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 304
+        width: 6
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 941e173511272a24b927e6f2b36c40f6
+      internalID: -1261911624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_32
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 304
+        width: 4
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02f47525ac9c4d740b7a2ed504707a64
+      internalID: -223653654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_33
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 96
+        width: 64
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6f09a701493abc45a82ea39c971ab26
+      internalID: 2069738474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_34
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 96
+        width: 64
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed01f368f83094549ab1cc8665c1099e
+      internalID: 43489338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Assets aparte_35
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 96
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c93eaee9a048c7546b4a58e7fa6e80c0
+      internalID: -451817577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 665e01dba71f63a4096cd57af5a12f5b
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Assets aparte_0: -1030479104
+      Assets aparte_1: 1097156291
+      Assets aparte_10: -1071575973
+      Assets aparte_11: -1689879569
+      Assets aparte_12: 1844320684
+      Assets aparte_13: -1709036194
+      Assets aparte_14: -696098587
+      Assets aparte_15: 1786509409
+      Assets aparte_16: 2127122797
+      Assets aparte_17: -265915060
+      Assets aparte_18: -1742669543
+      Assets aparte_19: -2069045297
+      Assets aparte_2: 701935036
+      Assets aparte_20: 1026563629
+      Assets aparte_21: -1950207559
+      Assets aparte_22: -518910042
+      Assets aparte_23: -484378642
+      Assets aparte_24: 2111144377
+      Assets aparte_25: -1761377636
+      Assets aparte_26: 1343624386
+      Assets aparte_27: 2059900551
+      Assets aparte_28: -1261911624
+      Assets aparte_29: -649749497
+      Assets aparte_3: 1368254251
+      Assets aparte_30: 1318890271
+      Assets aparte_31: 1040248697
+      Assets aparte_32: -223653654
+      Assets aparte_33: 2069738474
+      Assets aparte_34: 43489338
+      Assets aparte_35: -451817577
+      Assets aparte_4: -850093589
+      Assets aparte_5: -527859440
+      Assets aparte_6: 972018036
+      Assets aparte_7: -1354630082
+      Assets aparte_8: -1956776745
+      Assets aparte_9: -675841584
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
