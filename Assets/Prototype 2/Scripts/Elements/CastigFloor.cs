@@ -27,7 +27,7 @@ public class CastigFloor : MonoBehaviour
         {
             // Busca la cámara como hijo del jugador
             miCamara = GetComponentInChildren<Camera>();
-
+            
             // Si no está como hijo, busca por tag
             if (miCamara == null)
             {
@@ -48,7 +48,7 @@ public class CastigFloor : MonoBehaviour
             if (sprites[i]) sprites[i].enabled = (i == 0);
             if (luces[i]) luces[i].enabled = (i == 0);
         }
-
+        
         StartCoroutine(Fade(0, 0f, 1f, tiempoFadeIn));
     }
 
@@ -74,7 +74,7 @@ public class CastigFloor : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Horizontal") && !estaTransicionando &&
+        if (other.CompareTag("Horizontal") && !estaTransicionando && 
             Time.time - tiempoUltimoCambio > tiempoEsperaEntreCambios)
         {
             CambiarEstado((estadoActual + 1) % 3);

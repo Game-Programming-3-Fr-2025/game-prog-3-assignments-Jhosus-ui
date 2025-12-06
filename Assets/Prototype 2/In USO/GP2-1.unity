@@ -582,8 +582,8 @@ Transform:
   m_GameObject: {fileID: 224854926}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.63, y: -5.1199, z: 10}
-  m_LocalScale: {x: 0.2796979, y: 1.1146201, z: 0.13127}
+  m_LocalPosition: {x: -8.4315, y: -0.5951, z: 10}
+  m_LocalScale: {x: 0.5349681, y: 0.6368264, z: 0.13127}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1229941192}
@@ -660,7 +660,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -679,8 +679,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 2.25, y: 9.46875, z: 0}
+    m_Center: {x: -0.03125, y: 0, z: 0}
+    m_Extent: {x: 3.09375, y: 9.4375, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -9103,37 +9103,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 9.300022, y: 40.31}
   m_EdgeRadius: 0
---- !u!1 &980735800
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 980735801}
-  m_Layer: 0
-  m_Name: P (36)
-  m_TagString: RespawnPoint
-  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &980735801
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 980735800}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.3, y: -5.32, z: -0.29046386}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2016400817}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &982964550
 GameObject:
   m_ObjectHideFlags: 0
@@ -15153,7 +15122,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -15214,7 +15183,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1174217996
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -16585,37 +16554,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4653685789349968292, guid: 3a8e59ebf947752458453155ab4119d8, type: 3}
   m_PrefabInstance: {fileID: 51544706252804248}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1338208303
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1338208304}
-  m_Layer: 0
-  m_Name: P (38)
-  m_TagString: RespawnPoint
-  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1338208304
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1338208303}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.01, y: -8.64, z: -0.29046386}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2016400817}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1344566575
 GameObject:
   m_ObjectHideFlags: 0
@@ -17386,7 +17324,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.8
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 1
   m_ApplyToSortingLayers: 00000000
@@ -18200,7 +18138,7 @@ MonoBehaviour:
   maxNivelesActivos: 3
   puntoFinalPlayer1: {fileID: 154380458}
   puntoFinalPlayer2: {fileID: 893360621}
-  nivelesAntesDeTransicion: 5
+  nivelesAntesDeTransicion: 2
   prefabTransicion: {fileID: 8347444526995371878, guid: 4176940544ca0e948aa2ed8ecbd2f928, type: 3}
   nivelesHorizontalesAntesDeArriba: 2
   prefabTransicionArriba: {fileID: 8962154787812474648, guid: d6b4bdbe63b9a4c49bfb977d106c4985, type: 3}
@@ -18223,37 +18161,6 @@ MonoBehaviour:
   - {fileID: 4188755971343298230, guid: 8a5dab3bb455aec47bab2bfbb24e91fc, type: 3}
   jugador1: {fileID: 1035062589}
   jugador2: {fileID: 1254523872}
---- !u!1 &1787381553
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1787381554}
-  m_Layer: 0
-  m_Name: P (34)
-  m_TagString: RespawnPoint
-  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1787381554
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1787381553}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.13, y: -0.03, z: -0.29046386}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2016400817}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1816709050
 GameObject:
   m_ObjectHideFlags: 0
@@ -19327,11 +19234,8 @@ Transform:
   m_Children:
   - {fileID: 1050716420}
   - {fileID: 577861475}
-  - {fileID: 1787381554}
   - {fileID: 1042225878}
-  - {fileID: 980735801}
   - {fileID: 790427024}
-  - {fileID: 1338208304}
   m_Father: {fileID: 434725523}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2018044762
