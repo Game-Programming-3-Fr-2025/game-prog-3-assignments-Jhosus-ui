@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6541778272754953109}
   - component: {fileID: 980221511585801814}
   - component: {fileID: 7079962194932127508}
-  - component: {fileID: -2626532840802292257}
   m_Layer: 6
   m_Name: platforms_2
   m_TagString: Platformer
@@ -181,15 +180,3 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &-2626532840802292257
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5244529807561430147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24ceb1566b45aba478d83b181971de94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
