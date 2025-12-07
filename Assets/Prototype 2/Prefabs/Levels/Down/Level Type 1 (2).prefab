@@ -12919,6 +12919,7 @@ GameObject:
   - component: {fileID: 4626794813443129007}
   - component: {fileID: 9053933621914132555}
   - component: {fileID: 2114654972419245758}
+  - component: {fileID: 6196482035942447699}
   m_Layer: 6
   m_Name: platforms_2 (1)
   m_TagString: FF
@@ -12936,7 +12937,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 5.6, y: -10.31, z: 0.16533257}
-  m_LocalScale: {x: 0.59741014, y: 0.59741014, z: 0.59741014}
+  m_LocalScale: {x: 0.89008135, y: 0.89008135, z: 0.89008135}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7549936694589702569}
@@ -13011,7 +13012,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementDirection: {x: -1, y: 0}
   movementDistance: 11
-  movementSpeed: 5
+  movementSpeed: 3
   showGizmos: 1
   gizmoColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!61 &9053933621914132555
@@ -13087,6 +13088,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &6196482035942447699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732227042811216895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ceb1566b45aba478d83b181971de94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5922687371597933059
 GameObject:
   m_ObjectHideFlags: 0
@@ -19161,15 +19174,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.56564
+      value: 0.9427521
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.56564
+      value: 0.9427521
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.56564
+      value: 0.9427521
       objectReference: {fileID: 0}
     - target: {fileID: 984363290836084677, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -19217,7 +19230,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6541778272754953109, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: movementSpeed
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7079962194932127508, guid: 5b6d35e91b0bab841a801bd82b1ed8bc, type: 3}
       propertyPath: m_Simulated

@@ -20,17 +20,24 @@ public class PDash : MonoBehaviour
     public bool isDashUnlocked = true;
     public GameObject dashActivatorObject;
 
+    [Header("Visual Effects")]
+    public Color dashColor = Color.cyan;
+    public float dashTrailTime = 0.1f;
+    public float dashTrailWidth = 0.5f;
+
     private Rigidbody2D rb;
     private PlayerController player;
     private Animator animator;
     private Gamepad playerGamepad;
+    private TrailRenderer trail;
+    private SpriteRenderer sprite;
+    private Color originalColor;
 
     private bool isDashing;
     private bool canDash = true;
     private int dashesRemaining;
     private float dashTimeCounter;
     private float dashCooldownTimer;
-    private Vector2 dashDirection;
     private float vibrationTimer;
     private bool triggerReady = true;
 
@@ -41,21 +48,36 @@ public class PDash : MonoBehaviour
         animator = GetComponent<Animator>();
         dashesRemaining = maxDashes;
 
+        sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) originalColor = sprite.color;
+
+        trail = GetComponent<TrailRenderer>();
+        if (trail == null) trail = gameObject.AddComponent<TrailRenderer>();
+
+        ConfigureTrailRenderer();
         FindGamepad();
+    }
+
+    void ConfigureTrailRenderer()
+    {
+        if (trail != null)
+        {
+            trail.time = dashTrailTime;
+            trail.startWidth = dashTrailWidth;
+            trail.endWidth = 0.1f;
+            trail.material = new Material(Shader.Find("Sprites/Default"));
+            trail.startColor = dashColor;
+            trail.endColor = new Color(dashColor.r, dashColor.g, dashColor.b, 0f);
+            trail.enabled = false;
+        }
     }
 
     void FindGamepad()
     {
         if (Gamepad.all.Count > 0)
         {
-            if (player.isPlayer1)
-            {
-                playerGamepad = Gamepad.all[0];
-            }
-            else
-            {
-                playerGamepad = Gamepad.all.Count > 1 ? Gamepad.all[1] : Gamepad.all[0];
-            }
+            playerGamepad = player.isPlayer1 ? Gamepad.all[0] :
+                           (Gamepad.all.Count > 1 ? Gamepad.all[1] : Gamepad.all[0]);
             Debug.Log($"Mando asignado: {playerGamepad.name}");
         }
     }
@@ -64,17 +86,11 @@ public class PDash : MonoBehaviour
     {
         if (!isDashUnlocked) return;
 
-        // Solo buscar mando si no tenemos uno asignado
         if (playerGamepad == null && Gamepad.all.Count > 0)
-        {
             FindGamepad();
-        }
 
-        // Detectar input de dash
         if (CheckDashInput() && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
-        {
             StartDash();
-        }
 
         UpdateDash();
         UpdateVibration();
@@ -82,19 +98,15 @@ public class PDash : MonoBehaviour
 
     bool CheckDashInput()
     {
-        // INPUT DE TECLADO - SIEMPRE DISPONIBLE
-        if (player.isPlayer1 && Input.GetKeyDown(KeyCode.LeftShift))
-            return true;
+        // Teclado
+        if (player.isPlayer1 && Input.GetKeyDown(KeyCode.LeftShift)) return true;
+        if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.Comma)) return true;
 
-        if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.Comma))
-            return true;
-
-        // INPUT DE MANDO - SOLO SI HAY MANDO CONECTADO
+        // Gamepad
         if (playerGamepad != null)
         {
             float triggerValue = playerGamepad.rightTrigger.ReadValue();
 
-            // Si el gatillo supera el umbral Y está listo para detectar
             if (triggerValue >= triggerThreshold && triggerReady)
             {
                 triggerReady = false;
@@ -102,13 +114,9 @@ public class PDash : MonoBehaviour
                 return true;
             }
 
-            // Resetear cuando el gatillo se suelta
             if (triggerValue < 0.2f)
-            {
                 triggerReady = true;
-            }
 
-            // También detectar R1
             if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady)
             {
                 triggerReady = false;
@@ -128,21 +136,18 @@ public class PDash : MonoBehaviour
         dashTimeCounter = dashDuration;
         dashCooldownTimer = dashCooldown;
 
-        // Dirección del dash
         float horizontalInput = player.GetHorizontalInput();
-        dashDirection = horizontalInput != 0 ?
+        Vector2 dashDirection = horizontalInput != 0 ?
             new Vector2(horizontalInput, 0) :
             new Vector2(transform.localScale.x, 0);
 
-        // Aplicar dash
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
         rb.linearVelocity = dashDirection * dashSpeed;
 
-        // Vibración
+        ApplyDashVisualEffects(true);
         StartVibration();
 
-        // Animación
         if (animator != null)
             animator.SetTrigger("Sprint");
     }
@@ -156,6 +161,7 @@ public class PDash : MonoBehaviour
             {
                 isDashing = false;
                 rb.gravityScale = 4f;
+                ApplyDashVisualEffects(false);
             }
         }
 
@@ -167,6 +173,18 @@ public class PDash : MonoBehaviour
             dashesRemaining = maxDashes;
             canDash = true;
         }
+    }
+
+    void ApplyDashVisualEffects(bool activate)
+    {
+        if (trail != null)
+        {
+            trail.enabled = activate;
+            if (activate) trail.Clear();
+        }
+
+        if (sprite != null)
+            sprite.color = activate ? dashColor : originalColor;
     }
 
     void StartVibration()
@@ -184,23 +202,20 @@ public class PDash : MonoBehaviour
         {
             vibrationTimer -= Time.deltaTime;
             if (vibrationTimer <= 0)
-            {
                 StopVibration();
-            }
         }
     }
 
     void StopVibration()
     {
         if (playerGamepad != null)
-        {
             playerGamepad.SetMotorSpeeds(0f, 0f);
-        }
     }
 
     void OnDisable()
     {
         StopVibration();
+        ApplyDashVisualEffects(false);
     }
 
     public bool IsDashing() => isDashing;

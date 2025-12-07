@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 
 public class UIPositioner : MonoBehaviour
@@ -8,30 +9,20 @@ public class UIPositioner : MonoBehaviour
     public RectTransform player1UIPanel;
     public RectTransform player2UIPanel;
 
-    private List<LifeSystem> lifeSystems = new List<LifeSystem>();
+    // Referencias a los textos de cada jugador
+    public TMP_Text p1CoinsText, p1DistText, p1ScoreText;
+    public TMP_Text p2CoinsText, p2DistText, p2ScoreText;
 
     void Start()
     {
-        FindAllLifeSystems();
-        PositionUIElements();
-        NotifyLifeSystems();
+        PositionUI();
+        ConnectPlayerUI();
     }
 
-    void FindAllLifeSystems()
-    {
-        // Buscar todos los LifeSystem en la escena
-        LifeSystem[] foundSystems = FindObjectsOfType<LifeSystem>();
-        lifeSystems.Clear();
-        lifeSystems.AddRange(foundSystems);
-
-        Debug.Log($"Encontrados {lifeSystems.Count} sistemas de vida");
-    }
-
-    void PositionUIElements()
+    void PositionUI()
     {
         if (splitScreen == null) return;
 
-        // Posicionar UI del Player 1 (Área derecha superior)
         if (player1UIPanel != null)
         {
             Rect uiSpace1 = splitScreen.GetPlayer1UISpace();
@@ -41,7 +32,6 @@ public class UIPositioner : MonoBehaviour
             player1UIPanel.offsetMax = Vector2.zero;
         }
 
-        // Posicionar UI del Player 2 (Área izquierda inferior)  
         if (player2UIPanel != null)
         {
             Rect uiSpace2 = splitScreen.GetPlayer2UISpace();
@@ -52,33 +42,28 @@ public class UIPositioner : MonoBehaviour
         }
     }
 
-    void NotifyLifeSystems()
+    void ConnectPlayerUI()
     {
-        foreach (LifeSystem lifeSystem in lifeSystems)
+        // Buscar todos los jugadores
+        PlayerScore[] players = FindObjectsOfType<PlayerScore>();
+
+        foreach (PlayerScore player in players)
         {
-            if (lifeSystem != null)
+            if (player.isPlayer1)
             {
-                lifeSystem.UpdateUIPosition();
+                player.coinsText = p1CoinsText;
+                player.distanceText = p1DistText;
+                player.totalText = p1ScoreText;
             }
+            else
+            {
+                player.coinsText = p2CoinsText;
+                player.distanceText = p2DistText;
+                player.totalText = p2ScoreText;
+            }
+
+            // Actualizar UI inicial
+            player.UpdateUI();
         }
     }
-
-    // Método para añadir un LifeSystem manualmente
-    public void RegisterLifeSystem(LifeSystem lifeSystem)
-    {
-        if (!lifeSystems.Contains(lifeSystem))
-        {
-            lifeSystems.Add(lifeSystem);
-            lifeSystem.UpdateUIPosition();
-        }
-    }
-
-    // Método público para forzar actualización
-    public void RefreshUI()
-    {
-        FindAllLifeSystems();
-        PositionUIElements();
-        NotifyLifeSystems();
-    }
-
 }

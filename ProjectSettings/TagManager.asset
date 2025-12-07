@@ -30,6 +30,9 @@ TagManager:
   - PuntoFinalP2
   - RespawnPoint
   - Coin
+  - PDash
+  - PJump
+  - Platformer
   layers:
   - Default
   - TransparentFX

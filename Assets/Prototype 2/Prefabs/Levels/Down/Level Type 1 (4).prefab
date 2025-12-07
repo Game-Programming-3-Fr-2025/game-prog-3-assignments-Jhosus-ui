@@ -3601,7 +3601,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6211664288122861587, guid: 8728ad4aade5a61469bbfddb91fa03ee, type: 3}
       propertyPath: movementSpeed
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6211664288122861587, guid: 8728ad4aade5a61469bbfddb91fa03ee, type: 3}
       propertyPath: triggerSize.x

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PJumps : MonoBehaviour
 {
@@ -9,8 +10,7 @@ public class PJumps : MonoBehaviour
 
     [Header("Point Jump")]
     public float pointJumpForce = 18f;
-    private float pointBufferTime = 0.2f;
-    private float pointBufferTimer = 0f;
+    public float pointBufferTime = 0.2f;
 
     [Header("Jump Sounds")]
     public AudioClip airJumpSound;
@@ -20,119 +20,134 @@ public class PJumps : MonoBehaviour
     private PlayerController player;
     private PDash dashComponent;
     private AudioSource audioSource;
+    private Gamepad gamepad;
 
     private bool hasUsedAirJump = false;
     private bool wasGrounded = true;
     private bool inPointTrigger = false;
+    private float pointBufferTimer = 0f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         player = GetComponent<PlayerController>();
         dashComponent = GetComponent<PDash>();
+        audioSource = GetComponent<AudioSource>() ?? gameObject.AddComponent<AudioSource>();
 
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-            audioSource = gameObject.AddComponent<AudioSource>();
+        AsignarGamepad();
+    }
+
+    void AsignarGamepad()
+    {
+        if (Gamepad.all.Count > 0)
+        {
+            int index = player.isPlayer1 ? 0 : Mathf.Min(1, Gamepad.all.Count - 1);
+            gamepad = Gamepad.all[index];
+        }
     }
 
     void Update()
     {
-        if (!isDoubleJumpUnlocked) return;
+        if (gamepad == null && Gamepad.all.Count > 0) AsignarGamepad();
 
-        HandleAirJump();
-        UpdateJumpReset();
+        if (isDoubleJumpUnlocked) ManejarSaltoAereo();
+
+        ActualizarReseteoSalto();
 
         if (pointBufferTimer > 0f)
-        {
             pointBufferTimer -= Time.deltaTime;
-        }
     }
 
-    void HandleAirJump()
+    void ManejarSaltoAereo()
     {
-        // DETECCIÓN DE INPUT SEPARADO POR JUGADOR
-        bool jumpInput = false;
+        bool inputSalto = DetectarInputSalto();
 
-        if (player.isPlayer1)
+        if (inputSalto)
         {
-            // Player 1: Tecla W
-            jumpInput = Input.GetKeyDown(KeyCode.W);
-        }
-        else
-        {
-            // Player 2: Flecha Arriba
-            jumpInput = Input.GetKeyDown(KeyCode.UpArrow);
-        }
-
-        // INPUT DE MANDO (Botón X de PlayStation)
-        if (player.gamepad != null && player.gamepad.buttonSouth.wasPressedThisFrame)
-        {
-            jumpInput = true;
-        }
-
-        if (jumpInput)
-        {
+            // Prioridad 1: Point Jump (si está en trigger o buffer activo)
             if (inPointTrigger || pointBufferTimer > 0f)
             {
-                PerformPointJump();
+                RealizarPointJump();
                 pointBufferTimer = 0f;
             }
-            else if (CanAirJump())
+            // Prioridad 2: Salto aéreo (solo si puede hacerlo)
+            else if (PuedeSaltarEnAire())
             {
-                PerformAirJump();
+                RealizarSaltoAereo();
             }
         }
     }
 
-    bool CanAirJump()
+    bool DetectarInputSalto()
     {
-        return !player.isGrounded && !hasUsedAirJump;
+        // Teclado
+        if (player.isPlayer1 && Input.GetKeyDown(KeyCode.W)) return true;
+        if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.UpArrow)) return true;
+
+        // Gamepad
+        if (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame) return true;
+
+        return false;
     }
 
-    void PerformAirJump()
+    bool PuedeSaltarEnAire()
+    {
+        // Puede saltar en aire si:
+        // 1. NO está en el suelo
+        // 2. NO ha usado el salto aéreo
+        // 3. NO está en dash (o puede saltar durante dash según PlayerController)
+        bool estaEnDash = dashComponent != null && dashComponent.IsDashing();
+        bool puedeSaltarDuranteDash = player != null && player.PuedeSaltarDuranteDash();
+
+        return !player.isGrounded &&
+               !hasUsedAirJump &&
+               (!estaEnDash || puedeSaltarDuranteDash);
+    }
+
+    void RealizarSaltoAereo()
     {
         hasUsedAirJump = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
 
         if (airJumpSound != null && audioSource != null)
-        {
             audioSource.PlayOneShot(airJumpSound);
-        }
     }
 
-    void PerformPointJump()
+    void RealizarPointJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, pointJumpForce);
-        if (isDoubleJumpUnlocked) hasUsedAirJump = false;
+
+        // Point jump resetea el salto aéreo si está desbloqueado
+        if (isDoubleJumpUnlocked)
+            hasUsedAirJump = false;
 
         if (pointJumpSound != null && audioSource != null)
-        {
             audioSource.PlayOneShot(pointJumpSound);
-        }
     }
 
-    void UpdateJumpReset()
+    void ActualizarReseteoSalto()
     {
+        // Resetear salto aéreo al tocar el suelo
         if (player.isGrounded && !wasGrounded)
-        {
             hasUsedAirJump = false;
-        }
+
         wasGrounded = player.isGrounded;
     }
 
     void OnTriggerStay2D(Collider2D other)
     {
-        if (!isDoubleJumpUnlocked && other.gameObject == doubleJumpActivatorObject)
+        // Desbloquear doble salto
+        if (!isDoubleJumpUnlocked &&
+            doubleJumpActivatorObject != null &&
+            other.gameObject == doubleJumpActivatorObject)
         {
             isDoubleJumpUnlocked = true;
             doubleJumpActivatorObject.SetActive(false);
         }
 
+        // Detectar punto de salto
         if (other.CompareTag("Points"))
-        {
             inPointTrigger = true;
-        }
     }
 
     void OnTriggerExit2D(Collider2D other)

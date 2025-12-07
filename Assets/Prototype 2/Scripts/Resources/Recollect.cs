@@ -2,51 +2,104 @@ using UnityEngine;
 
 public class Recollect : MonoBehaviour
 {
+    public enum TipoItem
+    {
+        Coin,
+        PDash,
+        PJump
+    }
+
+    [Header("Tipo de Item")]
+    [SerializeField] private TipoItem tipoItem = TipoItem.Coin;
+
     [Header("Configuración")]
-    [SerializeField] private string playerLayer = "Players"; // Layer del jugador
+    [SerializeField] private string playerLayer = "Players";
 
     [Header("Efectos")]
-    [SerializeField] private ParticleSystem particleEffect; // Referencia directa al ParticleSystem
+    [SerializeField] private ParticleSystem particleEffect;
+
+    [Header("Levitación")]
+    [SerializeField] private float levitationSpeed = 1f;
+    [SerializeField] private float levitationHeight = 0.2f;
+
+    private Vector3 startPosition;
+    private float timeCounter = 0f;
+
+    void Start()
+    {
+        startPosition = transform.position;
+    }
+
+    void Update()
+    {
+        timeCounter += Time.deltaTime * levitationSpeed;
+        float newY = startPosition.y + Mathf.Sin(timeCounter) * levitationHeight;
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Verificar si es un jugador
         if (other.gameObject.layer == LayerMask.NameToLayer(playerLayer))
         {
-            CollectItem();
+            RecolectarItem(other.gameObject);
         }
     }
 
-    private void CollectItem()
+    private void RecolectarItem(GameObject jugador)
     {
-        // Reproducir partículas si existe la referencia
-        if (particleEffect != null)
-        {
-            particleEffect.Play();
-        }
+        enabled = false;
 
-        // Reproducir sonido si hay AudioSource
+        // Activar habilidad según el tipo
+        ActivarHabilidad(jugador);
+
+        // Efectos visuales y sonoros
+        if (particleEffect != null) particleEffect.Play();
+
         AudioSource audio = GetComponent<AudioSource>();
-        if (audio != null)
-        {
-            audio.Play();
-        }
+        if (audio != null) audio.Play();
 
-        // Desactivar renderer para hacerlo invisible
+        // Ocultar item
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
-        if (sprite != null)
-        {
-            sprite.enabled = false;
-        }
+        if (sprite != null) sprite.enabled = false;
 
-        // Desactivar collider para que no pueda ser recolectado de nuevo
         Collider2D collider = GetComponent<Collider2D>();
-        if (collider != null)
-        {
-            collider.enabled = false;
-        }
+        if (collider != null) collider.enabled = false;
 
-        // Destruir el objeto después de un pequeño delay
         Destroy(gameObject, 0.9f);
+    }
+
+    private void ActivarHabilidad(GameObject jugador)
+    {
+        switch (tipoItem)
+        {
+            case TipoItem.PDash:
+                PDash dashComponent = jugador.GetComponent<PDash>();
+                if (dashComponent != null)
+                {
+                    dashComponent.isDashUnlocked = true;
+                    Debug.Log($"Dash desbloqueado para {jugador.name}");
+                }
+                break;
+
+            case TipoItem.PJump:
+                PJumps jumpComponent = jugador.GetComponent<PJumps>();
+                if (jumpComponent != null)
+                {
+                    jumpComponent.isDoubleJumpUnlocked = true;
+                    Debug.Log($"Doble salto desbloqueado para {jugador.name}");
+                }
+                break;
+
+            // Solo modifica el caso Coin en ActivarHabilidad():
+            case TipoItem.Coin:
+                PlayerScore playerScore = jugador.GetComponent<PlayerScore>();
+                if (playerScore != null)
+                {
+                    // El PlayerScore ya detecta la moneda por tag
+                    // Solo destruye el objeto
+                    Destroy(gameObject);
+                }
+                break;
+        }
     }
 }

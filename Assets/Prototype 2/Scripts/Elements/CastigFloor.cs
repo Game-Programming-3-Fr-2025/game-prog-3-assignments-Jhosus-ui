@@ -21,13 +21,18 @@ public class CastigFloor : MonoBehaviour
     private float tiempoUltimoCambio = -100f;
     private bool estaTransicionando = false;
 
+    // Guardar rotación y escala inicial
+    private Quaternion[] rotacionesIniciales = new Quaternion[3];
+    private Vector3[] escalasIniciales = new Vector3[3];
+    private Vector3[] posicionesLocalesIniciales = new Vector3[3];
+
     void Start()
     {
         if (miCamara == null)
         {
             // Busca la cámara como hijo del jugador
             miCamara = GetComponentInChildren<Camera>();
-            
+
             // Si no está como hijo, busca por tag
             if (miCamara == null)
             {
@@ -42,13 +47,24 @@ public class CastigFloor : MonoBehaviour
 
     void InicializarEstado()
     {
+        // Guardar transformaciones iniciales
+        for (int i = 0; i < 3; i++)
+        {
+            if (sprites[i])
+            {
+                rotacionesIniciales[i] = sprites[i].transform.localRotation;
+                escalasIniciales[i] = sprites[i].transform.localScale;
+                posicionesLocalesIniciales[i] = sprites[i].transform.localPosition;
+            }
+        }
+
         for (int i = 0; i < 3; i++)
         {
             SetAlpha(i, 0f);
             if (sprites[i]) sprites[i].enabled = (i == 0);
             if (luces[i]) luces[i].enabled = (i == 0);
         }
-        
+
         StartCoroutine(Fade(0, 0f, 1f, tiempoFadeIn));
     }
 
@@ -67,14 +83,23 @@ public class CastigFloor : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            if (sprites[i]) sprites[i].transform.position = posiciones[i] + Vector3.forward * sprites[i].transform.position.z;
-            if (luces[i]) luces[i].transform.position = posiciones[i] + Vector3.forward * luces[i].transform.position.z;
+            if (sprites[i])
+            {
+                sprites[i].transform.position = posiciones[i] + Vector3.forward * sprites[i].transform.position.z;
+                // Forzar transformaciones locales para evitar distorsiones
+                sprites[i].transform.localRotation = rotacionesIniciales[i];
+                sprites[i].transform.localScale = escalasIniciales[i];
+            }
+            if (luces[i])
+            {
+                luces[i].transform.position = posiciones[i] + Vector3.forward * luces[i].transform.position.z;
+            }
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Horizontal") && !estaTransicionando && 
+        if (other.CompareTag("Horizontal") && !estaTransicionando &&
             Time.time - tiempoUltimoCambio > tiempoEsperaEntreCambios)
         {
             CambiarEstado((estadoActual + 1) % 3);

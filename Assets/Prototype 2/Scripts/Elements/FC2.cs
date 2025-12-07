@@ -11,30 +11,30 @@ public class FC2 : MonoBehaviour
     [Header("Estado Cámara")]
     public bool modoHorizontal = false;
     public bool modoVerticalArriba = false;
+    public bool seguirJugadorHorizontal = false;
 
+    private Camera cam;
+    private Transform jugador;
     private float alturaInicial;
     private float posicionXInicial;
-    private Transform jugador;
-    private bool seguirJugadorHorizontal = false;
-    private float tiempoInicioHorizontal;
-    private float tiempoInicioVerticalArriba;
-    private Camera camaraComponent;
-    private float mitadAlturaCamara;
-    private float mitadAnchoCamara;
     private float posicionYFijaHorizontal;
     private float posicionYInicialArriba;
     private float posicionXFijaArriba;
+    private float tiempoInicioHorizontal;
+    private float tiempoInicioVerticalArriba;
+    private float mitadAlturaCamara;
+    private float mitadAnchoCamara;
 
     void Start()
     {
         alturaInicial = transform.position.y;
         posicionXInicial = transform.position.x;
 
-        camaraComponent = GetComponent<Camera>();
-        if (camaraComponent != null)
+        cam = GetComponent<Camera>();
+        if (cam != null)
         {
-            mitadAlturaCamara = camaraComponent.orthographicSize;
-            mitadAnchoCamara = camaraComponent.orthographicSize * camaraComponent.aspect;
+            mitadAlturaCamara = cam.orthographicSize;
+            mitadAnchoCamara = cam.orthographicSize * cam.aspect;
         }
         else
         {
@@ -42,46 +42,31 @@ public class FC2 : MonoBehaviour
             mitadAnchoCamara = 8f;
         }
 
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player 1");
-        if (playerObj != null)
-        {
-            jugador = playerObj.transform;
-        }
+        // Buscar jugador según tag del padre
+        string playerTag = transform.parent != null && transform.parent.CompareTag("Player 2") ? "Player 2" : "Player 1";
+        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
+        if (playerObj != null) jugador = playerObj.transform;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (modoVerticalArriba)
-        {
             MoverCamaraVerticalArriba();
-        }
         else if (modoHorizontal)
-        {
             MoverCamaraHorizontal();
-        }
         else
-        {
             MoverCamaraVertical();
-        }
     }
 
     void MoverCamaraVertical()
     {
         float nuevaY = alturaInicial - (velocidadBajada * Time.time);
-
-        Vector3 posicion = new Vector3(
-            posicionXFija,
-            nuevaY,
-            transform.position.z
-        );
-
-        transform.position = posicion;
+        transform.position = new Vector3(posicionXFija, nuevaY, transform.position.z);
     }
 
     void MoverCamaraHorizontal()
     {
         float nuevaX;
-        float nuevaY = posicionYFijaHorizontal;
 
         if (seguirJugadorHorizontal && jugador != null)
         {
@@ -89,27 +74,18 @@ public class FC2 : MonoBehaviour
         }
         else
         {
-            float tiempoHorizontal = Time.time - tiempoInicioHorizontal;
-            nuevaX = posicionXInicial + (velocidadDerecha * tiempoHorizontal);
+            float tiempoTranscurrido = Time.time - tiempoInicioHorizontal;
+            nuevaX = posicionXInicial + (velocidadDerecha * tiempoTranscurrido);
         }
 
-        Vector3 posicion = new Vector3(nuevaX, nuevaY, transform.position.z);
-        transform.position = posicion;
+        transform.position = new Vector3(nuevaX, posicionYFijaHorizontal, transform.position.z);
     }
 
     void MoverCamaraVerticalArriba()
     {
-        // CORREGIDO: Usar Time.time - tiempoInicio, igual que en MoverCamaraHorizontal
-        float tiempoVertical = Time.time - tiempoInicioVerticalArriba;
-        float nuevaY = posicionYInicialArriba + (velocidadSubida * tiempoVertical);
-
-        Vector3 posicion = new Vector3(
-            posicionXFijaArriba,
-            nuevaY,
-            transform.position.z
-        );
-
-        transform.position = posicion;
+        float tiempoTranscurrido = Time.time - tiempoInicioVerticalArriba;
+        float nuevaY = posicionYInicialArriba + (velocidadSubida * tiempoTranscurrido);
+        transform.position = new Vector3(posicionXFijaArriba, nuevaY, transform.position.z);
     }
 
     public void CambiarAModoHorizontal(Vector3 posicionAjuste)
@@ -121,13 +97,8 @@ public class FC2 : MonoBehaviour
             posicionXInicial = transform.position.x;
             tiempoInicioHorizontal = Time.time;
 
-            // Ajustar Y para que el BORDE INFERIOR esté en posicionAjuste.y
             posicionYFijaHorizontal = posicionAjuste.y + mitadAlturaCamara;
-
-            Vector3 nuevaPosicion = new Vector3(transform.position.x, posicionYFijaHorizontal, transform.position.z);
-            transform.position = nuevaPosicion;
-
-            Debug.Log($"Horizontal: Ajustado a Y={posicionYFijaHorizontal} (borde inferior en {posicionAjuste.y})");
+            transform.position = new Vector3(transform.position.x, posicionYFijaHorizontal, transform.position.z);
         }
     }
 
@@ -137,26 +108,11 @@ public class FC2 : MonoBehaviour
         {
             modoHorizontal = false;
             modoVerticalArriba = true;
-
-            // Guardar la posición Y ACTUAL como punto de inicio
             posicionYInicialArriba = transform.position.y;
-
-            // Inicializar el tiempo de inicio
             tiempoInicioVerticalArriba = Time.time;
-
-            
-            // El centro de la cámara debe estar a mitadAnchoCamara a la IZQUIERDA del borde derecho
             posicionXFijaArriba = puntoAjuste.x - mitadAnchoCamara;
 
-            // Aplicar la posición inmediatamente
-            Vector3 nuevaPosicion = new Vector3(
-                posicionXFijaArriba,
-                posicionYInicialArriba,
-                transform.position.z
-            );
-            transform.position = nuevaPosicion;
-
-            Debug.Log($"Vertical Arriba: Y={posicionYInicialArriba}, Centro X={posicionXFijaArriba}, Borde derecho en {puntoAjuste.x} (mitad ancho={mitadAnchoCamara})");
+            transform.position = new Vector3(posicionXFijaArriba, posicionYInicialArriba, transform.position.z);
         }
     }
 
@@ -167,11 +123,9 @@ public class FC2 : MonoBehaviour
             modoHorizontal = false;
             modoVerticalArriba = false;
             alturaInicial = transform.position.y;
-            Debug.Log("Cámara cambió a modo vertical");
         }
     }
 
-    // Métodos originales
     public void SetSeguirJugador(bool seguir) => seguirJugadorHorizontal = seguir;
     public void SetVelocidadBajada(float nuevaVelocidad) => velocidadBajada = nuevaVelocidad;
     public void SetVelocidadDerecha(float nuevaVelocidad) => velocidadDerecha = nuevaVelocidad;
