@@ -33,6 +33,7 @@ TagManager:
   - PDash
   - PJump
   - Platformer
+  - Start
   layers:
   - Default
   - TransparentFX
