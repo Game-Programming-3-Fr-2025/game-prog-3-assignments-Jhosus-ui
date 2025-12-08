@@ -87,7 +87,7 @@ public class ScoreManager : MonoBehaviour
         return player1Life.currentHealth <= 0 && player2Life.currentHealth <= 0;
     }
 
-    IEnumerator GameOverSequence()
+    public IEnumerator GameOverSequence()
     {
         // Esperar antes de mostrar resultados
         yield return new WaitForSeconds(delayBeforeResults);
