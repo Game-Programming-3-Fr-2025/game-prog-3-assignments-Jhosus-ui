@@ -9,7 +9,12 @@ public class Fire : MonoBehaviour
     public float escalaFinal = 1f;
     public float tiempoCrecimiento = 0.2f;
 
+    [Header("Daño")]
+    public Vector2 areaDanoSize = Vector2.one; // Tamaño del área de daño para cada sprite
+    public Vector2 areaDanoOffset = Vector2.zero; // Ajuste de posición del área
+
     private SpriteRenderer[] sprites;
+    private DamageSource[] damageSources; // Array para múltiples fuentes de daño
     private int frameActual = 0;
 
     void Start()
@@ -17,9 +22,21 @@ public class Fire : MonoBehaviour
         // Obtener sprites de los hijos
         sprites = GetComponentsInChildren<SpriteRenderer>();
 
-        // Ocultar todos al inicio
-        foreach (var sprite in sprites)
-            sprite.enabled = false;
+        // Inicializar array de DamageSources
+        damageSources = new DamageSource[sprites.Length];
+
+        // Crear un DamageSource para cada sprite hijo
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            // Añadir DamageSource al sprite hijo (no al padre)
+            damageSources[i] = sprites[i].gameObject.AddComponent<DamageSource>();
+
+            // Ocultar todos al inicio
+            sprites[i].enabled = false;
+
+            // Inicialmente desactivar el daño hasta que el sprite esté visible
+            damageSources[i].enabled = false;
+        }
 
         // Iniciar animación
         StartCoroutine(AnimacionFuego());
@@ -29,14 +46,30 @@ public class Fire : MonoBehaviour
     {
         while (true)
         {
-            // Ocultar frame anterior
+            // Ocultar frame anterior y desactivar su daño
             if (frameActual > 0)
-                sprites[frameActual - 1].enabled = false;
+            {
+                int prevFrame = frameActual - 1;
+                sprites[prevFrame].enabled = false;
+                damageSources[prevFrame].enabled = false;
+            }
 
             // Mostrar y animar frame actual
             var spriteActual = sprites[frameActual];
+            var transformActual = spriteActual.transform;
             spriteActual.enabled = true;
-            StartCoroutine(EscalarSprite(spriteActual.transform));
+
+            // Activar el daño para este sprite
+            damageSources[frameActual].enabled = true;
+
+            // Aplicar configuración de daño específica para fuego
+            var damageSource = damageSources[frameActual];
+            damageSource.damageAreaSize = areaDanoSize;
+
+            // Ajustar posición del área de daño si es necesario
+            // (El DamageSource ya está en el sprite hijo, así que usará su posición)
+
+            StartCoroutine(EscalarSprite(transformActual));
 
             // Avanzar frame
             frameActual = (frameActual + 1) % sprites.Length;

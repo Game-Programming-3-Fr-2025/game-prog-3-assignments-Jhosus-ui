@@ -16,16 +16,26 @@ public class PJumps : MonoBehaviour
     public AudioClip airJumpSound;
     public AudioClip pointJumpSound;
 
+    [Header("Visual Effects")]
+    public Color airJumpColor = Color.cyan;
+    public Color pointJumpColor = Color.yellow;
+    public float effectDuration = 0.3f;
+    public float trailTime = 0.2f;
+
     private Rigidbody2D rb;
     private PlayerController player;
     private PDash dashComponent;
     private AudioSource audioSource;
     private Gamepad gamepad;
+    private SpriteRenderer sprite;
+    private TrailRenderer trail;
+    private Color originalColor;
 
     private bool hasUsedAirJump = false;
     private bool wasGrounded = true;
     private bool inPointTrigger = false;
     private float pointBufferTimer = 0f;
+    private float effectTimer = 0f;
 
     void Start()
     {
@@ -33,8 +43,26 @@ public class PJumps : MonoBehaviour
         player = GetComponent<PlayerController>();
         dashComponent = GetComponent<PDash>();
         audioSource = GetComponent<AudioSource>() ?? gameObject.AddComponent<AudioSource>();
+        
+        sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) originalColor = sprite.color;
 
+        ConfigureTrail();
         AsignarGamepad();
+    }
+
+    void ConfigureTrail()
+    {
+        trail = GetComponent<TrailRenderer>();
+        if (trail == null)
+        {
+            trail = gameObject.AddComponent<TrailRenderer>();
+            trail.time = trailTime;
+            trail.startWidth = 0.3f;
+            trail.endWidth = 0.05f;
+            trail.material = new Material(Shader.Find("Sprites/Default"));
+        }
+        trail.enabled = false;
     }
 
     void AsignarGamepad()
@@ -53,6 +81,7 @@ public class PJumps : MonoBehaviour
         if (isDoubleJumpUnlocked) ManejarSaltoAereo();
 
         ActualizarReseteoSalto();
+        ActualizarEfectos();
 
         if (pointBufferTimer > 0f)
             pointBufferTimer -= Time.deltaTime;
@@ -64,13 +93,11 @@ public class PJumps : MonoBehaviour
 
         if (inputSalto)
         {
-            // Prioridad 1: Point Jump (si está en trigger o buffer activo)
             if (inPointTrigger || pointBufferTimer > 0f)
             {
                 RealizarPointJump();
                 pointBufferTimer = 0f;
             }
-            // Prioridad 2: Salto aéreo (solo si puede hacerlo)
             else if (PuedeSaltarEnAire())
             {
                 RealizarSaltoAereo();
@@ -80,22 +107,14 @@ public class PJumps : MonoBehaviour
 
     bool DetectarInputSalto()
     {
-        // Teclado
         if (player.isPlayer1 && Input.GetKeyDown(KeyCode.W)) return true;
         if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.UpArrow)) return true;
-
-        // Gamepad
         if (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame) return true;
-
         return false;
     }
 
     bool PuedeSaltarEnAire()
     {
-        // Puede saltar en aire si:
-        // 1. NO está en el suelo
-        // 2. NO ha usado el salto aéreo
-        // 3. NO está en dash (o puede saltar durante dash según PlayerController)
         bool estaEnDash = dashComponent != null && dashComponent.IsDashing();
         bool puedeSaltarDuranteDash = player != null && player.PuedeSaltarDuranteDash();
 
@@ -109,6 +128,9 @@ public class PJumps : MonoBehaviour
         hasUsedAirJump = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
 
+        // Efectos visuales
+        ActivarEfectos(airJumpColor);
+
         if (airJumpSound != null && audioSource != null)
             audioSource.PlayOneShot(airJumpSound);
     }
@@ -117,17 +139,54 @@ public class PJumps : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, pointJumpForce);
 
-        // Point jump resetea el salto aéreo si está desbloqueado
         if (isDoubleJumpUnlocked)
             hasUsedAirJump = false;
+
+        // Efectos visuales
+        ActivarEfectos(pointJumpColor);
 
         if (pointJumpSound != null && audioSource != null)
             audioSource.PlayOneShot(pointJumpSound);
     }
 
+    void ActivarEfectos(Color color)
+    {
+        effectTimer = effectDuration;
+
+        // Trail
+        if (trail != null)
+        {
+            trail.startColor = color;
+            trail.endColor = new Color(color.r, color.g, color.b, 0f);
+            trail.enabled = true;
+            trail.Clear();
+        }
+
+        // Color del sprite
+        if (sprite != null)
+            sprite.color = color;
+    }
+
+    void ActualizarEfectos()
+    {
+        if (effectTimer > 0f)
+        {
+            effectTimer -= Time.deltaTime;
+            
+            if (effectTimer <= 0f)
+            {
+                // Desactivar efectos
+                if (trail != null)
+                    trail.enabled = false;
+                
+                if (sprite != null)
+                    sprite.color = originalColor;
+            }
+        }
+    }
+
     void ActualizarReseteoSalto()
     {
-        // Resetear salto aéreo al tocar el suelo
         if (player.isGrounded && !wasGrounded)
             hasUsedAirJump = false;
 
@@ -136,7 +195,6 @@ public class PJumps : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D other)
     {
-        // Desbloquear doble salto
         if (!isDoubleJumpUnlocked &&
             doubleJumpActivatorObject != null &&
             other.gameObject == doubleJumpActivatorObject)
@@ -145,7 +203,6 @@ public class PJumps : MonoBehaviour
             doubleJumpActivatorObject.SetActive(false);
         }
 
-        // Detectar punto de salto
         if (other.CompareTag("Points"))
             inPointTrigger = true;
     }
@@ -157,6 +214,14 @@ public class PJumps : MonoBehaviour
             inPointTrigger = false;
             pointBufferTimer = pointBufferTime;
         }
+    }
+
+    void OnDisable()
+    {
+        if (trail != null)
+            trail.enabled = false;
+        if (sprite != null)
+            sprite.color = originalColor;
     }
 
     public bool HasUsedAirJump() => hasUsedAirJump;

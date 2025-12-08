@@ -211,6 +211,8 @@ MonoBehaviour:
   escalaInicial: 0.1
   escalaFinal: 1.2
   tiempoCrecimiento: 0.2
+  areaDanoSize: {x: 0.39, y: 0.57}
+  areaDanoOffset: {x: 0, y: 0}
 --- !u!1 &4322625801315579051
 GameObject:
   m_ObjectHideFlags: 0

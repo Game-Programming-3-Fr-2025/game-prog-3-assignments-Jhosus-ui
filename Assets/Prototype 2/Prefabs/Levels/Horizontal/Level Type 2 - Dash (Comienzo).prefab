@@ -4140,6 +4140,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3055746450622476010, guid: 3e73b1957fa30024ea69bfcc21532b9e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8009004138237504301, guid: 3e73b1957fa30024ea69bfcc21532b9e, type: 3}
       propertyPath: m_Name
       value: Shooter_Arrow_Trap_2 (3)

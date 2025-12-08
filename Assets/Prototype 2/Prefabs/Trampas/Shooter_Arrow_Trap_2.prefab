@@ -97,7 +97,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8009004138237504301}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -174,4 +174,4 @@ MonoBehaviour:
   damageCooldown: 0.5
   continuousDamage: 0
   damageAreaColor: {r: 1, g: 0, b: 0, a: 0.3}
-  damageAreaSize: {x: 0.4, y: 0.5}
+  damageAreaSize: {x: 0.33, y: 0.3}
