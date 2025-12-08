@@ -17,8 +17,8 @@ public class LifeSystem : MonoBehaviour
     public PlayerType playerType = PlayerType.Player1;
 
     [Header("Referencias UI")]
-    public RectTransform uiPanel; // Panel de UI asignado por UIPositioner
-    public Transform heartsContainer; // Contenedor de corazones
+    public RectTransform uiPanel;
+    public Transform heartsContainer;
 
     [Header("Vida")]
     public int maxHealth = 3;
@@ -26,14 +26,10 @@ public class LifeSystem : MonoBehaviour
     public List<Image> heartImages;
     public Sprite fullHeart, emptyHeart;
 
-    [Header("Prefabs UI (si se generan dinámicamente)")]
-    public GameObject heartPrefab;
-    public Vector2 heartSpacing = new Vector2(50f, 0f);
-
-    [Header("Detección de Daño (GIZMO ONLY)")]
+    [Header("Detección de Daño (GIZMO)")]
     public float damageDetectionRadius = 1f;
     public Color damageGizmoColor = Color.red;
-    public LayerMask dangerLayers; // Layer "Dangers" para objetos peligrosos
+    public LayerMask dangerLayers;
 
     [Header("Efectos")]
     public float invincibilityTime = 1.5f;
@@ -49,161 +45,60 @@ public class LifeSystem : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private UIPositioner uiPositioner;
-    private float lastDamageTime = 0f;
-    private float damageCooldown = 0.5f; // Cooldown entre daños
+
+    // Sistema mejorado de cooldown por objeto
+    private Dictionary<GameObject, float> objectCooldowns = new Dictionary<GameObject, float>();
+    private float cooldownDuration = 1f;
 
     void Start()
     {
         currentHealth = maxHealth;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        // Buscar UIPositioner en la escena
         uiPositioner = FindObjectOfType<UIPositioner>();
-
-        // Configurar UI
-        SetupHealthUI();
 
         UpdateHeartsUI();
     }
 
-    void SetupHealthUI()
-    {
-        // Si no hay contenedor de corazones, buscarlo
-        if (heartsContainer == null)
-        {
-            // Crear un nuevo objeto para los corazones
-            GameObject heartsGO = new GameObject("HeartsContainer");
-            heartsContainer = heartsGO.transform;
-
-            // Si tenemos un panel UI, parentearlo allí
-            if (uiPanel != null)
-            {
-                heartsContainer.SetParent(uiPanel);
-                heartsContainer.localPosition = Vector3.zero;
-            }
-            else
-            {
-                // Si no hay panel, buscar el panel correspondiente
-                FindAndAssignUIPanel();
-            }
-        }
-
-        // Si no hay imágenes de corazones, generarlas
-        if (heartImages == null || heartImages.Count == 0)
-        {
-            GenerateHeartsUI();
-        }
-
-        // Posicionar los corazones
-        PositionHeartsInPanel();
-    }
-
-    void FindAndAssignUIPanel()
-    {
-        if (uiPositioner == null) return;
-
-        // Asignar el panel correcto según el tipo de jugador
-        if (playerType == PlayerType.Player1 && uiPositioner.player1UIPanel != null)
-        {
-            uiPanel = uiPositioner.player1UIPanel;
-            heartsContainer.SetParent(uiPanel);
-            heartsContainer.localPosition = Vector3.zero;
-        }
-        else if (playerType == PlayerType.Player2 && uiPositioner.player2UIPanel != null)
-        {
-            uiPanel = uiPositioner.player2UIPanel;
-            heartsContainer.SetParent(uiPanel);
-            heartsContainer.localPosition = Vector3.zero;
-        }
-    }
-
-    void GenerateHeartsUI()
-    {
-        heartImages = new List<Image>();
-
-        // Destruir corazones existentes
-        foreach (Transform child in heartsContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Crear nuevos corazones
-        for (int i = 0; i < maxHealth; i++)
-        {
-            GameObject heartGO;
-
-            if (heartPrefab != null)
-            {
-                heartGO = Instantiate(heartPrefab, heartsContainer);
-                Image heartImage = heartGO.GetComponent<Image>();
-                if (heartImage != null)
-                {
-                    heartImages.Add(heartImage);
-                }
-            }
-            else
-            {
-                // Crear un corazón básico si no hay prefab
-                heartGO = new GameObject($"Heart_{i}");
-                heartGO.transform.SetParent(heartsContainer);
-
-                // Añadir Image component
-                Image heartImage = heartGO.AddComponent<Image>();
-                heartImage.rectTransform.sizeDelta = new Vector2(50f, 50f);
-
-                // Asignar sprite si está disponible
-                if (fullHeart != null)
-                {
-                    heartImage.sprite = fullHeart;
-                }
-
-                heartImages.Add(heartImage);
-            }
-        }
-    }
-
-    void PositionHeartsInPanel()
-    {
-        if (heartsContainer == null || heartImages.Count == 0) return;
-
-        // Posicionar corazones horizontalmente
-        for (int i = 0; i < heartImages.Count; i++)
-        {
-            RectTransform heartRT = heartImages[i].GetComponent<RectTransform>();
-
-            if (heartRT != null)
-            {
-                // Anclas al centro
-                heartRT.anchorMin = new Vector2(0.5f, 0.5f);
-                heartRT.anchorMax = new Vector2(0.5f, 0.5f);
-                heartRT.pivot = new Vector2(0.5f, 0.5f);
-
-                // Posición basada en el índice
-                float xPos = (i - (heartImages.Count - 1) / 2f) * heartSpacing.x;
-                heartRT.anchoredPosition = new Vector2(xPos, 0f);
-            }
-        }
-    }
-
     void Update()
     {
+        // Limpiar cooldowns expirados
+        UpdateCooldowns();
+
         // Solo detectar daño si no es invencible
-        if (!isInvincible && CanTakeDamage())
+        if (!isInvincible)
         {
             CheckForDamage();
         }
     }
 
-    bool CanTakeDamage()
+    void UpdateCooldowns()
     {
-        // Verificar cooldown entre daños
-        return Time.time >= lastDamageTime + damageCooldown;
+        // Crear lista de keys a remover para evitar modificar dict durante iteración
+        List<GameObject> toRemove = new List<GameObject>();
+
+        foreach (var kvp in objectCooldowns)
+        {
+            // Si el objeto es null o el cooldown expiró
+            if (kvp.Key == null || Time.time >= kvp.Value)
+            {
+                toRemove.Add(kvp.Key);
+            }
+        }
+
+        // Remover cooldowns expirados y referencias nulas
+        foreach (var key in toRemove)
+        {
+            if (key != null)
+            {
+                objectCooldowns.Remove(key);
+            }
+        }
     }
 
     void CheckForDamage()
     {
-        // Detectar objetos peligrosos dentro del radio de detección
+        // Detectar objetos peligrosos dentro del radio
         Collider2D[] dangers = Physics2D.OverlapCircleAll(
             transform.position,
             damageDetectionRadius,
@@ -212,15 +107,27 @@ public class LifeSystem : MonoBehaviour
 
         foreach (Collider2D danger in dangers)
         {
+            if (danger == null) continue;
+
+            GameObject dangerObject = danger.gameObject;
+
+            // Verificar si este objeto está en cooldown
+            if (objectCooldowns.ContainsKey(dangerObject))
+                continue;
+
             DamageSource damageSource = danger.GetComponent<DamageSource>();
+
             if (damageSource != null && damageSource.CanDamage())
             {
-                // Calcular dirección del daño para knockback
-                Vector2 damageDirection = (transform.position - danger.transform.position).normalized;
+                // Aplicar daño
                 TakeDamage(damageSource.damageAmount, danger.transform.position);
                 damageSource.OnDamageDealt();
-                lastDamageTime = Time.time;
-                break; // Solo un daño por frame
+
+                // Agregar este objeto al cooldown
+                objectCooldowns[dangerObject] = Time.time + cooldownDuration;
+
+                // Solo un daño por frame
+                break;
             }
         }
     }
@@ -318,18 +225,13 @@ public class LifeSystem : MonoBehaviour
     {
         for (int i = 0; i < heartImages.Count; i++)
         {
-            if (i < heartImages.Count)
-            {
-                heartImages[i].sprite = i < currentHealth ? fullHeart : emptyHeart;
-            }
+            heartImages[i].sprite = i < currentHealth ? fullHeart : emptyHeart;
         }
     }
 
     private void Die()
     {
         Debug.Log($"{playerType} ha muerto!");
-        // Aquí puedes agregar lógica de muerte
-        // Ejemplo: Desactivar control, animación de muerte, etc.
     }
 
     public void ResetHealth()
@@ -339,7 +241,7 @@ public class LifeSystem : MonoBehaviour
         StopAllCoroutines();
         if (spriteRenderer != null) spriteRenderer.enabled = true;
         isInvincible = false;
-        lastDamageTime = 0f;
+        objectCooldowns.Clear();
         if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
 
@@ -348,35 +250,21 @@ public class LifeSystem : MonoBehaviour
         if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
 
-    // Dibujar gizmo para visualizar el área de detección de daño
     private void OnDrawGizmosSelected()
     {
-        // Área de detección de daño (SOLO VISUAL)
         Gizmos.color = damageGizmoColor;
         Gizmos.DrawWireSphere(transform.position, damageDetectionRadius);
 
-        // Indicador visual más pequeño en el centro
         Gizmos.color = new Color(damageGizmoColor.r, damageGizmoColor.g, damageGizmoColor.b, 0.3f);
         Gizmos.DrawSphere(transform.position, damageDetectionRadius * 0.1f);
     }
 
-    // Dibujar siempre el gizmo (opcional, para verlo siempre)
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
 
         Gizmos.color = new Color(damageGizmoColor.r, damageGizmoColor.g, damageGizmoColor.b, 0.1f);
         Gizmos.DrawSphere(transform.position, damageDetectionRadius);
-    }
-
-    // Método para actualizar la posición UI cuando cambia el splitscreen
-    public void UpdateUIPosition()
-    {
-        if (uiPositioner != null)
-        {
-            FindAndAssignUIPanel();
-            PositionHeartsInPanel();
-        }
     }
 
     public bool IsInvincible => isInvincible;

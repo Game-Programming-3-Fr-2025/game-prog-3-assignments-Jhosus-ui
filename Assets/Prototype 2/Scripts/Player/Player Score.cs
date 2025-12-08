@@ -69,13 +69,6 @@ public class PlayerScore : MonoBehaviour
             lastPosition = transform.position;
             Debug.Log(gameObject.name + " empezó a contar");
         }
-
-        // Detectar final de carrera (opcional)
-        if (other.CompareTag("Finish") && isCounting)
-        {
-            isCounting = false;
-            Debug.Log(gameObject.name + " terminó con distancia: " + distance.ToString("F0"));
-        }
     }
 
     public void UpdateUI()

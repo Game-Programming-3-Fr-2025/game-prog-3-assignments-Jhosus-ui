@@ -1,5 +1,7 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+using System.Collections;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -16,9 +18,14 @@ public class ScoreManager : MonoBehaviour
     public TMP_Text player2FinalText;
     public TMP_Text winnerText;
 
-    [Header("Game Over Settings")]
-    public bool gameEnded = false;
+    [Header("Result Screen")]
+    public GameObject resultsScreen; // Pantalla completa de resultados
+    public Image backgroundPanel;    // Fondo (opcional si está dentro de resultsScreen)
     public float delayBeforeResults = 1f;
+    public bool pauseGameOnEnd = true;
+
+    [Header("Game State")]
+    public bool gameEnded = false;
 
     void Start()
     {
@@ -28,31 +35,31 @@ public class ScoreManager : MonoBehaviour
             FindPlayers();
         }
 
-        // Buscar LifeSystems automáticamente
         if (player1Life == null || player2Life == null)
         {
             FindLifeSystems();
         }
+
+        // Ocultar pantalla de resultados al inicio
+        HideResultsScreen();
     }
 
     void Update()
     {
-        // Opcional: Actualizar UI global cada frame
+        // Actualizar UI global
         UpdateGlobalUI();
 
         // Verificar si ambos jugadores han muerto
         if (!gameEnded && CheckBothPlayersDead())
         {
             gameEnded = true;
-            Invoke("ShowResults", delayBeforeResults);
+            StartCoroutine(GameOverSequence());
         }
     }
 
     void FindPlayers()
     {
-        // Buscar todos los PlayerScore en la escena
         PlayerScore[] allScores = FindObjectsOfType<PlayerScore>();
-
         foreach (PlayerScore score in allScores)
         {
             if (score.isPlayer1 && player1 == null)
@@ -64,9 +71,7 @@ public class ScoreManager : MonoBehaviour
 
     void FindLifeSystems()
     {
-        // Buscar todos los LifeSystem en la escena
         LifeSystem[] allLives = FindObjectsOfType<LifeSystem>();
-
         foreach (LifeSystem life in allLives)
         {
             if (life.playerType == PlayerType.Player1 && player1Life == null)
@@ -78,27 +83,64 @@ public class ScoreManager : MonoBehaviour
 
     bool CheckBothPlayersDead()
     {
-        if (player1Life == null || player2Life == null)
+        if (player1Life == null || player2Life == null) return false;
+        return player1Life.currentHealth <= 0 && player2Life.currentHealth <= 0;
+    }
+
+    IEnumerator GameOverSequence()
+    {
+        // Esperar antes de mostrar resultados
+        yield return new WaitForSeconds(delayBeforeResults);
+
+        // Pausar el juego
+        if (pauseGameOnEnd)
         {
-            // Si no hay referencias a los LifeSystems, no podemos verificar
-            return false;
+            Time.timeScale = 0f;
         }
 
-        // Verificar si ambos tienen 0 o menos de vida
-        // Puedes acceder al currentHealth si es público, o crear un método público en LifeSystem
-        return player1Life.currentHealth <= 0 && player2Life.currentHealth <= 0;
+        // Mostrar pantalla de resultados
+        ShowResultsScreen();
+
+        // Calcular y mostrar quién ganó
+        ShowResults();
     }
 
     void UpdateGlobalUI()
     {
         if (player1FinalText != null && player1 != null)
-            player1FinalText.text = "P1: " + player1.GetTotalScore();
+            player1FinalText.text = player1.GetTotalScore().ToString();
 
         if (player2FinalText != null && player2 != null)
-            player2FinalText.text = "P2: " + player2.GetTotalScore();
+            player2FinalText.text = player2.GetTotalScore().ToString();
     }
 
-    // Llamar este método cuando termine el nivel
+    void HideResultsScreen()
+    {
+        if (resultsScreen != null)
+            resultsScreen.SetActive(false);
+
+        if (backgroundPanel != null)
+            backgroundPanel.gameObject.SetActive(false);
+
+        if (winnerText != null)
+            winnerText.gameObject.SetActive(false);
+    }
+
+    void ShowResultsScreen()
+    {
+        // Primero mostrar el fondo
+        if (backgroundPanel != null)
+            backgroundPanel.gameObject.SetActive(true);
+
+        // Luego la pantalla completa
+        if (resultsScreen != null)
+            resultsScreen.SetActive(true);
+
+        // Finalmente el texto del ganador
+        if (winnerText != null)
+            winnerText.gameObject.SetActive(true);
+    }
+
     public void ShowResults()
     {
         if (player1 == null || player2 == null) return;
@@ -109,20 +151,21 @@ public class ScoreManager : MonoBehaviour
         if (winnerText != null)
         {
             if (score1 > score2)
-                winnerText.text = "Jugador 1 Gana!";
+                winnerText.text = "Player 1 Win!";
             else if (score2 > score1)
-                winnerText.text = "Jugador 2 Gana!";
+                winnerText.text = "Player 2 Win!";
             else
-                winnerText.text = "Empate!";
+                winnerText.text = "Tied!";
         }
 
         Debug.Log("Resultados: P1=" + score1 + ", P2=" + score2);
     }
 
-    // Resetear puntajes (para nueva partida)
     public void ResetGame()
     {
         gameEnded = false;
+        Time.timeScale = 1f;
+        HideResultsScreen();
         Debug.Log("Juego reseteado");
     }
 }
