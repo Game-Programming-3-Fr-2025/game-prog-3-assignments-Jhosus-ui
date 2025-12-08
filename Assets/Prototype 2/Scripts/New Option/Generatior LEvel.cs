@@ -36,6 +36,9 @@ public class GeneratiorLEvel : MonoBehaviour
     private bool transicionArriba = false;
     private bool inicializado = false;
 
+    // Control de repetición
+    private GameObject ultimoPrefabGenerado = null;
+
     void Start()
     {
         BuscarJugadores();
@@ -71,7 +74,6 @@ public class GeneratiorLEvel : MonoBehaviour
         bool p2Cerca = jugador2 != null &&
             Vector2.Distance(jugador2.position, puntoFinalPlayer2.position) < distanciaActivacion;
 
-        // 🔥 Si CUALQUIERA está cerca, genera para AMBOS
         if (p1Cerca || p2Cerca)
             GenerarNivelesParaAmbos();
     }
@@ -96,17 +98,20 @@ public class GeneratiorLEvel : MonoBehaviour
 
         if (nivelesActuales.Count == 0) return;
 
-        GameObject prefab = nivelesActuales[Random.Range(0, nivelesActuales.Count)];
+        // Selección con control de repetición
+        GameObject prefab = ObtenerPrefabNoRepetido();
         Quaternion rotacion = transicionArriba ? Quaternion.Euler(0, 0, 0f) : Quaternion.identity;
 
-        // 🔥 Generar nivel para Player 1
+        // Generar nivel para Player 1
         GameObject nivelP1 = Instantiate(prefab, puntoFinalPlayer1.position, rotacion);
         nivelesActivosP1.Enqueue(nivelP1);
 
-        // 🔥 Generar nivel para Player 2
+        // Generar nivel para Player 2
         GameObject nivelP2 = Instantiate(prefab, puntoFinalPlayer2.position, rotacion);
         nivelesActivosP2.Enqueue(nivelP2);
 
+        // Guardar el último prefab usado
+        ultimoPrefabGenerado = prefab;
         contadorNiveles++;
 
         // Actualizar puntos finales de cada jugador
@@ -114,6 +119,27 @@ public class GeneratiorLEvel : MonoBehaviour
         ActualizarPuntoFinal(nivelP2, ref puntoFinalPlayer2, "PuntoFinalP2");
 
         LimpiarNivelesViejos();
+    }
+
+    // Obtiene un prefab diferente al último usado
+    GameObject ObtenerPrefabNoRepetido()
+    {
+        // Si solo hay 1 prefab, no hay opción
+        if (nivelesActuales.Count == 1)
+            return nivelesActuales[0];
+
+        GameObject prefabSeleccionado;
+        int intentos = 0;
+        int maxIntentos = 10; // Seguridad para evitar loop infinito
+
+        do
+        {
+            prefabSeleccionado = nivelesActuales[Random.Range(0, nivelesActuales.Count)];
+            intentos++;
+        }
+        while (prefabSeleccionado == ultimoPrefabGenerado && intentos < maxIntentos);
+
+        return prefabSeleccionado;
     }
 
     void GenerarTransicionParaAmbos(GameObject prefab, List<GameObject> nuevaLista, ref bool flag)
@@ -134,6 +160,9 @@ public class GeneratiorLEvel : MonoBehaviour
         flag = true;
         nivelesActuales = new List<GameObject>(nuevaLista);
         nivelesActuales.RemoveAll(n => n == null);
+
+        // Resetear el control al cambiar de fase
+        ultimoPrefabGenerado = null;
 
         LimpiarNivelesViejos();
     }
@@ -201,27 +230,6 @@ public class GeneratiorLEvel : MonoBehaviour
         }
     }
 
-    //public void OnPhaseChanged(bool isHorizontal, bool isUpPhase)
-    //{
-    //    Falling[] fallingScripts = FindObjectsOfType<Falling>();
-
-    //    foreach (Falling falling in fallingScripts)
-    //    {
-    //        if (isHorizontal)
-    //        {
-    //            falling.SetLevelDirection(LevelDirection.HorizontalRight);
-    //        }
-    //        else if (isUpPhase)
-    //        {
-    //            falling.SetLevelDirection(LevelDirection.VerticalUp);
-    //        }
-    //        else
-    //        {
-    //            falling.SetLevelDirection(LevelDirection.VerticalDown);
-    //        }
-    //    }
-    //}
-
     void OnDrawGizmosSelected()
     {
         if (!Application.isPlaying) return;
@@ -259,6 +267,7 @@ public class GeneratiorLEvel : MonoBehaviour
         transicionHorizontal = false;
         transicionArriba = false;
         contadorNiveles = 0;
+        ultimoPrefabGenerado = null; // Resetear control
         nivelesActuales = new List<GameObject>(nivelesVerticales);
 
         for (int i = 0; i < cantidadInicial; i++)

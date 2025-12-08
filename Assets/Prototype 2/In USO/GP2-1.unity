@@ -17929,7 +17929,7 @@ GameObject:
   m_Icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1254523871
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19444,6 +19444,7 @@ GameObject:
   - component: {fileID: 1519675941}
   - component: {fileID: 1519675940}
   - component: {fileID: 1519675942}
+  - component: {fileID: 1519675943}
   m_Layer: 0
   m_Name: GAME MANAGER
   m_TagString: Untagged
@@ -19506,6 +19507,19 @@ MonoBehaviour:
   delayBeforeResults: 0.5
   pauseGameOnEnd: 1
   gameEnded: 0
+--- !u!114 &1519675943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519675939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4890481ecd9b87b4db5db1a6c8b9347e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tiempoEspera: 1
 --- !u!1 &1549228904
 GameObject:
   m_ObjectHideFlags: 0
@@ -20653,7 +20667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanciaActivacion: 12
-  cantidadInicial: 0
+  cantidadInicial: 1
   maxNivelesActivos: 3
   puntoFinalPlayer1: {fileID: 154380458}
   puntoFinalPlayer2: {fileID: 893360621}
