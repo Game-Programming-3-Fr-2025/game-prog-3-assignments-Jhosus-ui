@@ -22,7 +22,7 @@ public class FC2 : MonoBehaviour
     private float posicionXFijaArriba;
     private float tiempoInicioHorizontal;
     private float tiempoInicioVerticalArriba;
-    private float tiempoInicioVertical; // NUEVO
+    private float tiempoInicioVertical;
     private float mitadAlturaCamara;
     private float mitadAnchoCamara;
 
@@ -30,7 +30,7 @@ public class FC2 : MonoBehaviour
     {
         alturaInicial = transform.position.y;
         posicionXInicial = transform.position.x;
-        tiempoInicioVertical = Time.time; // NUEVO: Guardar cuando inicia
+        tiempoInicioVertical = Time.time;
 
         cam = GetComponent<Camera>();
         if (cam != null)
@@ -44,7 +44,6 @@ public class FC2 : MonoBehaviour
             mitadAnchoCamara = 8f;
         }
 
-        // Buscar jugador según tag del padre
         string playerTag = transform.parent != null && transform.parent.CompareTag("Player 2") ? "Player 2" : "Player 1";
         GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
         if (playerObj != null) jugador = playerObj.transform;
@@ -62,7 +61,6 @@ public class FC2 : MonoBehaviour
 
     void MoverCamaraVertical()
     {
-        // CAMBIO: Usar tiempo relativo desde el inicio
         float tiempoTranscurrido = Time.time - tiempoInicioVertical;
         float nuevaY = alturaInicial - (velocidadBajada * tiempoTranscurrido);
         transform.position = new Vector3(posicionXFija, nuevaY, transform.position.z);
@@ -70,17 +68,9 @@ public class FC2 : MonoBehaviour
 
     void MoverCamaraHorizontal()
     {
-        float nuevaX;
-
-        if (seguirJugadorHorizontal && jugador != null)
-        {
-            nuevaX = Mathf.Lerp(transform.position.x, jugador.position.x, Time.deltaTime * velocidadDerecha);
-        }
-        else
-        {
-            float tiempoTranscurrido = Time.time - tiempoInicioHorizontal;
-            nuevaX = posicionXInicial + (velocidadDerecha * tiempoTranscurrido);
-        }
+        float nuevaX = seguirJugadorHorizontal && jugador != null
+            ? Mathf.Lerp(transform.position.x, jugador.position.x, Time.deltaTime * velocidadDerecha)
+            : posicionXInicial + (velocidadDerecha * (Time.time - tiempoInicioHorizontal));
 
         transform.position = new Vector3(nuevaX, posicionYFijaHorizontal, transform.position.z);
     }
@@ -100,7 +90,6 @@ public class FC2 : MonoBehaviour
             modoVerticalArriba = false;
             posicionXInicial = transform.position.x;
             tiempoInicioHorizontal = Time.time;
-
             posicionYFijaHorizontal = posicionAjuste.y + mitadAlturaCamara;
             transform.position = new Vector3(transform.position.x, posicionYFijaHorizontal, transform.position.z);
         }
@@ -115,7 +104,6 @@ public class FC2 : MonoBehaviour
             posicionYInicialArriba = transform.position.y;
             tiempoInicioVerticalArriba = Time.time;
             posicionXFijaArriba = puntoAjuste.x - mitadAnchoCamara;
-
             transform.position = new Vector3(posicionXFijaArriba, posicionYInicialArriba, transform.position.z);
         }
     }
@@ -127,7 +115,7 @@ public class FC2 : MonoBehaviour
             modoHorizontal = false;
             modoVerticalArriba = false;
             alturaInicial = transform.position.y;
-            tiempoInicioVertical = Time.time; // NUEVO: Resetear tiempo
+            tiempoInicioVertical = Time.time;
         }
     }
 

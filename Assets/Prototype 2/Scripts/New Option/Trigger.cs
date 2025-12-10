@@ -20,18 +20,12 @@ public class Trigger : MonoBehaviour
 
         if (!isPlayer1 && !isPlayer2) return;
 
-        // Verificar si este jugador ya activó el trigger
         if ((isPlayer1 && player1Activado) || (isPlayer2 && player2Activado))
-        {
-            Debug.Log($"{(isPlayer1 ? "Player 1" : "Player 2")} ya activó este trigger");
             return;
-        }
 
-        // Marcar como activado para este jugador
         if (isPlayer1) player1Activado = true;
         if (isPlayer2) player2Activado = true;
 
-        // Buscar la cámara correcta por nombre
         string nombreCamaraBuscada = isPlayer1 ? nombreCamaraPlayer1 : nombreCamaraPlayer2;
         GameObject camaraObj = GameObject.Find(nombreCamaraBuscada);
 
@@ -51,47 +45,29 @@ public class Trigger : MonoBehaviour
         Vector3 posicion = puntoAjuste != null ? puntoAjuste.position : transform.position;
 
         if (esModoArriba)
-        {
             camara.CambiarAModoVerticalArriba(posicion);
-            Debug.Log($"Trigger Arriba activado por {(isPlayer1 ? "Player 1" : "Player 2")}");
-        }
         else
-        {
             camara.CambiarAModoHorizontal(posicion);
-            Debug.Log($"Trigger Horizontal activado por {(isPlayer1 ? "Player 1" : "Player 2")}");
-        }
 
-        // Desactivar visualmente solo para este jugador (opcional)
         StartCoroutine(DesactivarTemporalmenteParaJugador(other));
 
-        // Si ambos jugadores ya activaron, desactivar completamente
         if (player1Activado && player2Activado)
-        {
-            Debug.Log("Ambos jugadores activaron el trigger - desactivando completamente");
             gameObject.SetActive(false);
-        }
     }
 
     IEnumerator DesactivarTemporalmenteParaJugador(Collider2D playerCollider)
     {
-        // Desactivar collider temporalmente para evitar múltiples activaciones
         Collider2D triggerCollider = GetComponent<Collider2D>();
         if (triggerCollider != null)
         {
             triggerCollider.enabled = false;
-
-            // Esperar un momento antes de reactivar (para que el otro jugador pueda usarlo)
             yield return new WaitForSeconds(0.5f);
 
-            // Solo reactivar si no ambos jugadores han activado
             if (!(player1Activado && player2Activado))
-            {
                 triggerCollider.enabled = true;
-            }
         }
     }
 
-    // Para debug visual
     void OnDrawGizmos()
     {
         Gizmos.color = esModoArriba ? Color.cyan : Color.yellow;

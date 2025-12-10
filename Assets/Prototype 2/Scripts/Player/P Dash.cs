@@ -51,25 +51,22 @@ public class PDash : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         if (sprite != null) originalColor = sprite.color;
 
-        trail = GetComponent<TrailRenderer>();
-        if (trail == null) trail = gameObject.AddComponent<TrailRenderer>();
-
+        trail = GetComponent<TrailRenderer>() ?? gameObject.AddComponent<TrailRenderer>();
         ConfigureTrailRenderer();
         FindGamepad();
     }
 
     void ConfigureTrailRenderer()
     {
-        if (trail != null)
-        {
-            trail.time = dashTrailTime;
-            trail.startWidth = dashTrailWidth;
-            trail.endWidth = 0.1f;
-            trail.material = new Material(Shader.Find("Sprites/Default"));
-            trail.startColor = dashColor;
-            trail.endColor = new Color(dashColor.r, dashColor.g, dashColor.b, 0f);
-            trail.enabled = false;
-        }
+        if (trail == null) return;
+
+        trail.time = dashTrailTime;
+        trail.startWidth = dashTrailWidth;
+        trail.endWidth = 0.1f;
+        trail.material = new Material(Shader.Find("Sprites/Default"));
+        trail.startColor = dashColor;
+        trail.endColor = new Color(dashColor.r, dashColor.g, dashColor.b, 0f);
+        trail.enabled = false;
     }
 
     void FindGamepad()
@@ -78,7 +75,6 @@ public class PDash : MonoBehaviour
         {
             playerGamepad = player.isPlayer1 ? Gamepad.all[0] :
                            (Gamepad.all.Count > 1 ? Gamepad.all[1] : Gamepad.all[0]);
-            Debug.Log($"Mando asignado: {playerGamepad.name}");
         }
     }
 
@@ -98,11 +94,9 @@ public class PDash : MonoBehaviour
 
     bool CheckDashInput()
     {
-        // Teclado
-        if (player.isPlayer1 && Input.GetKeyDown(KeyCode.LeftShift)) return true;
-        if (!player.isPlayer1 && Input.GetKeyDown(KeyCode.Comma)) return true;
+        KeyCode dashKey = player.isPlayer1 ? KeyCode.LeftShift : KeyCode.Comma;
+        if (Input.GetKeyDown(dashKey)) return true;
 
-        // Gamepad
         if (playerGamepad != null)
         {
             float triggerValue = playerGamepad.rightTrigger.ReadValue();
@@ -110,7 +104,6 @@ public class PDash : MonoBehaviour
             if (triggerValue >= triggerThreshold && triggerReady)
             {
                 triggerReady = false;
-                Debug.Log($"Dash por R2: {triggerValue:F2}");
                 return true;
             }
 
@@ -120,7 +113,6 @@ public class PDash : MonoBehaviour
             if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady)
             {
                 triggerReady = false;
-                Debug.Log("Dash por R1");
                 return true;
             }
         }
@@ -141,9 +133,8 @@ public class PDash : MonoBehaviour
             new Vector2(horizontalInput, 0) :
             new Vector2(transform.localScale.x, 0);
 
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f;
         rb.linearVelocity = dashDirection * dashSpeed;
+        rb.gravityScale = 0f;
 
         ApplyDashVisualEffects(true);
         StartVibration();

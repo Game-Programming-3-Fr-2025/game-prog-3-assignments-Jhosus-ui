@@ -21,68 +21,60 @@ public class Starts : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 0f; // Pausar todo
+        Time.timeScale = 0f;
         tiempoRestante = tiempoTotalJuego;
 
-        // Apagar luces
         if (luzAdvertenciaJugador1 != null) luzAdvertenciaJugador1.enabled = false;
         if (luzAdvertenciaJugador2 != null) luzAdvertenciaJugador2.enabled = false;
-
-        Debug.Log("Presiona cualquier tecla para comenzar...");
     }
 
     void Update()
     {
-        // Esperar tecla para iniciar
         if (!juegoActivo && Input.anyKeyDown)
         {
             Time.timeScale = 1f;
             juegoActivo = true;
-            Debug.Log("¡Juego iniciado!");
         }
 
-        // Contar tiempo cuando está activo
         if (juegoActivo)
         {
             tiempoRestante -= Time.deltaTime;
 
-            // Luces de advertencia
             if (tiempoRestante <= tiempoAdvertencia)
             {
                 float intensidad = 1f - (tiempoRestante / tiempoAdvertencia);
-                if (luzAdvertenciaJugador1 != null)
-                {
-                    luzAdvertenciaJugador1.enabled = true;
-                    luzAdvertenciaJugador1.intensity = intensidad;
-                    luzAdvertenciaJugador1.color = colorAdvertencia;
-                }
-                if (luzAdvertenciaJugador2 != null)
-                {
-                    luzAdvertenciaJugador2.enabled = true;
-                    luzAdvertenciaJugador2.intensity = intensidad;
-                    luzAdvertenciaJugador2.color = colorAdvertencia;
-                }
+                ActualizarLuzAdvertencia(luzAdvertenciaJugador1, intensidad);
+                ActualizarLuzAdvertencia(luzAdvertenciaJugador2, intensidad);
             }
 
-            // Fin del juego
             if (tiempoRestante <= 0f)
-            {
-                juegoActivo = false;
-                if (luzAdvertenciaJugador1 != null) luzAdvertenciaJugador1.enabled = false;
-                if (luzAdvertenciaJugador2 != null) luzAdvertenciaJugador2.enabled = false;
-
-                if (scoreManager != null)
-                {
-                    scoreManager.gameEnded = true;
-                    StartCoroutine(scoreManager.GameOverSequence());
-                }
-
-                Debug.Log("¡Tiempo terminado!");
-            }
+                FinalizarJuego();
         }
     }
 
-    // Métodos públicos útiles
+    void ActualizarLuzAdvertencia(Light2D luz, float intensidad)
+    {
+        if (luz != null)
+        {
+            luz.enabled = true;
+            luz.intensity = intensidad;
+            luz.color = colorAdvertencia;
+        }
+    }
+
+    void FinalizarJuego()
+    {
+        juegoActivo = false;
+        if (luzAdvertenciaJugador1 != null) luzAdvertenciaJugador1.enabled = false;
+        if (luzAdvertenciaJugador2 != null) luzAdvertenciaJugador2.enabled = false;
+
+        if (scoreManager != null)
+        {
+            scoreManager.gameEnded = true;
+            StartCoroutine(scoreManager.GameOverSequence());
+        }
+    }
+
     public float GetTiempoRestante() => tiempoRestante;
     public bool IsJuegoActivo() => juegoActivo;
 }

@@ -12,17 +12,17 @@ public class Recollect : MonoBehaviour
     [Header("Tipo de Item")]
     [SerializeField] private TipoItem tipoItem = TipoItem.Coin;
 
-    [Header("Configuracin")]
+    [Header("Configuración")]
     [SerializeField] private string playerLayer = "Players";
 
     [Header("Efectos")]
     [SerializeField] private ParticleSystem particleEffect;
 
     [Header("Sonido")]
-    [SerializeField] private AudioClip collectSound; // Asigna el sonido desde el Inspector
-    [SerializeField] private float volume = 1f; // Volumen del sonido
+    [SerializeField] private AudioClip collectSound;
+    [SerializeField] private float volume = 1f;
 
-    [Header("Levitacin")]
+    [Header("Levitación")]
     [SerializeField] private float levitationSpeed = 1f;
     [SerializeField] private float levitationHeight = 0.2f;
 
@@ -44,25 +44,18 @@ public class Recollect : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer(playerLayer))
-        {
             RecolectarItem(other.gameObject);
-        }
     }
 
     private void RecolectarItem(GameObject jugador)
     {
         enabled = false;
 
-        // Reproducir sonido de recolección
         PlayCollectSound();
-
-        // Activar habilidad seg˙n el tipo
         ActivarHabilidad(jugador);
 
-        // Efectos visuales
         if (particleEffect != null) particleEffect.Play();
 
-        // Ocultar item
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         if (sprite != null) sprite.enabled = false;
 
@@ -75,14 +68,7 @@ public class Recollect : MonoBehaviour
     private void PlayCollectSound()
     {
         if (collectSound != null)
-        {
-            // Método simple: AudioSource.PlayClipAtPoint
             AudioSource.PlayClipAtPoint(collectSound, transform.position, volume);
-        }
-        else
-        {
-            Debug.LogWarning("No hay AudioClip asignado para el sonido de recolección");
-        }
     }
 
     private void ActivarHabilidad(GameObject jugador)
@@ -92,27 +78,19 @@ public class Recollect : MonoBehaviour
             case TipoItem.PDash:
                 PDash dashComponent = jugador.GetComponent<PDash>();
                 if (dashComponent != null)
-                {
                     dashComponent.isDashUnlocked = true;
-                    Debug.Log($"Dash desbloqueado para {jugador.name}");
-                }
                 break;
 
             case TipoItem.PJump:
                 PJumps jumpComponent = jugador.GetComponent<PJumps>();
                 if (jumpComponent != null)
-                {
                     jumpComponent.isDoubleJumpUnlocked = true;
-                    Debug.Log($"Doble salto desbloqueado para {jugador.name}");
-                }
                 break;
 
             case TipoItem.Coin:
                 PlayerScore playerScore = jugador.GetComponent<PlayerScore>();
                 if (playerScore != null)
-                {
                     Destroy(gameObject);
-                }
                 break;
         }
     }

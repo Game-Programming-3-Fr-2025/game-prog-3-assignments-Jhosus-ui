@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using static Falling;
 
 public class GeneratiorLEvel : MonoBehaviour
 {
@@ -35,8 +34,6 @@ public class GeneratiorLEvel : MonoBehaviour
     private bool transicionHorizontal = false;
     private bool transicionArriba = false;
     private bool inicializado = false;
-
-    // Control de repetición
     private GameObject ultimoPrefabGenerado = null;
 
     void Start()
@@ -80,14 +77,12 @@ public class GeneratiorLEvel : MonoBehaviour
 
     void GenerarNivelesParaAmbos()
     {
-        // Primera transición
         if (!transicionHorizontal && contadorNiveles >= nivelesAntesDeTransicion && prefabTransicion != null)
         {
             GenerarTransicionParaAmbos(prefabTransicion, nivelesHorizontales, ref transicionHorizontal);
             return;
         }
 
-        // Segunda transición
         if (transicionHorizontal && !transicionArriba &&
             contadorNiveles >= nivelesAntesDeTransicion + nivelesHorizontalesAntesDeArriba &&
             prefabTransicionArriba != null)
@@ -98,39 +93,32 @@ public class GeneratiorLEvel : MonoBehaviour
 
         if (nivelesActuales.Count == 0) return;
 
-        // Selección con control de repetición
         GameObject prefab = ObtenerPrefabNoRepetido();
         Quaternion rotacion = transicionArriba ? Quaternion.Euler(0, 0, 0f) : Quaternion.identity;
 
-        // Generar nivel para Player 1
         GameObject nivelP1 = Instantiate(prefab, puntoFinalPlayer1.position, rotacion);
         nivelesActivosP1.Enqueue(nivelP1);
 
-        // Generar nivel para Player 2
         GameObject nivelP2 = Instantiate(prefab, puntoFinalPlayer2.position, rotacion);
         nivelesActivosP2.Enqueue(nivelP2);
 
-        // Guardar el último prefab usado
         ultimoPrefabGenerado = prefab;
         contadorNiveles++;
 
-        // Actualizar puntos finales de cada jugador
         ActualizarPuntoFinal(nivelP1, ref puntoFinalPlayer1, "PuntoFinalP1");
         ActualizarPuntoFinal(nivelP2, ref puntoFinalPlayer2, "PuntoFinalP2");
 
         LimpiarNivelesViejos();
     }
 
-    // Obtiene un prefab diferente al último usado
     GameObject ObtenerPrefabNoRepetido()
     {
-        // Si solo hay 1 prefab, no hay opción
         if (nivelesActuales.Count == 1)
             return nivelesActuales[0];
 
         GameObject prefabSeleccionado;
         int intentos = 0;
-        int maxIntentos = 10; // Seguridad para evitar loop infinito
+        const int maxIntentos = 10;
 
         do
         {
@@ -144,11 +132,9 @@ public class GeneratiorLEvel : MonoBehaviour
 
     void GenerarTransicionParaAmbos(GameObject prefab, List<GameObject> nuevaLista, ref bool flag)
     {
-        // Transición para Player 1
         GameObject transicionP1 = Instantiate(prefab, puntoFinalPlayer1.position, Quaternion.identity);
         nivelesActivosP1.Enqueue(transicionP1);
 
-        // Transición para Player 2
         GameObject transicionP2 = Instantiate(prefab, puntoFinalPlayer2.position, Quaternion.identity);
         nivelesActivosP2.Enqueue(transicionP2);
 
@@ -160,8 +146,6 @@ public class GeneratiorLEvel : MonoBehaviour
         flag = true;
         nivelesActuales = new List<GameObject>(nuevaLista);
         nivelesActuales.RemoveAll(n => n == null);
-
-        // Resetear el control al cambiar de fase
         ultimoPrefabGenerado = null;
 
         LimpiarNivelesViejos();
@@ -169,7 +153,6 @@ public class GeneratiorLEvel : MonoBehaviour
 
     void ActualizarPuntoFinal(GameObject nivel, ref Transform puntoFinal, string tagEspecifico)
     {
-        // Buscar punto específico primero
         Transform puntoEspecifico = BuscarEnHijos(nivel.transform, tagEspecifico);
 
         if (puntoEspecifico != null)
@@ -178,12 +161,9 @@ public class GeneratiorLEvel : MonoBehaviour
             return;
         }
 
-        // Si no existe, buscar punto genérico
         Transform puntoGeneral = BuscarEnHijos(nivel.transform, "PuntoFinal");
         if (puntoGeneral != null)
-        {
             puntoFinal = puntoGeneral;
-        }
     }
 
     Transform BuscarEnHijos(Transform parent, string tag)
@@ -200,14 +180,12 @@ public class GeneratiorLEvel : MonoBehaviour
 
     void LimpiarNivelesViejos()
     {
-        // Limpiar niveles viejos de Player 1
         while (nivelesActivosP1.Count > maxNivelesActivos)
         {
             GameObject viejo = nivelesActivosP1.Dequeue();
             if (viejo != null) Destroy(viejo);
         }
 
-        // Limpiar niveles viejos de Player 2
         while (nivelesActivosP2.Count > maxNivelesActivos)
         {
             GameObject viejo = nivelesActivosP2.Dequeue();
@@ -247,7 +225,6 @@ public class GeneratiorLEvel : MonoBehaviour
         }
     }
 
-    // Métodos públicos
     public void ForzarGeneracionNivel() => GenerarNivelesParaAmbos();
 
     public void LimpiarTodo()
@@ -267,7 +244,7 @@ public class GeneratiorLEvel : MonoBehaviour
         transicionHorizontal = false;
         transicionArriba = false;
         contadorNiveles = 0;
-        ultimoPrefabGenerado = null; // Resetear control
+        ultimoPrefabGenerado = null;
         nivelesActuales = new List<GameObject>(nivelesVerticales);
 
         for (int i = 0; i < cantidadInicial; i++)

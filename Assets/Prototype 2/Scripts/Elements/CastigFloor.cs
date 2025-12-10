@@ -20,8 +20,6 @@ public class CastigFloor : MonoBehaviour
     private int estadoActual = 0;
     private float tiempoUltimoCambio = -100f;
     private bool estaTransicionando = false;
-
-    // Guardar rotación y escala inicial
     private Quaternion[] rotacionesIniciales = new Quaternion[3];
     private Vector3[] escalasIniciales = new Vector3[3];
     private Vector3[] posicionesLocalesIniciales = new Vector3[3];
@@ -30,10 +28,8 @@ public class CastigFloor : MonoBehaviour
     {
         if (miCamara == null)
         {
-            // Busca la cámara como hijo del jugador
             miCamara = GetComponentInChildren<Camera>();
 
-            // Si no está como hijo, busca por tag
             if (miCamara == null)
             {
                 string nombreCam = gameObject.CompareTag("Player 1") ? "MainCameraP1" : "MainCameraP2";
@@ -47,7 +43,6 @@ public class CastigFloor : MonoBehaviour
 
     void InicializarEstado()
     {
-        // Guardar transformaciones iniciales
         for (int i = 0; i < 3; i++)
         {
             if (sprites[i])
@@ -86,7 +81,6 @@ public class CastigFloor : MonoBehaviour
             if (sprites[i])
             {
                 sprites[i].transform.position = posiciones[i] + Vector3.forward * sprites[i].transform.position.z;
-                // Forzar transformaciones locales para evitar distorsiones
                 sprites[i].transform.localRotation = rotacionesIniciales[i];
                 sprites[i].transform.localScale = escalasIniciales[i];
             }
@@ -116,15 +110,12 @@ public class CastigFloor : MonoBehaviour
     {
         estaTransicionando = true;
 
-        // Fade Out actual
         yield return Fade(estadoActual, 1f, 0f, tiempoFadeOut);
         if (sprites[estadoActual]) sprites[estadoActual].enabled = false;
         if (luces[estadoActual]) luces[estadoActual].enabled = false;
 
-        // Espera
         yield return new WaitForSeconds(tiempoEspera);
 
-        // Fade In nuevo
         if (sprites[nuevoEstado]) sprites[nuevoEstado].enabled = true;
         if (luces[nuevoEstado]) luces[nuevoEstado].enabled = true;
         yield return Fade(nuevoEstado, 0f, 1f, tiempoFadeIn);
@@ -161,7 +152,6 @@ public class CastigFloor : MonoBehaviour
         }
     }
 
-    // Métodos públicos para control manual
     public void CambiarAArriba() => CambiarEstado(0);
     public void CambiarAIzquierda() => CambiarEstado(1);
     public void CambiarAAbajo() => CambiarEstado(2);

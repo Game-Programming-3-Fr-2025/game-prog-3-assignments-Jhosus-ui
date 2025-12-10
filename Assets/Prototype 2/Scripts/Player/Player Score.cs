@@ -14,8 +14,8 @@ public class PlayerScore : MonoBehaviour
     public float distanceMultiplier = 0.1f;
 
     [Header("Distance Settings")]
-    public float distanceIncrementRate = 1f; // Cuánto aumenta por segundo
-    public bool useTimeBasedDistance = true; // Si true, usa tiempo; si false, usa posición X
+    public float distanceIncrementRate = 1f;
+    public bool useTimeBasedDistance = true;
 
     private int coins = 0;
     private float distance = 0f;
@@ -31,58 +31,53 @@ public class PlayerScore : MonoBehaviour
 
     void Update()
     {
-        if (isCounting)
-        {
-            if (useTimeBasedDistance)
-            {
-                // Método basado en tiempo (simplemente aumenta con el tiempo)
-                countingTime += Time.deltaTime;
-                distance = countingTime * distanceIncrementRate;
-            }
-            else
-            {
-                // Método basado en posición X (avance horizontal)
-                float xMovement = Mathf.Max(0, transform.position.x - lastPosition.x);
-                distance += xMovement;
-                lastPosition = transform.position;
-            }
+        if (!isCounting) return;
 
-            UpdateUI();
+        if (useTimeBasedDistance)
+        {
+            countingTime += Time.deltaTime;
+            distance = countingTime * distanceIncrementRate;
         }
+        else
+        {
+            float xMovement = Mathf.Max(0, transform.position.x - lastPosition.x);
+            distance += xMovement;
+            lastPosition = transform.position;
+        }
+
+        UpdateUI();
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Detectar moneda
         if (other.CompareTag("Coin"))
         {
             coins++;
             UpdateUI();
             Destroy(other.gameObject);
         }
-
-        // Detectar inicio de carrera
-        if (other.CompareTag("Start") && !isCounting)
+        else if (other.CompareTag("Start") && !isCounting)
         {
-            isCounting = true;
-            countingTime = 0f;
-            lastPosition = transform.position;
-            Debug.Log(gameObject.name + " empezó a contar");
+            IniciarConteo();
         }
+    }
+
+    void IniciarConteo()
+    {
+        isCounting = true;
+        countingTime = 0f;
+        lastPosition = transform.position;
     }
 
     public void UpdateUI()
     {
-        // Calcular puntaje total
-        int totalScore = (coins * coinsMultiplier) + Mathf.RoundToInt(distance * distanceMultiplier);
+        int totalScore = GetTotalScore();
 
-        // Actualizar textos (solo números)
         if (coinsText != null) coinsText.text = coins.ToString();
         if (distanceText != null) distanceText.text = distance.ToString("F0");
         if (totalText != null) totalText.text = totalScore.ToString();
     }
 
-    // Métodos públicos para acceder a los valores
     public int GetCoins() => coins;
     public float GetDistance() => distance;
     public int GetTotalScore() => (coins * coinsMultiplier) + Mathf.RoundToInt(distance * distanceMultiplier);
