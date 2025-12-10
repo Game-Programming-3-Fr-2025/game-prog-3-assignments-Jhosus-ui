@@ -1,10 +1,10 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.InputSystem;
 using System;
 
 public class Attacks : MonoBehaviour
 {
-    [Header("ConfiguraciÛn")]
+    [Header("Configuraci√≥n")]
     public float attackRange = 1.5f;
     public int damage = 1;
     public float cooldown = 0.5f;
@@ -14,10 +14,14 @@ public class Attacks : MonoBehaviour
     private KeyCode player1Key = KeyCode.E;
     private KeyCode player2Key = KeyCode.Slash;
 
-    [Header("VibraciÛn")]
+    [Header("Vibraci√≥n")]
     public float vibrationLowFrequency = 0.3f;
     public float vibrationHighFrequency = 0.1f;
     public float vibrationDuration = 0.1f;
+
+    [Header("Sonido")]
+    public AudioClip attackSound; // Sonido cuando ataca
+    public float attackVolume = 1f; // Volumen del sonido
 
     [Header("Referencias")]
     public Animator animator;
@@ -56,7 +60,7 @@ public class Attacks : MonoBehaviour
 
     void Update()
     {
-        // Actualizar temporizador de vibraciÛn
+        // Actualizar temporizador de vibraci√≥n
         if (isVibrating)
         {
             vibrationTimer -= Time.deltaTime;
@@ -77,12 +81,12 @@ public class Attacks : MonoBehaviour
             controllerAttack = playerGamepad.buttonWest.wasPressedThisFrame;
         }
 
-        // Atacar si est· disponible y se presiona alguna entrada
+        // Atacar si est√° disponible y se presiona alguna entrada
         if (canAttack && (keyboardAttack || controllerAttack))
         {
             Attack();
 
-            // Activar vibraciÛn si se usÛ el mando
+            // Activar vibraci√≥n si se us√≥ el mando
             if (controllerAttack)
             {
                 TriggerVibration();
@@ -92,7 +96,10 @@ public class Attacks : MonoBehaviour
 
     void Attack()
     {
-        // Activar animaciÛn
+        // Reproducir sonido de ataque
+        PlayAttackSound();
+
+        // Activar animaci√≥n
         if (animator != null)
         {
             animator.SetTrigger("Attack");
@@ -109,6 +116,14 @@ public class Attacks : MonoBehaviour
         // Cooldown
         canAttack = false;
         Invoke(nameof(ResetAttack), cooldown);
+    }
+
+    private void PlayAttackSound()
+    {
+        if (attackSound != null)
+        {
+            AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
+        }
     }
 
     void ApplyDamage(Collider2D enemy)
@@ -133,16 +148,16 @@ public class Attacks : MonoBehaviour
         EnemyGP enemyGP = enemy.GetComponent<EnemyGP>();
         if (enemyGP != null)
         {
-            // Si tu EnemyGP tiene mÈtodo para daÒo
+            // Si tu EnemyGP tiene m√©todo para da≈Ño
             // enemyGP.TakeDamage(damage);
             return;
         }
 
-        // 4. Cualquier MonoBehaviour con mÈtodo TakeDamage(int)
+        // 4. Cualquier MonoBehaviour con m√©todo TakeDamage(int)
         MonoBehaviour[] scripts = enemy.GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
-            // Buscar SOLO mÈtodos que reciban int
+            // Buscar SOLO m√©todos que reciban int
             var method = script.GetType().GetMethod("TakeDamage",
                 System.Reflection.BindingFlags.Public |
                 System.Reflection.BindingFlags.Instance,
@@ -163,7 +178,7 @@ public class Attacks : MonoBehaviour
         canAttack = true;
     }
 
-    // MÈtodos para manejar el mando
+    // M√©todos para manejar el mando
     Gamepad GetGamepadForPlayer(int playerIndex)
     {
         if (Gamepad.all.Count > playerIndex)
@@ -194,13 +209,13 @@ public class Attacks : MonoBehaviour
 
     void OnDisable()
     {
-        // Asegurarse de detener la vibraciÛn al desactivar el script
+        // Asegurarse de detener la vibraci√≥n al desactivar el script
         StopVibration();
     }
 
     void OnDestroy()
     {
-        // Asegurarse de detener la vibraciÛn al destruir el objeto
+        // Asegurarse de detener la vibraci√≥n al destruir el objeto
         StopVibration();
     }
 
@@ -209,5 +224,4 @@ public class Attacks : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
-    
 }

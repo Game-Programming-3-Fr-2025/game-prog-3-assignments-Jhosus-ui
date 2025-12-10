@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8089434794504610277}
   - component: {fileID: 5992842836131883454}
   - component: {fileID: 4588944383169679545}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Trampa Abajo
   m_TagString: Untagged
   m_Icon: {fileID: 0}

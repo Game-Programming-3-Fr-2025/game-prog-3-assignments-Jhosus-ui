@@ -41,6 +41,10 @@ public class LifeSystem : MonoBehaviour
     public float knockbackForce = 10f;
     public float knockbackIntensity = 1f;
 
+    [Header("Sonido")]
+    public AudioClip damageSound; // Sonido cuando recibe daño
+    public float damageVolume = 1f; // Volumen del sonido
+
     private bool isInvincible = false;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -98,7 +102,11 @@ public class LifeSystem : MonoBehaviour
 
     void CheckForDamage()
     {
-        // Detectar objetos peligrosos dentro del radio
+        // Añade esta verificación AL PRINCIPIO
+        if (currentHealth <= 0) return; // ← Si ya está muerto, no buscar daño
+        if (!enabled) return; // ← Si el script está deshabilitado, no buscar daño
+
+        // El resto del código se mantiene igual...
         Collider2D[] dangers = Physics2D.OverlapCircleAll(
             transform.position,
             damageDetectionRadius,
@@ -111,7 +119,6 @@ public class LifeSystem : MonoBehaviour
 
             GameObject dangerObject = danger.gameObject;
 
-            // Verificar si este objeto está en cooldown
             if (objectCooldowns.ContainsKey(dangerObject))
                 continue;
 
@@ -119,14 +126,10 @@ public class LifeSystem : MonoBehaviour
 
             if (damageSource != null && damageSource.CanDamage())
             {
-                // Aplicar daño
                 TakeDamage(damageSource.damageAmount, danger.transform.position);
                 damageSource.OnDamageDealt();
 
-                // Agregar este objeto al cooldown
                 objectCooldowns[dangerObject] = Time.time + cooldownDuration;
-
-                // Solo un daño por frame
                 break;
             }
         }
@@ -134,10 +137,23 @@ public class LifeSystem : MonoBehaviour
 
     public void TakeDamage(int damageAmount, Vector2 damageSourcePosition)
     {
+        // Añade estas verificaciones AL PRINCIPIO del método
         if (isInvincible) return;
+        if (currentHealth <= 0) return; // ← Si ya está muerto, no hacer nada
+        if (!enabled) return; // ← Si el script está deshabilitado, no hacer nada
+
+        // Solo después reproducir sonido de daño
+        PlayDamageSound();
 
         currentHealth = Mathf.Max(0, currentHealth - damageAmount);
         UpdateHeartsUI();
+
+        // Asegurar que si la vida llega a 0, se llama a Die()
+        if (currentHealth <= 0)
+        {
+            Die();
+            return; // ← IMPORTANTE: Salir del método después de morir
+        }
 
         StartCoroutine(DamageVibration());
 
@@ -151,11 +167,17 @@ public class LifeSystem : MonoBehaviour
         }
 
         StartCoroutine(DamageEffects());
-
-        if (currentHealth <= 0) Die();
     }
 
     public void TakeDamage(int damageAmount) => TakeDamage(damageAmount, Vector2.zero);
+
+    private void PlayDamageSound()
+    {
+        if (damageSound != null)
+        {
+            AudioSource.PlayClipAtPoint(damageSound, transform.position, damageVolume);
+        }
+    }
 
     private IEnumerator ApplyKnockback(Vector2 direction, float force)
     {
@@ -232,6 +254,34 @@ public class LifeSystem : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{playerType} ha muerto!");
+
+        // 1. Asegurar que no se reproduzcan más sonidos
+        StopAllCoroutines(); // Esto detiene DamageEffects, DamageVibration, etc.
+
+        // 2. Deshabilitar completamente la detección de daño
+        isInvincible = true;
+        enabled = false; // ← Esto desactiva el Update() y CheckForDamage()
+
+        // 3. Detener vibración del mando si está activa
+        if (Gamepad.current?.added == true)
+        {
+            try
+            {
+                Gamepad.current.SetMotorSpeeds(0f, 0f);
+            }
+            catch (System.InvalidOperationException) { }
+        }
+
+        // 4. Ocultar sprite (opcional, pero buena práctica)
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = false;
+        }
+
+        // 5. Limpiar cooldowns
+        objectCooldowns.Clear();
+
+        Debug.Log($"{playerType} está completamente muerto. No más sonidos de daño.");
     }
 
     public void ResetHealth()

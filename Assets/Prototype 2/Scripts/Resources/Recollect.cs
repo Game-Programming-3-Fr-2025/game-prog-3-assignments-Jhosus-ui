@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Recollect : MonoBehaviour
 {
@@ -12,13 +12,17 @@ public class Recollect : MonoBehaviour
     [Header("Tipo de Item")]
     [SerializeField] private TipoItem tipoItem = TipoItem.Coin;
 
-    [Header("Configuración")]
+    [Header("Configuracin")]
     [SerializeField] private string playerLayer = "Players";
 
     [Header("Efectos")]
     [SerializeField] private ParticleSystem particleEffect;
 
-    [Header("Levitación")]
+    [Header("Sonido")]
+    [SerializeField] private AudioClip collectSound; // Asigna el sonido desde el Inspector
+    [SerializeField] private float volume = 1f; // Volumen del sonido
+
+    [Header("Levitacin")]
     [SerializeField] private float levitationSpeed = 1f;
     [SerializeField] private float levitationHeight = 0.2f;
 
@@ -49,14 +53,14 @@ public class Recollect : MonoBehaviour
     {
         enabled = false;
 
-        // Activar habilidad según el tipo
+        // Reproducir sonido de recolecciÃ³n
+        PlayCollectSound();
+
+        // Activar habilidad segË™n el tipo
         ActivarHabilidad(jugador);
 
-        // Efectos visuales y sonoros
+        // Efectos visuales
         if (particleEffect != null) particleEffect.Play();
-
-        AudioSource audio = GetComponent<AudioSource>();
-        if (audio != null) audio.Play();
 
         // Ocultar item
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
@@ -66,6 +70,19 @@ public class Recollect : MonoBehaviour
         if (collider != null) collider.enabled = false;
 
         Destroy(gameObject, 0.9f);
+    }
+
+    private void PlayCollectSound()
+    {
+        if (collectSound != null)
+        {
+            // MÃ©todo simple: AudioSource.PlayClipAtPoint
+            AudioSource.PlayClipAtPoint(collectSound, transform.position, volume);
+        }
+        else
+        {
+            Debug.LogWarning("No hay AudioClip asignado para el sonido de recolecciÃ³n");
+        }
     }
 
     private void ActivarHabilidad(GameObject jugador)
@@ -90,13 +107,10 @@ public class Recollect : MonoBehaviour
                 }
                 break;
 
-            // Solo modifica el caso Coin en ActivarHabilidad():
             case TipoItem.Coin:
                 PlayerScore playerScore = jugador.GetComponent<PlayerScore>();
                 if (playerScore != null)
                 {
-                    // El PlayerScore ya detecta la moneda por tag
-                    // Solo destruye el objeto
                     Destroy(gameObject);
                 }
                 break;

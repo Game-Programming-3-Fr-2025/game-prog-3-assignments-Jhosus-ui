@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class ScoreManager : MonoBehaviour
@@ -18,42 +19,48 @@ public class ScoreManager : MonoBehaviour
     public TMP_Text player2FinalText;
     public TMP_Text winnerText;
 
+    [Header("Contador")]
+    public TMP_Text countdownText; // Texto para mostrar cuenta regresiva
+    public float countdownTime = 5f; // Tiempo antes de cargar escena
+
+    [Header("Escena")]
+    public string nextSceneName = "Menu"; // Nombre de la escena a cargar
+
     [Header("Result Screen")]
-    public GameObject resultsScreen; // Pantalla completa de resultados
-    public Image backgroundPanel;    // Fondo (opcional si está dentro de resultsScreen)
+    public GameObject resultsScreen;
+    public Image backgroundPanel;
     public float delayBeforeResults = 1f;
-    public bool pauseGameOnEnd = true;
 
     [Header("Game State")]
     public bool gameEnded = false;
 
+    private bool player1Dead = false;
+    private bool player2Dead = false;
+    private bool countdownStarted = false;
+
     void Start()
     {
-        // Buscar jugadores automáticamente si no están asignados
-        if (player1 == null || player2 == null)
-        {
-            FindPlayers();
-        }
-
-        if (player1Life == null || player2Life == null)
-        {
-            FindLifeSystems();
-        }
-
-        // Ocultar pantalla de resultados al inicio
+        if (player1 == null || player2 == null) FindPlayers();
+        if (player1Life == null || player2Life == null) FindLifeSystems();
         HideResultsScreen();
     }
 
     void Update()
     {
-        // Actualizar UI global
         UpdateGlobalUI();
+        CheckIndividualDeaths();
 
-        // Verificar si ambos jugadores han muerto
         if (!gameEnded && CheckBothPlayersDead())
         {
             gameEnded = true;
             StartCoroutine(GameOverSequence());
+        }
+
+        // Actualizar contador si está activo
+        if (countdownStarted && countdownText != null)
+        {
+            countdownTime -= Time.deltaTime;
+            countdownText.text = Mathf.CeilToInt(countdownTime).ToString();
         }
     }
 
@@ -62,10 +69,8 @@ public class ScoreManager : MonoBehaviour
         PlayerScore[] allScores = FindObjectsOfType<PlayerScore>();
         foreach (PlayerScore score in allScores)
         {
-            if (score.isPlayer1 && player1 == null)
-                player1 = score;
-            else if (!score.isPlayer1 && player2 == null)
-                player2 = score;
+            if (score.isPlayer1 && player1 == null) player1 = score;
+            else if (!score.isPlayer1 && player2 == null) player2 = score;
         }
     }
 
@@ -74,10 +79,44 @@ public class ScoreManager : MonoBehaviour
         LifeSystem[] allLives = FindObjectsOfType<LifeSystem>();
         foreach (LifeSystem life in allLives)
         {
-            if (life.playerType == PlayerType.Player1 && player1Life == null)
-                player1Life = life;
-            else if (life.playerType == PlayerType.Player2 && player2Life == null)
-                player2Life = life;
+            if (life.playerType == PlayerType.Player1 && player1Life == null) player1Life = life;
+            else if (life.playerType == PlayerType.Player2 && player2Life == null) player2Life = life;
+        }
+    }
+
+    void CheckIndividualDeaths()
+    {
+        if (player1Life != null && player1Life.currentHealth <= 0 && !player1Dead)
+        {
+            HidePlayer(player1Life.gameObject);
+            player1Dead = true;
+        }
+
+        if (player2Life != null && player2Life.currentHealth <= 0 && !player2Dead)
+        {
+            HidePlayer(player2Life.gameObject);
+            player2Dead = true;
+        }
+    }
+
+    void HidePlayer(GameObject player)
+    {
+        if (player == null) return;
+
+        SpriteRenderer sprite = player.GetComponent<SpriteRenderer>();
+        if (sprite != null) sprite.enabled = false;
+
+        Collider2D[] colliders = player.GetComponents<Collider2D>();
+        foreach (Collider2D col in colliders) col.enabled = false;
+
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null) rb.simulated = false;
+
+        MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour script in scripts)
+        {
+            if (script is LifeSystem || script is PlayerScore) continue;
+            script.enabled = false;
         }
     }
 
@@ -89,20 +128,26 @@ public class ScoreManager : MonoBehaviour
 
     public IEnumerator GameOverSequence()
     {
-        // Esperar antes de mostrar resultados
         yield return new WaitForSeconds(delayBeforeResults);
 
-        // Pausar el juego
-        if (pauseGameOnEnd)
+        Time.timeScale = 0f;
+        ShowResultsScreen();
+        ShowResults();
+
+        // Iniciar contador para cargar escena
+        yield return new WaitForSecondsRealtime(1f); // Pequeña pausa
+
+        if (countdownText != null)
         {
-            Time.timeScale = 0f;
+            countdownText.gameObject.SetActive(true);
+            countdownStarted = true;
         }
 
-        // Mostrar pantalla de resultados
-        ShowResultsScreen();
+        // Esperar tiempo del contador
+        yield return new WaitForSecondsRealtime(countdownTime);
 
-        // Calcular y mostrar quién ganó
-        ShowResults();
+        // Cargar escena obligatoria
+        SceneManager.LoadScene(nextSceneName);
     }
 
     void UpdateGlobalUI()
@@ -116,29 +161,17 @@ public class ScoreManager : MonoBehaviour
 
     void HideResultsScreen()
     {
-        if (resultsScreen != null)
-            resultsScreen.SetActive(false);
-
-        if (backgroundPanel != null)
-            backgroundPanel.gameObject.SetActive(false);
-
-        if (winnerText != null)
-            winnerText.gameObject.SetActive(false);
+        if (resultsScreen != null) resultsScreen.SetActive(false);
+        if (backgroundPanel != null) backgroundPanel.gameObject.SetActive(false);
+        if (winnerText != null) winnerText.gameObject.SetActive(false);
+        if (countdownText != null) countdownText.gameObject.SetActive(false);
     }
 
     void ShowResultsScreen()
     {
-        // Primero mostrar el fondo
-        if (backgroundPanel != null)
-            backgroundPanel.gameObject.SetActive(true);
-
-        // Luego la pantalla completa
-        if (resultsScreen != null)
-            resultsScreen.SetActive(true);
-
-        // Finalmente el texto del ganador
-        if (winnerText != null)
-            winnerText.gameObject.SetActive(true);
+        if (backgroundPanel != null) backgroundPanel.gameObject.SetActive(true);
+        if (resultsScreen != null) resultsScreen.SetActive(true);
+        if (winnerText != null) winnerText.gameObject.SetActive(true);
     }
 
     public void ShowResults()
@@ -150,22 +183,9 @@ public class ScoreManager : MonoBehaviour
 
         if (winnerText != null)
         {
-            if (score1 > score2)
-                winnerText.text = "Player 1 Win!";
-            else if (score2 > score1)
-                winnerText.text = "Player 2 Win!";
-            else
-                winnerText.text = "Tied!";
+            if (score1 > score2) winnerText.text = "Player 1 Win!";
+            else if (score2 > score1) winnerText.text = "Player 2 Win!";
+            else winnerText.text = "Tied!";
         }
-
-        Debug.Log("Resultados: P1=" + score1 + ", P2=" + score2);
-    }
-
-    public void ResetGame()
-    {
-        gameEnded = false;
-        Time.timeScale = 1f;
-        HideResultsScreen();
-        Debug.Log("Juego reseteado");
     }
 }
