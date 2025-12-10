@@ -33,7 +33,7 @@ public class FC2 : MonoBehaviour
         tiempoInicioVertical = Time.time;
 
         cam = GetComponent<Camera>();
-        if (cam != null)
+        if (cam != null) // Calcular la mitad del tamaño de la cámara aunque otros tambien se encargan de esto
         {
             mitadAlturaCamara = cam.orthographicSize;
             mitadAnchoCamara = cam.orthographicSize * cam.aspect;
@@ -44,7 +44,7 @@ public class FC2 : MonoBehaviour
             mitadAnchoCamara = 8f;
         }
 
-        string playerTag = transform.parent != null && transform.parent.CompareTag("Player 2") ? "Player 2" : "Player 1";
+        string playerTag = transform.parent != null && transform.parent.CompareTag("Player 2") ? "Player 2" : "Player 1"; //Para recordar que la camara es hija de player constante
         GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
         if (playerObj != null) jugador = playerObj.transform;
     }
@@ -59,14 +59,14 @@ public class FC2 : MonoBehaviour
             MoverCamaraVertical();
     }
 
-    void MoverCamaraVertical()
+    void MoverCamaraVertical() //EVENTO #1
     {
         float tiempoTranscurrido = Time.time - tiempoInicioVertical;
         float nuevaY = alturaInicial - (velocidadBajada * tiempoTranscurrido);
         transform.position = new Vector3(posicionXFija, nuevaY, transform.position.z);
     }
 
-    void MoverCamaraHorizontal()
+    void MoverCamaraHorizontal() //EVENTO #2
     {
         float nuevaX = seguirJugadorHorizontal && jugador != null
             ? Mathf.Lerp(transform.position.x, jugador.position.x, Time.deltaTime * velocidadDerecha)
@@ -75,7 +75,7 @@ public class FC2 : MonoBehaviour
         transform.position = new Vector3(nuevaX, posicionYFijaHorizontal, transform.position.z);
     }
 
-    void MoverCamaraVerticalArriba()
+    void MoverCamaraVerticalArriba() //EVENTO #3
     {
         float tiempoTranscurrido = Time.time - tiempoInicioVerticalArriba;
         float nuevaY = posicionYInicialArriba + (velocidadSubida * tiempoTranscurrido);
@@ -84,7 +84,7 @@ public class FC2 : MonoBehaviour
 
     public void CambiarAModoHorizontal(Vector3 posicionAjuste)
     {
-        if (!modoHorizontal)
+        if (!modoHorizontal) 
         {
             modoHorizontal = true;
             modoVerticalArriba = false;
@@ -117,7 +117,7 @@ public class FC2 : MonoBehaviour
             alturaInicial = transform.position.y;
             tiempoInicioVertical = Time.time;
         }
-    }
+    } 
 
     public void SetSeguirJugador(bool seguir) => seguirJugadorHorizontal = seguir;
     public void SetVelocidadBajada(float nuevaVelocidad) => velocidadBajada = nuevaVelocidad;

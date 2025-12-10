@@ -55,21 +55,21 @@ public class Fire : MonoBehaviour
             frameActual = (frameActual + 1) % sprites.Length;
 
             yield return new WaitForSeconds(tiempoEntreFrames);
-        }
+        } // COnsideremos que el daño se aplica mientras el sprite está activo
     }
 
-    IEnumerator EscalarSprite(Transform spriteTransform)
+    IEnumerator EscalarSprite(Transform spriteTransform) //Tratemos de escalar el sprite para que parezca que crece
     {
         float tiempo = 0;
         Vector3 escalaIni = Vector3.one * escalaInicial;
         Vector3 escalaFin = Vector3.one * escalaFinal;
 
-        while (tiempo < tiempoCrecimiento)
+        while (tiempo < tiempoCrecimiento) 
         {
             tiempo += Time.deltaTime;
             float t = tiempo / tiempoCrecimiento;
             spriteTransform.localScale = Vector3.Lerp(escalaIni, escalaFin, t);
-            yield return null;
+            yield return null; //Esperar al siguiente frame
         }
 
         spriteTransform.localScale = escalaFin;

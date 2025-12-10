@@ -56,7 +56,7 @@ public class Attacks : MonoBehaviour
 
     void UpdateVibration()
     {
-        if (isVibrating)
+        if (isVibrating) 
         {
             vibrationTimer -= Time.deltaTime;
             if (vibrationTimer <= 0f)
@@ -68,12 +68,12 @@ public class Attacks : MonoBehaviour
     {
         KeyCode attackKey = isPlayer1 ? player1Key : player2Key;
         bool keyboardAttack = Input.GetKeyDown(attackKey);
-        bool controllerAttack = playerGamepad?.buttonWest.wasPressedThisFrame ?? false;
+        bool controllerAttack = playerGamepad?.buttonWest.wasPressedThisFrame ?? false; // X button o cuadrado da uigual
 
         if (controllerAttack)
             TriggerVibration();
 
-        return keyboardAttack || controllerAttack;
+        return keyboardAttack || controllerAttack; //devolver un solo true si se presionó alguna de las dos
     }
 
     void Attack()
@@ -83,7 +83,7 @@ public class Attacks : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Attack");
 
-        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer);
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer); // Detectar enemigos en rango medianete Giz
 
         foreach (Collider2D enemy in enemies)
             ApplyDamage(enemy);
@@ -95,7 +95,7 @@ public class Attacks : MonoBehaviour
     private void PlayAttackSound()
     {
         if (attackSound != null)
-            audioSource.PlayOneShot(attackSound, attackVolume);
+            audioSource.PlayOneShot(attackSound, attackVolume); // Reproducir sonido de ataque aunque esperemos que logre 
     }
 
     void ApplyDamage(Collider2D enemy)
@@ -107,14 +107,14 @@ public class Attacks : MonoBehaviour
             return;
         }
 
-        LifeSystem lifeSystem = enemy.GetComponent<LifeSystem>();
+        LifeSystem lifeSystem = enemy.GetComponent<LifeSystem>(); //referenciamos al sistema de vida
         if (lifeSystem != null)
         {
-            lifeSystem.TakeDamage(damage, transform.position);
+            lifeSystem.TakeDamage(damage, transform.position); // Aplicar daño al sistema de vida
             return;
         }
 
-        EnemyGP enemyGP = enemy.GetComponent<EnemyGP>();
+        EnemyGP enemyGP = enemy.GetComponent<EnemyGP>(); 
         if (enemyGP != null)
         {
             return;
@@ -130,7 +130,7 @@ public class Attacks : MonoBehaviour
         {
             var method = script.GetType().GetMethod("TakeDamage",
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-                null, new Type[] { typeof(int) }, null);
+                null, new Type[] { typeof(int) }, null); //ACUERDATE DE ESTO PARA FUTURO
 
             if (method != null)
             {
@@ -149,7 +149,7 @@ public class Attacks : MonoBehaviour
 
     void TriggerVibration()
     {
-        if (playerGamepad != null)
+        if (playerGamepad != null) // Asegurémonos de que el gamepad exista
         {
             playerGamepad.SetMotorSpeeds(vibrationLowFrequency, vibrationHighFrequency);
             vibrationTimer = vibrationDuration;
@@ -157,16 +157,16 @@ public class Attacks : MonoBehaviour
         }
     }
 
-    void StopVibration()
+    void StopVibration() 
     {
         if (playerGamepad != null)
         {
-            playerGamepad.SetMotorSpeeds(0f, 0f);
+            playerGamepad.SetMotorSpeeds(0f, 0f); //Matemos la vibración
             isVibrating = false;
         }
     }
 
-    void OnDisable() => StopVibration();
+    void OnDisable() => StopVibration(); 
     void OnDestroy() => StopVibration();
 
     void OnDrawGizmosSelected()

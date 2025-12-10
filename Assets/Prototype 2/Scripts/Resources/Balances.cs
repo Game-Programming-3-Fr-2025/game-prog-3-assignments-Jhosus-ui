@@ -28,24 +28,24 @@ public class Balances : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Contar objetos en cada lado
+                                                             // Contar objetos en cada lado
         int pesoIzquierda = ContarPeso(puntoIzquierdo);
         int pesoDerecha = ContarPeso(puntoDerecho);
 
-        // Calcular balance
+                                                           // Calcular balance
         if (pesoIzquierda == 0 && pesoDerecha == 0)
         {
-            // Volver al centro
+                                                                                                         // Volver al centro
             anguloObjetivo = Mathf.Lerp(anguloObjetivo, 0f, Time.fixedDeltaTime * fuerzaResorte);
         }
         else
         {
-            // Calcular inclinación
+                                                                                     // Calcular inclinación
             float diferencia = pesoDerecha - pesoIzquierda;
             anguloObjetivo = Mathf.Clamp(diferencia, -1f, 1f) * maxAngulo;
         }
 
-        // Aplicar rotación suave
+                                                                                                           // Aplicar rotación suave
         Quaternion rotacion = Quaternion.Euler(0, 0,
             Mathf.LerpAngle(rb.rotation, anguloObjetivo, Time.fixedDeltaTime * velocidadRotacion));
         rb.MoveRotation(rotacion);
@@ -60,7 +60,7 @@ public class Balances : MonoBehaviour
 
         foreach (var col in colliders)
         {
-            // Ignorar la plataforma misma y triggers
+                                                                                                        // Ignorar la plataforma misma y triggers
             if (col.gameObject != gameObject && !col.isTrigger && col.attachedRigidbody != null)
             {
                 contador++;

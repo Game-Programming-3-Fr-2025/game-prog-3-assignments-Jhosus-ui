@@ -18,7 +18,7 @@ public class EnemyGP2 : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        leftLimit = transform.position.x - patrolDistance;
+        leftLimit = transform.position.x - patrolDistance; // Definir los límites de patrulla
         rightLimit = transform.position.x + patrolDistance;
         direction = startFacingRight ? 1 : -1;
 
@@ -27,10 +27,10 @@ public class EnemyGP2 : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y); 
 
         if ((direction > 0 && transform.position.x >= rightLimit) ||
-            (direction < 0 && transform.position.x <= leftLimit))
+            (direction < 0 && transform.position.x <= leftLimit)) // Cambiar dirección al llegar a los límites
         {
             direction = -direction;
             spriteRenderer.flipX = !spriteRenderer.flipX;
@@ -39,7 +39,7 @@ public class EnemyGP2 : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        float left = Application.isPlaying ? leftLimit : transform.position.x - patrolDistance;
+        float left = Application.isPlaying ? leftLimit : transform.position.x - patrolDistance; 
         float right = Application.isPlaying ? rightLimit : transform.position.x + patrolDistance;
         float y = transform.position.y;
 
@@ -50,7 +50,7 @@ public class EnemyGP2 : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            Gizmos.DrawRay(transform.position, Vector3.right * direction);
+            Gizmos.DrawRay(transform.position, Vector3.right * direction); // Indicar dirección actual
         }
     }
 }

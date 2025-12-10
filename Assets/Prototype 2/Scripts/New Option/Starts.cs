@@ -26,11 +26,11 @@ public class Starts : MonoBehaviour
 
         if (luzAdvertenciaJugador1 != null) luzAdvertenciaJugador1.enabled = false;
         if (luzAdvertenciaJugador2 != null) luzAdvertenciaJugador2.enabled = false;
-    }
+    } //Tratemos de iniciar el juego pausado y activar con cualquier tecla
 
     void Update()
     {
-        if (!juegoActivo && Input.anyKeyDown)
+        if (!juegoActivo && Input.anyKeyDown) //Aunque tambien aplica con el gamepad
         {
             Time.timeScale = 1f;
             juegoActivo = true;
@@ -52,7 +52,7 @@ public class Starts : MonoBehaviour
         }
     }
 
-    void ActualizarLuzAdvertencia(Light2D luz, float intensidad)
+    void ActualizarLuzAdvertencia(Light2D luz, float intensidad) //Quizas nola use pero por si acaso para experimentar con mis propios juegos
     {
         if (luz != null)
         {
@@ -62,7 +62,7 @@ public class Starts : MonoBehaviour
         }
     }
 
-    void FinalizarJuego()
+    void FinalizarJuego() //Podemos llamar a esto desde otros scripts si es necesario
     {
         juegoActivo = false;
         if (luzAdvertenciaJugador1 != null) luzAdvertenciaJugador1.enabled = false;
@@ -75,6 +75,6 @@ public class Starts : MonoBehaviour
         }
     }
 
-    public float GetTiempoRestante() => tiempoRestante;
-    public bool IsJuegoActivo() => juegoActivo;
+    public float GetTiempoRestante() => tiempoRestante; //Otros scripts pueden consultar el tiempo restante
+    public bool IsJuegoActivo() => juegoActivo; //Otros scripts pueden consultar si el juego está activo
 }

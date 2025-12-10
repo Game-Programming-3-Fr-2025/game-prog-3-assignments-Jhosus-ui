@@ -20,14 +20,13 @@ public class PlatformMovement : MonoBehaviour
     void Start()
     {
         startPos = transform.position;
-        // Normalizamos la dirección para que tenga magnitud 1 y luego multiplicamos por la distancia
-        targetPos = startPos + (Vector3)movementDirection.normalized * movementDistance;
+        
+        targetPos = startPos + (Vector3)movementDirection.normalized * movementDistance; // Normalizamos la dirección para que tenga magnitud 1 y luego multiplicamos por la distancia
     }
 
     void Update()
     {
-        // Solo se mueve si ha sido activada por un jugador
-        if (!hasBeenActivated) return;
+        if (!hasBeenActivated) return; // Solo se mueve si ha sido activada por un jugador
 
         Vector3 target = movingToTarget ? targetPos : startPos;
         transform.position = Vector3.MoveTowards(transform.position, target, movementSpeed * Time.deltaTime);
@@ -43,8 +42,8 @@ public class PlatformMovement : MonoBehaviour
             hasPlayer = true;
             collision.transform.SetParent(transform);
 
-            // Activar el movimiento solo la primera vez que un jugador pisa la plataforma
-            if (!hasBeenActivated)
+            
+            if (!hasBeenActivated) // Activar el movimiento solo la primera vez que un jugador pisa la plataforma
             {
                 hasBeenActivated = true;
             }
@@ -84,11 +83,11 @@ public class PlatformMovement : MonoBehaviour
         Gizmos.DrawRay(arrowTip, Quaternion.Euler(0, 0, -135) * dir * 0.6f);
     }
 
-    // Método para validar y normalizar la dirección en el Inspector
-    void OnValidate()
+    
+    void OnValidate() // Método para validar y normalizar la dirección en el Inspector
     {
-        // Asegurarnos de que la dirección no sea cero
-        if (movementDirection == Vector2.zero)
+        
+        if (movementDirection == Vector2.zero) // Asegurarnos de que la dirección no sea cero
         {
             movementDirection = Vector2.right;
         }

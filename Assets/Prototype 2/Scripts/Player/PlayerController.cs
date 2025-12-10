@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
         wasGrounded = isGrounded;
     }
 
-    void AsignarGamepad()
+    void AsignarGamepad() // Agregar Sistema De Control
     {
         if (Gamepad.all.Count > 0)
         {
@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!EstaEnDash()) ManejarMovimiento();
+        if (!EstaEnDash()) ManejarMovimiento(); 
         VerificarSuelo();
     }
 
@@ -103,16 +103,16 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(left)) inputTeclado -= 1f;
         if (Input.GetKey(right)) inputTeclado += 1f;
 
-        if (gamepad != null)
+        if (gamepad != null) // Por si no hay gamepad conectado
         {
             float stickX = gamepad.leftStick.x.ReadValue();
             inputGamepad = Mathf.Abs(stickX) > 0.1f ? stickX : 0f;
         }
 
-        horizontalInput = Mathf.Abs(inputGamepad) > 0.1f ? inputGamepad : inputTeclado;
+        horizontalInput = Mathf.Abs(inputGamepad) > 0.1f ? inputGamepad : inputTeclado; // Priorizar gamepad sobre teclado
     }
 
-    void ManejarMovimiento()
+    void ManejarMovimiento()  // Movimiento Horizontal
     {
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
 
@@ -120,7 +120,7 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(Mathf.Sign(horizontalInput), 1, 1);
     }
 
-    void ActualizarCoyoteTime()
+    void ActualizarCoyoteTime() // Tiempo de Coyote
     {
         if (isGrounded)
         {
@@ -133,12 +133,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void ManejarSalto()
+    void ManejarSalto() 
     {
         bool inputSalto = DetectarInput(InputType.Pressed);
         bool soltarSalto = DetectarInput(InputType.Released);
 
-        if (inputSalto && !EstaEnDash())
+        if (inputSalto && !EstaEnDash()) // Iniciar Salto
         {
             if (isGrounded)
             {
@@ -153,7 +153,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (soltarSalto && rb.linearVelocity.y > 0)
+        if (soltarSalto && rb.linearVelocity.y > 0) // Necesario para cortar el salto
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * cutJumpHeight);
             isJumping = false;
@@ -165,7 +165,7 @@ public class PlayerController : MonoBehaviour
     {
         if (isJumping && DetectarInput(InputType.Hold) && !usingCoyoteTime && (!EstaEnDash() || PuedeSaltarDuranteDash()))
         {
-            if (jumpTimeCounter > 0)
+            if (jumpTimeCounter > 0) // Continuar salto mientras se mantenga el boton
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 jumpTimeCounter -= Time.deltaTime;
@@ -184,7 +184,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void IniciarSalto(bool permitirMantenido)
+    void IniciarSalto(bool permitirMantenido) // Sirve para iniciar el salto normal con tiempo de coyote
     {
         isJumping = permitirMantenido;
         jumpTimeCounter = permitirMantenido ? jumpTime : 0;
@@ -204,11 +204,11 @@ public class PlayerController : MonoBehaviour
 
     enum InputType { Pressed, Released, Hold }
 
-    bool DetectarInput(InputType tipo)
+    bool DetectarInput(InputType tipo) //Detectar Controles de Salto
     {
         KeyCode key = isPlayer1 ? KeyCode.W : KeyCode.UpArrow;
 
-        bool teclado = tipo switch
+        bool teclado = tipo switch 
         {
             InputType.Pressed => Input.GetKeyDown(key),
             InputType.Released => Input.GetKeyUp(key),
@@ -216,20 +216,20 @@ public class PlayerController : MonoBehaviour
             _ => false
         };
 
-        bool control = gamepad != null && tipo switch
+        bool control = gamepad != null && tipo switch // Por si no hay gamepad conectado
         {
             InputType.Pressed => gamepad.buttonSouth.wasPressedThisFrame,
             InputType.Released => gamepad.buttonSouth.wasReleasedThisFrame,
             InputType.Hold => gamepad.buttonSouth.isPressed,
             _ => false
-        };
+        }; 
 
         return teclado || control;
     }
 
-    public bool PuedeSaltarDuranteDash() => EstaEnDash() && jumpComponent != null && !jumpComponent.HasUsedAirJump();
+    public bool PuedeSaltarDuranteDash() => EstaEnDash() && jumpComponent != null && !jumpComponent.HasUsedAirJump(); // Permitir salto durante dash si tiene salto en aire
 
-    void ActualizarAnimaciones()
+    void ActualizarAnimaciones() 
     {
         if (animator == null || EstaEnDash()) return;
 
@@ -239,11 +239,11 @@ public class PlayerController : MonoBehaviour
 
     void VerificarSuelo()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer); //Ayuda a verificar si el jugador esta en el suelo
         isGrounded = hit.collider != null;
     }
 
-    bool EstaEnDash() => dashComponent != null && dashComponent.IsDashing();
+    bool EstaEnDash() => dashComponent != null && dashComponent.IsDashing(); // Verificar si el jugador esta en dash
 
     void VerificarVibracionAterrizar()
     {
@@ -254,7 +254,7 @@ public class PlayerController : MonoBehaviour
             if (gamepad != null)
             {
                 float intensidad = jumpHeight > 3f ? bigJumpVibration : smallJumpVibration;
-                StartCoroutine(VibrarControl(intensidad, vibrationDuration));
+                StartCoroutine(VibrarControl(intensidad, vibrationDuration)); // Vibrar al aterrizar
             }
 
             jumpHeight = 0;
@@ -263,9 +263,9 @@ public class PlayerController : MonoBehaviour
         wasGrounded = isGrounded;
     }
 
-    private System.Collections.IEnumerator VibrarControl(float intensidad, float duracion)
+    private System.Collections.IEnumerator VibrarControl(float intensidad, float duracion) // Coroutine para manejar la vibración
     {
-        if (gamepad != null)
+        if (gamepad != null) // Por si no hay gamepad conectado
         {
             gamepad.SetMotorSpeeds(intensidad, intensidad);
             yield return new WaitForSeconds(duracion);
@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviour
 
     void OnDestroy()
     {
-        if (gamepad != null) gamepad.SetMotorSpeeds(0f, 0f);
+        if (gamepad != null) gamepad.SetMotorSpeeds(0f, 0f); // Asegurarse de detener la vibración
     }
 
     void OnDrawGizmosSelected()
@@ -288,8 +288,8 @@ public class PlayerController : MonoBehaviour
 
     public void ReasignarGamepad(int nuevoIndice)
     {
-        if (nuevoIndice < Gamepad.all.Count) gamepad = Gamepad.all[nuevoIndice];
+        if (nuevoIndice < Gamepad.all.Count) gamepad = Gamepad.all[nuevoIndice]; // Reasignar gamepad manualmente
     }
 
-    public float GetHorizontalInput() => horizontalInput;
+    public float GetHorizontalInput() => horizontalInput; // Obtener el input horizontal actual
 }

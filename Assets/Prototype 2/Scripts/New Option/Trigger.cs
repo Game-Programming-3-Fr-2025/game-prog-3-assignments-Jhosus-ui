@@ -20,13 +20,13 @@ public class Trigger : MonoBehaviour
 
         if (!isPlayer1 && !isPlayer2) return;
 
-        if ((isPlayer1 && player1Activado) || (isPlayer2 && player2Activado))
+        if ((isPlayer1 && player1Activado) || (isPlayer2 && player2Activado)) //Garantizemos que cada jugador solo active una vez
             return;
 
         if (isPlayer1) player1Activado = true;
         if (isPlayer2) player2Activado = true;
 
-        string nombreCamaraBuscada = isPlayer1 ? nombreCamaraPlayer1 : nombreCamaraPlayer2;
+        string nombreCamaraBuscada = isPlayer1 ? nombreCamaraPlayer1 : nombreCamaraPlayer2; // Determinar la cámara según el jugador
         GameObject camaraObj = GameObject.Find(nombreCamaraBuscada);
 
         if (camaraObj == null)
@@ -42,20 +42,20 @@ public class Trigger : MonoBehaviour
             return;
         }
 
-        Vector3 posicion = puntoAjuste != null ? puntoAjuste.position : transform.position;
+        Vector3 posicion = puntoAjuste != null ? puntoAjuste.position : transform.position; // Usar la posición del trigger si no hay punto de ajuste
 
         if (esModoArriba)
             camara.CambiarAModoVerticalArriba(posicion);
         else
             camara.CambiarAModoHorizontal(posicion);
 
-        StartCoroutine(DesactivarTemporalmenteParaJugador(other));
+        StartCoroutine(DesactivarTemporalmenteParaJugador(other)); 
 
         if (player1Activado && player2Activado)
             gameObject.SetActive(false);
     }
 
-    IEnumerator DesactivarTemporalmenteParaJugador(Collider2D playerCollider)
+    IEnumerator DesactivarTemporalmenteParaJugador(Collider2D playerCollider) //Desactivemos los trigger temporalmente
     {
         Collider2D triggerCollider = GetComponent<Collider2D>();
         if (triggerCollider != null)
@@ -65,7 +65,7 @@ public class Trigger : MonoBehaviour
 
             if (!(player1Activado && player2Activado))
                 triggerCollider.enabled = true;
-        }
+        } //Si no hay collider, no hacemos nada
     }
 
     void OnDrawGizmos()

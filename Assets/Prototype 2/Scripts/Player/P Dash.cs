@@ -51,12 +51,12 @@ public class PDash : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         if (sprite != null) originalColor = sprite.color;
 
-        trail = GetComponent<TrailRenderer>() ?? gameObject.AddComponent<TrailRenderer>();
+        trail = GetComponent<TrailRenderer>() ?? gameObject.AddComponent<TrailRenderer>(); //Mejor aseguremonos de aplicar aqui el TrailRenderer 
         ConfigureTrailRenderer();
         FindGamepad();
     }
 
-    void ConfigureTrailRenderer()
+    void ConfigureTrailRenderer() //Coniguracionas basicas del TrailRenderer
     {
         if (trail == null) return;
 
@@ -71,7 +71,7 @@ public class PDash : MonoBehaviour
 
     void FindGamepad()
     {
-        if (Gamepad.all.Count > 0)
+        if (Gamepad.all.Count > 0) //Asignar el gamepad correspondiente al jugador
         {
             playerGamepad = player.isPlayer1 ? Gamepad.all[0] :
                            (Gamepad.all.Count > 1 ? Gamepad.all[1] : Gamepad.all[0]);
@@ -85,7 +85,7 @@ public class PDash : MonoBehaviour
         if (playerGamepad == null && Gamepad.all.Count > 0)
             FindGamepad();
 
-        if (CheckDashInput() && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0)
+        if (CheckDashInput() && canDash && dashesRemaining > 0 && dashCooldownTimer <= 0) //Asignemos el dash
             StartDash();
 
         UpdateDash();
@@ -99,7 +99,7 @@ public class PDash : MonoBehaviour
 
         if (playerGamepad != null)
         {
-            float triggerValue = playerGamepad.rightTrigger.ReadValue();
+            float triggerValue = playerGamepad.rightTrigger.ReadValue(); // Comprobar el valor del gatillo derecho
 
             if (triggerValue >= triggerThreshold && triggerReady)
             {
@@ -110,7 +110,7 @@ public class PDash : MonoBehaviour
             if (triggerValue < 0.2f)
                 triggerReady = true;
 
-            if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady)
+            if (playerGamepad.rightShoulder.ReadValue() > 0.5f && triggerReady) // Comprobar el botón derecho del hombro
             {
                 triggerReady = false;
                 return true;
@@ -166,7 +166,7 @@ public class PDash : MonoBehaviour
         }
     }
 
-    void ApplyDashVisualEffects(bool activate)
+    void ApplyDashVisualEffects(bool activate) //No hace falta decir nah?
     {
         if (trail != null)
         {
@@ -183,7 +183,7 @@ public class PDash : MonoBehaviour
         if (playerGamepad != null)
         {
             vibrationTimer = vibrationDuration;
-            playerGamepad.SetMotorSpeeds(vibrationIntensity, vibrationIntensity);
+            playerGamepad.SetMotorSpeeds(vibrationIntensity, vibrationIntensity); // Iniciar vibración
         }
     }
 
@@ -191,7 +191,7 @@ public class PDash : MonoBehaviour
     {
         if (vibrationTimer > 0)
         {
-            vibrationTimer -= Time.deltaTime;
+            vibrationTimer -= Time.deltaTime; // Actualizar temporizador de vibración
             if (vibrationTimer <= 0)
                 StopVibration();
         }
@@ -200,7 +200,7 @@ public class PDash : MonoBehaviour
     void StopVibration()
     {
         if (playerGamepad != null)
-            playerGamepad.SetMotorSpeeds(0f, 0f);
+            playerGamepad.SetMotorSpeeds(0f, 0f); // Detener vibración
     }
 
     void OnDisable()
@@ -209,5 +209,5 @@ public class PDash : MonoBehaviour
         ApplyDashVisualEffects(false);
     }
 
-    public bool IsDashing() => isDashing;
+    public bool IsDashing() => isDashing; //Verifiquemos si esta en dash
 }

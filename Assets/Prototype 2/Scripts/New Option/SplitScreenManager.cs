@@ -8,7 +8,7 @@ public class SplitScreenManager : MonoBehaviour
 
     [Header("Configuración")]
     [Range(0.5f, 0.8f)]
-    public float cameraWidthPercent = 0.7f; // Qué % del ancho ocupa cada cámara
+    public float cameraWidthPercent = 0.7f; // Qué % del ancho ocupa cada cámara comenzemos con este valro que tal
 
     public Color backgroundColor = Color.black;
 
@@ -45,18 +45,18 @@ public class SplitScreenManager : MonoBehaviour
 
         // PLAYER 1 (ARRIBA) - Pegado a la IZQUIERDA, espacio libre a la DERECHA
         player1Camera.rect = new Rect(
-            0f,                    // x: pegado al borde izquierdo
-            halfHeight,            // y: mitad superior
-            cameraWidthPercent,    // width: ocupa 70% del ancho
+            0f,                    // x pegado al borde izquierdo
+            halfHeight,            // y mitad superior
+            cameraWidthPercent,    // width: ocupa % del ancho
             halfHeight             // height: mitad de la pantalla
         );
 
         // PLAYER 2 (ABAJO) - Pegado a la DERECHA, espacio libre a la IZQUIERDA
         player2Camera.rect = new Rect(
-            1f - cameraWidthPercent, // x: pegado al borde derecho
-            0f,                      // y: mitad inferior
-            cameraWidthPercent,      // width: ocupa 70% del ancho
-            halfHeight               // height: mitad de la pantalla
+            1f - cameraWidthPercent, // x pegado al borde derecho
+            0f,                      // y mitad inferior
+            cameraWidthPercent,      // width ocupa % del ancho
+            halfHeight               // height mitad de la pantalla
         );
     }
 

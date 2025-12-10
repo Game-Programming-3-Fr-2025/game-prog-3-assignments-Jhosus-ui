@@ -4,7 +4,7 @@ public class Blocks : MonoBehaviour
 {
     [Header("Block Settings")]
     public Sprite normalFace;
-    public Sprite crackedFace;
+    public Sprite crackedFace; //Dejemoslo comoo opcional a futuro auque no pasa nada si e deja asi
     public float breakTime = 0.5f;
     public float respawnTime = 3f;
     public float shakeIntensity = 0.1f;

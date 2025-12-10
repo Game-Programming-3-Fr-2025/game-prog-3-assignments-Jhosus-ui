@@ -4,8 +4,8 @@ public class DamageSource : MonoBehaviour
 {
     [Header("Configuración de Daño")]
     public int damageAmount = 1;
-    public float damageCooldown = 0.5f; // Tiempo entre daños
-    public bool continuousDamage = false; // Si hace daño continuo
+    public float damageCooldown = 0.5f; 
+    public bool continuousDamage = false; 
 
     [Header("Área de Daño Rectangular")]
     public Color damageAreaColor = new Color(1f, 0f, 0f, 0.3f);
@@ -15,8 +15,8 @@ public class DamageSource : MonoBehaviour
 
     void Start()
     {
-        // Configurar layer si no está en "Dangers"
-        if (gameObject.layer != LayerMask.NameToLayer("Dangers"))
+        
+        if (gameObject.layer != LayerMask.NameToLayer("Dangers")) // Configurar layer manual aunque podria servir a futuro a otros casos
         {
             int dangersLayer = LayerMask.NameToLayer("Dangers");
             if (dangersLayer != -1)
@@ -34,8 +34,8 @@ public class DamageSource : MonoBehaviour
     {
         if (continuousDamage)
         {
-            // Para daño continuo, verificar cooldown
-            return Time.time >= lastDamageTime + damageCooldown;
+           
+            return Time.time >= lastDamageTime + damageCooldown;  // Para daño continuo, verificar cooldown aunque opciona en algunas areas
         }
         return true;
     }
@@ -45,8 +45,8 @@ public class DamageSource : MonoBehaviour
         lastDamageTime = Time.time;
     }
 
-    // Método para verificar si un punto está dentro del área de daño
-    public bool IsPointInDamageArea(Vector2 point)
+    
+    public bool IsPointInDamageArea(Vector2 point) // Método para verificar si un punto está dentro del área de daño
     {
         Vector2 halfSize = damageAreaSize * 0.5f;
         Rect damageRect = new Rect(
@@ -56,26 +56,20 @@ public class DamageSource : MonoBehaviour
             damageAreaSize.y
         );
 
-        return damageRect.Contains(point);
+        return damageRect.Contains(point); // Verificar si el punto está dentro del rectángulo
     }
 
-    // Dibujar gizmo para visualizar el área de daño rectangular
+    
     private void OnDrawGizmos()
     {
-        // Área de daño (siempre visible)
         Gizmos.color = damageAreaColor;
-
-        // Dibujar rectángulo
         Vector3 size = new Vector3(damageAreaSize.x, damageAreaSize.y, 0.1f);
         Gizmos.DrawWireCube(transform.position, size);
-
-        // Pequeño cubo central para referencia
         Gizmos.DrawCube(transform.position, Vector3.one * 0.1f);
     }
 
     private void OnDrawGizmosSelected()
     {
-        // Resaltar cuando está seleccionado
         Gizmos.color = Color.yellow;
 
         Vector3 size = new Vector3(damageAreaSize.x * 1.2f, damageAreaSize.y * 1.2f, 0.1f);

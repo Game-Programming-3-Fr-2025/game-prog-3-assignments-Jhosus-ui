@@ -38,7 +38,7 @@ public class EnemyGP : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void FixedUpdate() //Establecemos el movimiento base a velocidad constante
     {
         Vector2 moveDirection = targetPlayer != null
             ? ((Vector2)targetPlayer.position - (Vector2)transform.position).normalized
@@ -52,18 +52,18 @@ public class EnemyGP : MonoBehaviour
     {
         float distanceFromCenter = Vector2.Distance(transform.position, patrolCenter);
 
-        if (distanceFromCenter >= patrolRadius * EDGE_THRESHOLD)
+        if (distanceFromCenter >= patrolRadius * EDGE_THRESHOLD) // Si está cerca del borde, volver al centro
         {
             Vector2 toCenter = (patrolCenter - (Vector2)transform.position).normalized;
             currentDirection = toCenter;
         }
 
-        return currentDirection;
+        return currentDirection; // Dirección actual de patrulla
     }
 
     void FindNearestPlayer()
     {
-        Collider2D[] players = Physics2D.OverlapCircleAll(transform.position, detectionRadius, playerLayer);
+        Collider2D[] players = Physics2D.OverlapCircleAll(transform.position, detectionRadius, playerLayer); // Detectar jugadores cercanos
 
         if (players.Length == 0)
         {
@@ -81,7 +81,7 @@ public class EnemyGP : MonoBehaviour
             {
                 minDistance = distance;
                 nearest = players[i].transform;
-            }
+            } // Actualizar el jugador más cercano
         }
 
         targetPlayer = nearest;
@@ -94,7 +94,7 @@ public class EnemyGP : MonoBehaviour
 
     void FlipSprite(float directionX)
     {
-        if (directionX != 0)
+        if (directionX != 0) //Volteo correcto
         {
             Vector3 scale = transform.localScale;
             scale.x = Mathf.Abs(scale.x) * Mathf.Sign(directionX);

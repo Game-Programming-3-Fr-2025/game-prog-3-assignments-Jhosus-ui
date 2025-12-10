@@ -57,7 +57,7 @@ public class LifeSystem : MonoBehaviour
         currentHealth = maxHealth;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        uiPositioner = FindObjectOfType<UIPositioner>();
+        uiPositioner = FindObjectOfType<UIPositioner>(); //Sigo sin enteder porque muestran eso si cambio todo cae hahahah
         UpdateHeartsUI();
     }
 
@@ -69,15 +69,15 @@ public class LifeSystem : MonoBehaviour
 
     void UpdateCooldowns()
     {
-        List<GameObject> toRemove = new List<GameObject>();
+        List<GameObject> toRemove = new List<GameObject>(); //Lista temporal para objetos a eliminar
 
-        foreach (var kvp in objectCooldowns)
+        foreach (var kvp in objectCooldowns) //Recorrer el diccionario
         {
             if (kvp.Key == null || Time.time >= kvp.Value)
                 toRemove.Add(kvp.Key);
         }
 
-        foreach (var key in toRemove)
+        foreach (var key in toRemove) //Eliminar los objetos caducados
         {
             if (key != null) objectCooldowns.Remove(key);
         }
@@ -87,18 +87,18 @@ public class LifeSystem : MonoBehaviour
     {
         if (currentHealth <= 0 || !enabled) return;
 
-        Collider2D[] dangers = Physics2D.OverlapCircleAll(transform.position, damageDetectionRadius, dangerLayers);
+        Collider2D[] dangers = Physics2D.OverlapCircleAll(transform.position, damageDetectionRadius, dangerLayers); //Detectar peligros cercanos Dangers 
 
-        foreach (Collider2D danger in dangers)
+        foreach (Collider2D danger in dangers) 
         {
             if (danger == null) continue;
 
             GameObject dangerObject = danger.gameObject;
-            if (objectCooldowns.ContainsKey(dangerObject)) continue;
+            if (objectCooldowns.ContainsKey(dangerObject)) continue; //Si el objeto está en cooldown, saltarlo
 
             DamageSource damageSource = danger.GetComponent<DamageSource>();
 
-            if (damageSource != null && damageSource.CanDamage())
+            if (damageSource != null && damageSource.CanDamage()) //Verifiquemos si puede dañar
             {
                 TakeDamage(damageSource.damageAmount, danger.transform.position);
                 damageSource.OnDamageDealt();
@@ -110,7 +110,7 @@ public class LifeSystem : MonoBehaviour
 
     public void TakeDamage(int damageAmount, Vector2 damageSourcePosition)
     {
-        if (isInvincible || currentHealth <= 0 || !enabled) return;
+        if (isInvincible || currentHealth <= 0 || !enabled) return; //Verificamos aqui si puede recibir daño
 
         PlayDamageSound();
         currentHealth = Mathf.Max(0, currentHealth - damageAmount);
@@ -122,27 +122,27 @@ public class LifeSystem : MonoBehaviour
             return;
         }
 
-        StartCoroutine(DamageVibration());
+        StartCoroutine(DamageVibration()); //Iniciar vibración
 
         if (rb != null)
         {
             Vector2 knockbackDir = ((Vector2)transform.position - damageSourcePosition).normalized;
-            knockbackDir = new Vector2(knockbackDir.x * 1.2f, Mathf.Clamp(knockbackDir.y + 0.3f, 0.4f, 0.8f)).normalized;
+            knockbackDir = new Vector2(knockbackDir.x * 1.2f, Mathf.Clamp(knockbackDir.y + 0.3f, 0.4f, 0.8f)).normalized; //Apesar del ajuste sigue habiendo knockback algo torpe
             StartCoroutine(ApplyKnockback(knockbackDir, knockbackForce * knockbackIntensity));
         }
 
         StartCoroutine(DamageEffects());
     }
 
-    public void TakeDamage(int damageAmount) => TakeDamage(damageAmount, Vector2.zero);
+    public void TakeDamage(int damageAmount) => TakeDamage(damageAmount, Vector2.zero); 
 
     private void PlayDamageSound()
     {
         if (damageSound != null)
-            AudioSource.PlayClipAtPoint(damageSound, transform.position, damageVolume);
+            AudioSource.PlayClipAtPoint(damageSound, transform.position, damageVolume); //Esperemos a ver si es mejor esto o quedarnos en el PlayClipAtPoint
     }
 
-    private IEnumerator ApplyKnockback(Vector2 direction, float force)
+    private IEnumerator ApplyKnockback(Vector2 direction, float force) //Apliquendo knockback
     {
         if (rb != null)
         {
@@ -160,16 +160,16 @@ public class LifeSystem : MonoBehaviour
 
         while (elapsed < damageVibrationDuration)
         {
-            try
+            try //Intentar aplicar vibración
             {
                 Gamepad.current.SetMotorSpeeds(damageVibrationIntensity, damageVibrationIntensity);
             }
-            catch (System.InvalidOperationException)
+            catch (System.InvalidOperationException) //Si falla, salir
             {
                 yield break;
             }
 
-            elapsed += Time.deltaTime;
+            elapsed += Time.deltaTime; //Incrementar tiempo transcurrido
             yield return null;
         }
 
@@ -177,7 +177,7 @@ public class LifeSystem : MonoBehaviour
 
         try
         {
-            Gamepad.current.SetMotorSpeeds(0f, 0f);
+            Gamepad.current.SetMotorSpeeds(0f, 0f); //Detener vibración
         }
         catch (System.InvalidOperationException) { }
     }
@@ -188,7 +188,7 @@ public class LifeSystem : MonoBehaviour
         float timer = 0f;
         bool isVisible = true;
 
-        while (timer < invincibilityTime)
+        while (timer < invincibilityTime) //Parpadeeando
         {
             if (spriteRenderer != null) spriteRenderer.enabled = isVisible;
             isVisible = !isVisible;
@@ -196,7 +196,7 @@ public class LifeSystem : MonoBehaviour
             timer += blinkInterval;
         }
 
-        if (spriteRenderer != null) spriteRenderer.enabled = true;
+        if (spriteRenderer != null) spriteRenderer.enabled = true; //Asegurarse de que el sprite esté visible al final
         isInvincible = false;
     }
 
@@ -218,13 +218,13 @@ public class LifeSystem : MonoBehaviour
         isInvincible = true;
         enabled = false;
 
-        if (Gamepad.current?.added == true)
+        if (Gamepad.current?.added == true) //Detener vibración si está activa
         {
             try { Gamepad.current.SetMotorSpeeds(0f, 0f); }
             catch (System.InvalidOperationException) { }
         }
 
-        if (spriteRenderer != null) spriteRenderer.enabled = false;
+        if (spriteRenderer != null) spriteRenderer.enabled = false; //Ocultar sprite al morir
         objectCooldowns.Clear();
     }
 
@@ -233,16 +233,16 @@ public class LifeSystem : MonoBehaviour
         currentHealth = maxHealth;
         UpdateHeartsUI();
         StopAllCoroutines();
-        if (spriteRenderer != null) spriteRenderer.enabled = true;
+        if (spriteRenderer != null) spriteRenderer.enabled = true; //Asegurarse de que el sprite esté visible
         isInvincible = false;
         enabled = true;
         objectCooldowns.Clear();
-        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
+        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f); //Asegurarse de que la vibración esté apagada
     }
 
     private void OnDestroy()
     {
-        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f);
+        if (Gamepad.current?.added == true) Gamepad.current.SetMotorSpeeds(0f, 0f); //Asegurar apagar y para luego destruir
     }
 
     private void OnDrawGizmosSelected()
@@ -263,5 +263,5 @@ public class LifeSystem : MonoBehaviour
     }
 
     public bool IsInvincible => isInvincible;
-    public PlayerType GetPlayerType() => playerType;
+    public PlayerType GetPlayerType() => playerType; //Devuelve el tipo de jugador
 }

@@ -63,14 +63,14 @@ public class ScoreManager : MonoBehaviour
         {
             currentCountdownTime -= Time.unscaledDeltaTime;
             if (countdownText != null)
-                countdownText.text = Mathf.CeilToInt(currentCountdownTime).ToString();
+                countdownText.text = Mathf.CeilToInt(currentCountdownTime).ToString(); 
 
             if (currentCountdownTime <= 0)
             {
                 countdownActive = false;
                 CargarEscenaFinal();
             }
-        }
+        } 
     }
 
     void FindPlayers()
@@ -85,7 +85,7 @@ public class ScoreManager : MonoBehaviour
 
     void FindLifeSystems()
     {
-        LifeSystem[] allLives = FindObjectsOfType<LifeSystem>();
+        LifeSystem[] allLives = FindObjectsOfType<LifeSystem>(); //refereciemos a todos los sistemas de vida en la escena
         foreach (LifeSystem life in allLives)
         {
             if (life.playerType == PlayerType.Player1 && player1Life == null) player1Life = life;
@@ -95,16 +95,27 @@ public class ScoreManager : MonoBehaviour
 
     void CheckIndividualDeaths()
     {
-        if (player1Life != null && player1Life.currentHealth <= 0 && !player1Dead)
+        if (player1Life != null && player1Life.currentHealth <= 0 && !player1Dead) //Verifiquemos si el jugador 1 ha muerto
         {
-            HidePlayer(player1Life.gameObject);
             player1Dead = true;
+            StopPlayerScoreCounting(player1);
+            HidePlayer(player1Life.gameObject);
         }
 
-        if (player2Life != null && player2Life.currentHealth <= 0 && !player2Dead)
+        if (player2Life != null && player2Life.currentHealth <= 0 && !player2Dead) //Verifiquemos si el jugador 2 ha muerto
         {
-            HidePlayer(player2Life.gameObject);
             player2Dead = true;
+            StopPlayerScoreCounting(player2);
+            HidePlayer(player2Life.gameObject);
+        }
+    }
+
+    void StopPlayerScoreCounting(PlayerScore playerScore)
+    {
+        if (playerScore != null)
+        {
+            MonoBehaviour mb = playerScore as MonoBehaviour; //Transformar PlayerScore a MonoBehaviour para deshabilitarlo
+            if (mb != null) mb.enabled = false;
         }
     }
 
@@ -112,12 +123,11 @@ public class ScoreManager : MonoBehaviour
     {
         if (player == null) return;
 
-        // PRIMERO: Desactivar TrailRenderer y efectos visuales
         TrailRenderer trail = player.GetComponent<TrailRenderer>();
         if (trail != null)
         {
             trail.enabled = false;
-            trail.Clear(); // Limpiar el trail
+            trail.Clear();
         }
 
         ParticleSystem[] particles = player.GetComponentsInChildren<ParticleSystem>();
@@ -127,7 +137,6 @@ public class ScoreManager : MonoBehaviour
             ps.Clear();
         }
 
-        // SEGUNDO: Desactivar componentes de movimiento
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
@@ -138,16 +147,14 @@ public class ScoreManager : MonoBehaviour
         Collider2D[] colliders = player.GetComponents<Collider2D>();
         foreach (Collider2D col in colliders) col.enabled = false;
 
-        // TERCERO: Desactivar scripts (excepto los necesarios)
-        MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
+        MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>(); //Desactivemos solo lifesystem y player score
         foreach (MonoBehaviour script in scripts)
         {
-            if (script is LifeSystem || script is PlayerScore) continue;
+            if (script is LifeSystem || script is PlayerScore) continue; 
             script.enabled = false;
         }
 
-        // CUARTO: Ocultar visualmente
-        SpriteRenderer sprite = player.GetComponent<SpriteRenderer>();
+        SpriteRenderer sprite = player.GetComponent<SpriteRenderer>(); //Ocultemos el sprite del jugador
         if (sprite != null) sprite.enabled = false;
     }
 
@@ -157,18 +164,16 @@ public class ScoreManager : MonoBehaviour
         return player1Life.currentHealth <= 0 && player2Life.currentHealth <= 0;
     }
 
-    public IEnumerator GameOverSequence()
+    public IEnumerator GameOverSequence() //Pasemos a la pantalla de resultados
     {
         Time.timeScale = 0f;
         ShowResultsScreen();
         ShowResults();
-
         yield return new WaitForSecondsRealtime(1f);
-
         StartCountdown();
     }
 
-    void StartCountdown()
+    void StartCountdown() //No tanto la escena final sino abrir paso a repetir nivel
     {
         if (countdownText != null)
         {
@@ -184,14 +189,11 @@ public class ScoreManager : MonoBehaviour
 
     void CargarEscenaFinal()
     {
-        // Restaurar tiempo antes de cargar
         Time.timeScale = 1f;
-
-        // Cargar escena (esto limpia todo automáticamente)
         SceneManager.LoadScene(nextSceneName);
     }
 
-    void UpdateGlobalUI()
+    void UpdateGlobalUI() 
     {
         if (player1FinalText != null && player1 != null)
             player1FinalText.text = player1.GetTotalScore().ToString();
@@ -222,7 +224,7 @@ public class ScoreManager : MonoBehaviour
         int score1 = player1.GetTotalScore();
         int score2 = player2.GetTotalScore();
 
-        if (winnerText != null)
+        if (winnerText != null) //Mostrar el ganador
         {
             if (score1 > score2) winnerText.text = "Player 1 Win!";
             else if (score2 > score1) winnerText.text = "Player 2 Win!";

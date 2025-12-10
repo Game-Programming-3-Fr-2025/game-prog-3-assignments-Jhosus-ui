@@ -31,21 +31,26 @@ public class PlayerScore : MonoBehaviour
 
     void Update()
     {
-        if (!isCounting) return;
+        if (!isCounting || !enabled) return;
 
         if (useTimeBasedDistance)
         {
             countingTime += Time.deltaTime;
-            distance = countingTime * distanceIncrementRate;
+            distance = countingTime * distanceIncrementRate; //Distancia basada en tiempo
         }
         else
         {
-            float xMovement = Mathf.Max(0, transform.position.x - lastPosition.x);
+            float xMovement = Mathf.Max(0, transform.position.x - lastPosition.x); //Solo contar movimiento hacia la derecha (Para algunos Casos)
             distance += xMovement;
             lastPosition = transform.position;
         }
 
         UpdateUI();
+    }
+
+    public void StopCounting()
+    {
+        isCounting = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -71,14 +76,14 @@ public class PlayerScore : MonoBehaviour
 
     public void UpdateUI()
     {
-        int totalScore = GetTotalScore();
+        int totalScore = GetTotalScore(); //Calcular Puntuación Total
 
         if (coinsText != null) coinsText.text = coins.ToString();
-        if (distanceText != null) distanceText.text = distance.ToString("F0");
+        if (distanceText != null) distanceText.text = distance.ToString("F0"); 
         if (totalText != null) totalText.text = totalScore.ToString();
-    }
+    } //Actualizar UI
 
     public int GetCoins() => coins;
     public float GetDistance() => distance;
-    public int GetTotalScore() => (coins * coinsMultiplier) + Mathf.RoundToInt(distance * distanceMultiplier);
+    public int GetTotalScore() => (coins * coinsMultiplier) + Mathf.RoundToInt(distance * distanceMultiplier); //calcular mediante fórmula
 }

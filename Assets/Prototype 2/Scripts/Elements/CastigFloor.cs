@@ -28,11 +28,11 @@ public class CastigFloor : MonoBehaviour
     {
         if (miCamara == null)
         {
-            miCamara = GetComponentInChildren<Camera>();
+            miCamara = GetComponentInChildren<Camera>(); // Intentar obtener la cámara hija
 
             if (miCamara == null)
             {
-                string nombreCam = gameObject.CompareTag("Player 1") ? "MainCameraP1" : "MainCameraP2";
+                string nombreCam = gameObject.CompareTag("Player 1") ? "MainCameraP1" : "MainCameraP2"; // Buscar la cámara por nombre según el jugador
                 GameObject camObj = GameObject.Find(nombreCam);
                 if (camObj) miCamara = camObj.GetComponent<Camera>();
             }
@@ -43,7 +43,7 @@ public class CastigFloor : MonoBehaviour
 
     void InicializarEstado()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) //Gueardmos las transformaciones iniciales
         {
             if (sprites[i])
             {
@@ -53,7 +53,7 @@ public class CastigFloor : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) //Ocultar todos excepto el primero
         {
             SetAlpha(i, 0f);
             if (sprites[i]) sprites[i].enabled = (i == 0);
@@ -74,9 +74,9 @@ public class CastigFloor : MonoBehaviour
             new Vector3(pos.x, pos.y + altura, 0),
             new Vector3(pos.x - ancho, pos.y, 0),
             new Vector3(pos.x, pos.y - altura, 0)
-        };
+        }; // Posiciones arriba, izquierda, abajo
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) //Actualizar posiciones y transformaciones
         {
             if (sprites[i])
             {
@@ -87,7 +87,7 @@ public class CastigFloor : MonoBehaviour
             if (luces[i])
             {
                 luces[i].transform.position = posiciones[i] + Vector3.forward * luces[i].transform.position.z;
-            }
+            } //Actualizar posiciones y transformaciones
         }
     }
 
@@ -99,14 +99,14 @@ public class CastigFloor : MonoBehaviour
             CambiarEstado((estadoActual + 1) % 3);
             tiempoUltimoCambio = Time.time;
         }
-    }
+    } 
 
     void CambiarEstado(int nuevoEstado)
     {
         StartCoroutine(TransicionEstado(nuevoEstado));
     }
 
-    IEnumerator TransicionEstado(int nuevoEstado)
+    IEnumerator TransicionEstado(int nuevoEstado) //Necesario apra evitar solapamientos
     {
         estaTransicionando = true;
 
@@ -124,7 +124,7 @@ public class CastigFloor : MonoBehaviour
         estaTransicionando = false;
     }
 
-    IEnumerator Fade(int indice, float alphaInicio, float alphaFin, float duracion)
+    IEnumerator Fade(int indice, float alphaInicio, float alphaFin, float duracion) //Fade genérico
     {
         float t = 0f;
         while (t < duracion)
@@ -136,7 +136,7 @@ public class CastigFloor : MonoBehaviour
         SetAlpha(indice, alphaFin);
     }
 
-    void SetAlpha(int indice, float alpha)
+    void SetAlpha(int indice, float alpha) //Setea alpha de sprite y luz
     {
         if (sprites[indice])
         {

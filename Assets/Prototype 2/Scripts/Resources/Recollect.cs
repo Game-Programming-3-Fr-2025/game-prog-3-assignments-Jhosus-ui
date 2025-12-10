@@ -2,7 +2,7 @@
 
 public class Recollect : MonoBehaviour
 {
-    public enum TipoItem { Coin, PDash, PJump }
+    public enum TipoItem { Coin, PDash, PJump } //Primero definimos los tipos de items que se pueden recolectar
 
     [SerializeField] private TipoItem tipoItem = TipoItem.Coin;
     [SerializeField] private string playerLayer = "Players";
@@ -16,7 +16,7 @@ public class Recollect : MonoBehaviour
     private float timeCounter = 0f;
     private bool collected = false;
 
-    void Start() => startPosition = transform.position;
+    void Start() => startPosition = transform.position; //Guardamos la posición inicial para la levitación
 
     void Update()
     {
@@ -36,7 +36,7 @@ public class Recollect : MonoBehaviour
     private void RecolectarItem(GameObject jugador)
     {
         collected = true;
-        PlayCollectSound(jugador); // ← Cambiado: pasar el jugador
+        PlayCollectSound(jugador); 
         ActivarHabilidad(jugador);
         SpawnCollectParticles();
         HideCollectible();
@@ -62,7 +62,7 @@ public class Recollect : MonoBehaviour
     private void SpawnCollectParticles()
     {
         if (collectParticlePrefab == null) return;
-        GameObject particles = Instantiate(collectParticlePrefab, transform.position, Quaternion.identity);
+        GameObject particles = Instantiate(collectParticlePrefab, transform.position, Quaternion.identity); //Instanciamos las partículas en la posición del objeto
         Destroy(particles, 3f);
     }
 
@@ -81,15 +81,15 @@ public class Recollect : MonoBehaviour
             case TipoItem.PDash:
                 PDash dash = jugador.GetComponent<PDash>();
                 if (dash != null) dash.isDashUnlocked = true;
-                break;
+                break; // Activamos la habilidad de dash en el jugador
             case TipoItem.PJump:
                 PJumps jump = jugador.GetComponent<PJumps>();
                 if (jump != null) jump.isDoubleJumpUnlocked = true;
-                break;
+                break; // Activamos la habilidad de doble salto en el jugador
             case TipoItem.Coin:
                 PlayerScore score = jugador.GetComponent<PlayerScore>();
                 if (score != null) Destroy(gameObject);
-                break;
+                break; // Las monedas son manejadas en PlayerScore, así que no hacemos nada aquí
         }
     }
 }

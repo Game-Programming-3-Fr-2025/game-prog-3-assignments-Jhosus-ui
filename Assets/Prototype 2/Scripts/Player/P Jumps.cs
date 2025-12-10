@@ -69,7 +69,7 @@ public class PJumps : MonoBehaviour
     {
         if (Gamepad.all.Count > 0)
         {
-            int index = player.isPlayer1 ? 0 : Mathf.Min(1, Gamepad.all.Count - 1);
+            int index = player.isPlayer1 ? 0 : Mathf.Min(1, Gamepad.all.Count - 1); //Asignar gamepad segun jugador
             gamepad = Gamepad.all[index];
         }
     }
@@ -83,7 +83,7 @@ public class PJumps : MonoBehaviour
         ActualizarReseteoSalto();
         ActualizarEfectos();
 
-        if (pointBufferTimer > 0f)
+        if (pointBufferTimer > 0f) //Actualizar un buffer de punto
             pointBufferTimer -= Time.deltaTime;
     }
 
@@ -93,7 +93,7 @@ public class PJumps : MonoBehaviour
 
         if (inputSalto)
         {
-            if (inPointTrigger || pointBufferTimer > 0f)
+            if (inPointTrigger || pointBufferTimer > 0f) // Realizar Point Jump
             {
                 RealizarPointJump();
                 pointBufferTimer = 0f;
@@ -162,7 +162,7 @@ public class PJumps : MonoBehaviour
             trail.Clear();
         }
 
-        // Color del sprite
+        // Color del sprite probemos aqui (experimentemos)
         if (sprite != null)
             sprite.color = color;
     }
@@ -197,7 +197,7 @@ public class PJumps : MonoBehaviour
     {
         if (!isDoubleJumpUnlocked &&
             doubleJumpActivatorObject != null &&
-            other.gameObject == doubleJumpActivatorObject)
+            other.gameObject == doubleJumpActivatorObject) //Activemos disponibilidad de doble salto
         {
             isDoubleJumpUnlocked = true;
             doubleJumpActivatorObject.SetActive(false);
@@ -224,5 +224,5 @@ public class PJumps : MonoBehaviour
             sprite.color = originalColor;
     }
 
-    public bool HasUsedAirJump() => hasUsedAirJump;
+    public bool HasUsedAirJump() => hasUsedAirJump; //Tengamos para saber si ha usado el salto aereo
 }

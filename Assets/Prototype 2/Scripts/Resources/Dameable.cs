@@ -21,92 +21,63 @@ public class Dameable : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
+        spriteRenderer = spriteRenderer ?? GetComponent<SpriteRenderer>();
+        rb = rb ?? GetComponent<Rigidbody2D>();
 
-        // Obtener referencias automáticamente
-        if (spriteRenderer == null)
-            spriteRenderer = GetComponent<SpriteRenderer>();
-
-        if (rb == null)
-            rb = GetComponent<Rigidbody2D>();
-
-        // Guardar color original
         if (spriteRenderer != null)
             originalColor = spriteRenderer.color;
     }
 
-    // Método específico para el script Attacks
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage) // Aplique daño sin dirección de atacante
     {
-        // Reducir vida
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth);
+        currentHealth = Mathf.Max(0, currentHealth - damage);
 
-        // Debug
-        Debug.Log($"{gameObject.name} dañado: -{damage} HP ({currentHealth}/{maxHealth})");
-
-        // Efectos visuales
         if (spriteRenderer != null)
             StartCoroutine(FlashDamage());
 
-        // Knockback simple
         if (rb != null)
             ApplySimpleKnockback();
 
-        // Verificar muerte
         if (currentHealth <= 0)
             Die();
     }
 
-    // Versión con posición para knockback direccional
-    public void TakeDamage(int damage, Vector2 attackerPosition)
+    public void TakeDamage(int damage, Vector2 attackerPosition) //Verifiquemos dano junto con la direccion 
     {
         TakeDamage(damage);
 
-        // Knockback direccional
-        if (rb != null)
+        if (rb != null) //Apliquemos un pequeno retroceso 
         {
-            Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
+            Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized; 
             rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
         }
     }
 
-    IEnumerator FlashDamage()
+    IEnumerator FlashDamage() //Creemos un efecto de parpadeo al recibir daño
     {
         if (spriteRenderer == null) yield break;
 
-        // Flash rojo
         spriteRenderer.color = damageColor;
-        yield return new WaitForSeconds(damageFlashDuration);
-
-        // Volver al color original
+        yield return new WaitForSeconds(damageFlashDuration); 
         spriteRenderer.color = originalColor;
     }
 
     void ApplySimpleKnockback()
     {
-        // Knockback simple hacia atrás
         rb.AddForce(Vector2.up * 2f + Vector2.left * 1f * knockbackForce, ForceMode2D.Impulse);
     }
 
     void Die()
     {
-        Debug.Log($"{gameObject.name} eliminado!");
-
-        // Opción 1: Desactivar
         gameObject.SetActive(false);
-
-        // Opción 2: Destruir después de delay
-        // Destroy(gameObject, 0.1f);
     }
 
-    // Método para curar
-    public void Heal(int amount)
+    public void Heal(int amount) //Opcion de Curar dejemoslos pero no es necesaria
     {
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount); 
     }
 
-    // Resetear objeto
-    public void ResetObject()
+    public void ResetObject() 
     {
         currentHealth = maxHealth;
         gameObject.SetActive(true);
@@ -115,12 +86,10 @@ public class Dameable : MonoBehaviour
             spriteRenderer.color = originalColor;
     }
 
-    // Para debug
     void OnDrawGizmos()
     {
         if (!Application.isPlaying) return;
 
-        // Barra de vida mini
         Vector3 barPos = transform.position + Vector3.up * 0.8f;
         float healthPercent = (float)currentHealth / maxHealth;
 
