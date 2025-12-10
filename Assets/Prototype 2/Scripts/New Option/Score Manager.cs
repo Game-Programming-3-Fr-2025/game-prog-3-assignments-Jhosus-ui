@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -36,7 +36,8 @@ public class ScoreManager : MonoBehaviour
 
     private bool player1Dead = false;
     private bool player2Dead = false;
-    private bool countdownStarted = false;
+    private float currentCountdownTime;
+    private bool countdownActive = false;
 
     void Start()
     {
@@ -47,20 +48,30 @@ public class ScoreManager : MonoBehaviour
 
     void Update()
     {
-        UpdateGlobalUI();
-        CheckIndividualDeaths();
-
-        if (!gameEnded && CheckBothPlayersDead())
+        // Solo actualizar UI si el juego no ha terminado
+        if (!gameEnded)
         {
-            gameEnded = true;
-            StartCoroutine(GameOverSequence());
+            UpdateGlobalUI();
+            CheckIndividualDeaths();
+
+            if (CheckBothPlayersDead())
+            {
+                gameEnded = true;
+                StartCoroutine(GameOverSequence());
+            }
         }
 
-        // Actualizar contador si est· activo
-        if (countdownStarted && countdownText != null)
+        // Actualizar contador en tiempo real (independiente de Time.timeScale)
+        if (countdownActive)
         {
-            countdownTime -= Time.deltaTime;
-            countdownText.text = Mathf.CeilToInt(countdownTime).ToString();
+            currentCountdownTime -= Time.unscaledDeltaTime; // ‚Üê ESTA ES LA CLAVE
+            countdownText.text = Mathf.CeilToInt(currentCountdownTime).ToString();
+
+            if (currentCountdownTime <= 0)
+            {
+                countdownActive = false;
+                CargarEscenaFinal();
+            }
         }
     }
 
@@ -128,26 +139,58 @@ public class ScoreManager : MonoBehaviour
 
     public IEnumerator GameOverSequence()
     {
-        yield return new WaitForSeconds(delayBeforeResults);
-
+        // Mostrar resultados inmediatamente (no esperar delay)
         Time.timeScale = 0f;
         ShowResultsScreen();
         ShowResults();
 
-        // Iniciar contador para cargar escena
-        yield return new WaitForSecondsRealtime(1f); // PequeÒa pausa
+        // Esperar un poco antes de mostrar el contador
+        yield return new WaitForSecondsRealtime(1f);
 
+        // Iniciar contador en tiempo real
+        StartCountdown();
+    }
+
+    void StartCountdown()
+    {
         if (countdownText != null)
         {
             countdownText.gameObject.SetActive(true);
-            countdownStarted = true;
+            currentCountdownTime = countdownTime;
+            countdownActive = true;
         }
+        else
+        {
+            // Si no hay texto, cargar escena directamente
+            Invoke(nameof(CargarEscenaFinal), countdownTime);
+        }
+    }
 
-        // Esperar tiempo del contador
-        yield return new WaitForSecondsRealtime(countdownTime);
+    void CargarEscenaFinal()
+    {
+        Time.timeScale = 1f;
 
-        // Cargar escena obligatoria
-        SceneManager.LoadScene(nextSceneName);
+        // Usar el TwoPlayerSceneManager si existe
+        if (GameManagerGP2.Instance != null)
+        {
+            GameManagerGP2.Instance.LoadMenuFromGame();
+        }
+        else
+        {
+            // Fallback seguro
+            SceneManager.LoadScene(4, LoadSceneMode.Single);
+        }
+    }
+
+    bool SceneExists(string sceneName)
+    {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string nameInBuild = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            if (nameInBuild == sceneName) return true;
+        }
+        return false;
     }
 
     void UpdateGlobalUI()
