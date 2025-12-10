@@ -22,6 +22,7 @@ public class FC2 : MonoBehaviour
     private float posicionXFijaArriba;
     private float tiempoInicioHorizontal;
     private float tiempoInicioVerticalArriba;
+    private float tiempoInicioVertical; // NUEVO
     private float mitadAlturaCamara;
     private float mitadAnchoCamara;
 
@@ -29,6 +30,7 @@ public class FC2 : MonoBehaviour
     {
         alturaInicial = transform.position.y;
         posicionXInicial = transform.position.x;
+        tiempoInicioVertical = Time.time; // NUEVO: Guardar cuando inicia
 
         cam = GetComponent<Camera>();
         if (cam != null)
@@ -60,7 +62,9 @@ public class FC2 : MonoBehaviour
 
     void MoverCamaraVertical()
     {
-        float nuevaY = alturaInicial - (velocidadBajada * Time.time);
+        // CAMBIO: Usar tiempo relativo desde el inicio
+        float tiempoTranscurrido = Time.time - tiempoInicioVertical;
+        float nuevaY = alturaInicial - (velocidadBajada * tiempoTranscurrido);
         transform.position = new Vector3(posicionXFija, nuevaY, transform.position.z);
     }
 
@@ -123,6 +127,7 @@ public class FC2 : MonoBehaviour
             modoHorizontal = false;
             modoVerticalArriba = false;
             alturaInicial = transform.position.y;
+            tiempoInicioVertical = Time.time; // NUEVO: Resetear tiempo
         }
     }
 

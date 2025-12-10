@@ -20,16 +20,15 @@ public class ScoreManager : MonoBehaviour
     public TMP_Text winnerText;
 
     [Header("Contador")]
-    public TMP_Text countdownText; // Texto para mostrar cuenta regresiva
-    public float countdownTime = 5f; // Tiempo antes de cargar escena
+    public TMP_Text countdownText;
+    public float countdownTime = 5f;
 
     [Header("Escena")]
-    public string nextSceneName = "Menu"; // Nombre de la escena a cargar
+    public string nextSceneName = "Menu";
 
     [Header("Result Screen")]
     public GameObject resultsScreen;
     public Image backgroundPanel;
-    public float delayBeforeResults = 1f;
 
     [Header("Game State")]
     public bool gameEnded = false;
@@ -48,7 +47,6 @@ public class ScoreManager : MonoBehaviour
 
     void Update()
     {
-        // Solo actualizar UI si el juego no ha terminado
         if (!gameEnded)
         {
             UpdateGlobalUI();
@@ -61,11 +59,11 @@ public class ScoreManager : MonoBehaviour
             }
         }
 
-        // Actualizar contador en tiempo real (independiente de Time.timeScale)
         if (countdownActive)
         {
-            currentCountdownTime -= Time.unscaledDeltaTime; // ← ESTA ES LA CLAVE
-            countdownText.text = Mathf.CeilToInt(currentCountdownTime).ToString();
+            currentCountdownTime -= Time.unscaledDeltaTime;
+            if (countdownText != null)
+                countdownText.text = Mathf.CeilToInt(currentCountdownTime).ToString();
 
             if (currentCountdownTime <= 0)
             {
@@ -114,21 +112,43 @@ public class ScoreManager : MonoBehaviour
     {
         if (player == null) return;
 
-        SpriteRenderer sprite = player.GetComponent<SpriteRenderer>();
-        if (sprite != null) sprite.enabled = false;
+        // PRIMERO: Desactivar TrailRenderer y efectos visuales
+        TrailRenderer trail = player.GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            trail.enabled = false;
+            trail.Clear(); // Limpiar el trail
+        }
+
+        ParticleSystem[] particles = player.GetComponentsInChildren<ParticleSystem>();
+        foreach (ParticleSystem ps in particles)
+        {
+            ps.Stop();
+            ps.Clear();
+        }
+
+        // SEGUNDO: Desactivar componentes de movimiento
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
 
         Collider2D[] colliders = player.GetComponents<Collider2D>();
         foreach (Collider2D col in colliders) col.enabled = false;
 
-        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-        if (rb != null) rb.simulated = false;
-
+        // TERCERO: Desactivar scripts (excepto los necesarios)
         MonoBehaviour[] scripts = player.GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
             if (script is LifeSystem || script is PlayerScore) continue;
             script.enabled = false;
         }
+
+        // CUARTO: Ocultar visualmente
+        SpriteRenderer sprite = player.GetComponent<SpriteRenderer>();
+        if (sprite != null) sprite.enabled = false;
     }
 
     bool CheckBothPlayersDead()
@@ -139,15 +159,12 @@ public class ScoreManager : MonoBehaviour
 
     public IEnumerator GameOverSequence()
     {
-        // Mostrar resultados inmediatamente (no esperar delay)
         Time.timeScale = 0f;
         ShowResultsScreen();
         ShowResults();
 
-        // Esperar un poco antes de mostrar el contador
         yield return new WaitForSecondsRealtime(1f);
 
-        // Iniciar contador en tiempo real
         StartCountdown();
     }
 
@@ -161,36 +178,17 @@ public class ScoreManager : MonoBehaviour
         }
         else
         {
-            // Si no hay texto, cargar escena directamente
             Invoke(nameof(CargarEscenaFinal), countdownTime);
         }
     }
 
     void CargarEscenaFinal()
     {
+        // Restaurar tiempo antes de cargar
         Time.timeScale = 1f;
 
-        // Usar el TwoPlayerSceneManager si existe
-        if (GameManagerGP2.Instance != null)
-        {
-            GameManagerGP2.Instance.LoadMenuFromGame();
-        }
-        else
-        {
-            // Fallback seguro
-            SceneManager.LoadScene(4, LoadSceneMode.Single);
-        }
-    }
-
-    bool SceneExists(string sceneName)
-    {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-            string nameInBuild = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-            if (nameInBuild == sceneName) return true;
-        }
-        return false;
+        // Cargar escena (esto limpia todo automáticamente)
+        SceneManager.LoadScene(nextSceneName);
     }
 
     void UpdateGlobalUI()
