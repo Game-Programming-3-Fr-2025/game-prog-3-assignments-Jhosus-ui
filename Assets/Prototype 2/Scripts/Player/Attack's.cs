@@ -32,6 +32,7 @@ public class Attacks : MonoBehaviour
     private bool isVibrating = false;
     private Gamepad playerGamepad;
 
+    public AudioSource audioSource;
     void Start()
     {
         Transform parent = transform.parent;
@@ -42,6 +43,7 @@ public class Attacks : MonoBehaviour
         }
 
         animator = animator ?? GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -93,7 +95,7 @@ public class Attacks : MonoBehaviour
     private void PlayAttackSound()
     {
         if (attackSound != null)
-            AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
+            audioSource.PlayOneShot(attackSound, attackVolume);
     }
 
     void ApplyDamage(Collider2D enemy)

@@ -2,40 +2,25 @@
 
 public class Recollect : MonoBehaviour
 {
-    public enum TipoItem
-    {
-        Coin,
-        PDash,
-        PJump
-    }
+    public enum TipoItem { Coin, PDash, PJump }
 
-    [Header("Tipo de Item")]
     [SerializeField] private TipoItem tipoItem = TipoItem.Coin;
-
-    [Header("Configuración")]
     [SerializeField] private string playerLayer = "Players";
-
-    [Header("Efectos")]
-    [SerializeField] private ParticleSystem particleEffect;
-
-    [Header("Sonido")]
+    [SerializeField] private GameObject collectParticlePrefab;
     [SerializeField] private AudioClip collectSound;
     [SerializeField] private float volume = 1f;
-
-    [Header("Levitación")]
     [SerializeField] private float levitationSpeed = 1f;
     [SerializeField] private float levitationHeight = 0.2f;
 
     private Vector3 startPosition;
     private float timeCounter = 0f;
+    private bool collected = false;
 
-    void Start()
-    {
-        startPosition = transform.position;
-    }
+    void Start() => startPosition = transform.position;
 
     void Update()
     {
+        if (collected) return;
         timeCounter += Time.deltaTime * levitationSpeed;
         float newY = startPosition.y + Mathf.Sin(timeCounter) * levitationHeight;
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
@@ -43,32 +28,50 @@ public class Recollect : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (collected) return;
         if (other.gameObject.layer == LayerMask.NameToLayer(playerLayer))
             RecolectarItem(other.gameObject);
     }
 
     private void RecolectarItem(GameObject jugador)
     {
-        enabled = false;
-
-        PlayCollectSound();
+        collected = true;
+        PlayCollectSound(jugador); // ← Cambiado: pasar el jugador
         ActivarHabilidad(jugador);
-
-        if (particleEffect != null) particleEffect.Play();
-
-        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
-        if (sprite != null) sprite.enabled = false;
-
-        Collider2D collider = GetComponent<Collider2D>();
-        if (collider != null) collider.enabled = false;
-
-        Destroy(gameObject, 0.9f);
+        SpawnCollectParticles();
+        HideCollectible();
+        Destroy(gameObject, 2f);
     }
 
-    private void PlayCollectSound()
+    private void PlayCollectSound(GameObject jugador)
     {
-        if (collectSound != null)
-            AudioSource.PlayClipAtPoint(collectSound, transform.position, volume);
+        if (collectSound == null) return;
+
+        // Reproducir en el AudioSource del jugador que recolectó
+        AudioSource playerAudio = jugador.GetComponent<AudioSource>();
+        if (playerAudio != null)
+        {
+            playerAudio.PlayOneShot(collectSound, volume);
+        }
+        else
+        {
+            Debug.LogWarning($"El jugador {jugador.name} no tiene AudioSource!");
+        }
+    }
+
+    private void SpawnCollectParticles()
+    {
+        if (collectParticlePrefab == null) return;
+        GameObject particles = Instantiate(collectParticlePrefab, transform.position, Quaternion.identity);
+        Destroy(particles, 3f);
+    }
+
+    private void HideCollectible()
+    {
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) sprite.enabled = false;
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null) collider.enabled = false;
     }
 
     private void ActivarHabilidad(GameObject jugador)
@@ -76,21 +79,16 @@ public class Recollect : MonoBehaviour
         switch (tipoItem)
         {
             case TipoItem.PDash:
-                PDash dashComponent = jugador.GetComponent<PDash>();
-                if (dashComponent != null)
-                    dashComponent.isDashUnlocked = true;
+                PDash dash = jugador.GetComponent<PDash>();
+                if (dash != null) dash.isDashUnlocked = true;
                 break;
-
             case TipoItem.PJump:
-                PJumps jumpComponent = jugador.GetComponent<PJumps>();
-                if (jumpComponent != null)
-                    jumpComponent.isDoubleJumpUnlocked = true;
+                PJumps jump = jugador.GetComponent<PJumps>();
+                if (jump != null) jump.isDoubleJumpUnlocked = true;
                 break;
-
             case TipoItem.Coin:
-                PlayerScore playerScore = jugador.GetComponent<PlayerScore>();
-                if (playerScore != null)
-                    Destroy(gameObject);
+                PlayerScore score = jugador.GetComponent<PlayerScore>();
+                if (score != null) Destroy(gameObject);
                 break;
         }
     }
