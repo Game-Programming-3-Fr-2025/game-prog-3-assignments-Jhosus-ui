@@ -1,0 +1,845 @@
+fileFormatVersion: 2
+guid: 9d38bb44c10941043a9ca7efbbd803f0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6111362669698838200
+    second: Gun-Sprite-Sheet (1)_0
+  - first:
+      213: 5650601828779019371
+    second: Gun-Sprite-Sheet (1)_1
+  - first:
+      213: -7655979542549630026
+    second: Gun-Sprite-Sheet (1)_2
+  - first:
+      213: 4414732014323217199
+    second: Gun-Sprite-Sheet (1)_3
+  - first:
+      213: -2802791405578504526
+    second: Gun-Sprite-Sheet (1)_4
+  - first:
+      213: -2043599656099368230
+    second: Gun-Sprite-Sheet (1)_5
+  - first:
+      213: 8197884418297484545
+    second: Gun-Sprite-Sheet (1)_6
+  - first:
+      213: -7120608444803480671
+    second: Gun-Sprite-Sheet (1)_7
+  - first:
+      213: -7494634578929065459
+    second: Gun-Sprite-Sheet (1)_8
+  - first:
+      213: -2987631452169090206
+    second: Gun-Sprite-Sheet (1)_9
+  - first:
+      213: 3741508701911694346
+    second: Gun-Sprite-Sheet (1)_10
+  - first:
+      213: 3796106029096530148
+    second: Gun-Sprite-Sheet (1)_11
+  - first:
+      213: -1840690132299285986
+    second: Gun-Sprite-Sheet (1)_12
+  - first:
+      213: 249668388084055747
+    second: Gun-Sprite-Sheet (1)_13
+  - first:
+      213: 2058997399388960939
+    second: Gun-Sprite-Sheet (1)_14
+  - first:
+      213: 1479176398600600993
+    second: Gun-Sprite-Sheet (1)_15
+  - first:
+      213: 8401092375463581910
+    second: Gun-Sprite-Sheet (1)_16
+  - first:
+      213: -4135518799794051847
+    second: Gun-Sprite-Sheet (1)_17
+  - first:
+      213: -4736552376742451084
+    second: Gun-Sprite-Sheet (1)_18
+  - first:
+      213: 1859654925627891310
+    second: Gun-Sprite-Sheet (1)_19
+  - first:
+      213: -8016568441083419909
+    second: Gun-Sprite-Sheet (1)_20
+  - first:
+      213: -2033426549387532626
+    second: Gun-Sprite-Sheet (1)_21
+  - first:
+      213: 3303001179836697227
+    second: Gun-Sprite-Sheet (1)_22
+  - first:
+      213: 8626167179471293399
+    second: Gun-Sprite-Sheet (1)_23
+  - first:
+      213: -110441105994992317
+    second: Gun-Sprite-Sheet (1)_24
+  - first:
+      213: -2047244981274496016
+    second: Gun-Sprite-Sheet (1)_25
+  - first:
+      213: 2627755300036989451
+    second: Gun-Sprite-Sheet (1)_26
+  - first:
+      213: -7108569957588578596
+    second: Gun-Sprite-Sheet (1)_27
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 60
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_0
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 72
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84194030804103ba0800000000000000
+      internalID: -6111362669698838200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_1
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 72
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6ccb83dc68fa6e40800000000000000
+      internalID: 5650601828779019371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_2
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 72
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b3fbae4b2f70c590800000000000000
+      internalID: -7655979542549630026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_3
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 72
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f23b7447067444d30800000000000000
+      internalID: 4414732014323217199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_4
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 72
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b6b9f2011c7a19d0800000000000000
+      internalID: -2802791405578504526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_5
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 72
+        width: 28
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad23613b0fca3a3e0800000000000000
+      internalID: -2043599656099368230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_6
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 72
+        width: 28
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 105d456b17cb4c170800000000000000
+      internalID: 8197884418297484545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_7
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 40
+        width: 28
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a387d698548e2d90800000000000000
+      internalID: -7120608444803480671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_8
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 40
+        width: 28
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d02e2990f85bdf790800000000000000
+      internalID: -7494634578929065459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_9
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 41
+        width: 28
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26b4dadf50dc986d0800000000000000
+      internalID: -2987631452169090206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_10
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 38
+        width: 34
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0cba7d47528ce330800000000000000
+      internalID: 3741508701911694346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_11
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 35
+        width: 34
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e07402225a7ea430800000000000000
+      internalID: 3796106029096530148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_12
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 40
+        width: 34
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1afbbab31e8476e0800000000000000
+      internalID: -1840690132299285986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_13
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 31
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cef46f7310077300800000000000000
+      internalID: 249668388084055747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_14
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 38
+        width: 33
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba83808c937039c10800000000000000
+      internalID: 2058997399388960939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_15
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 32
+        width: 29
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1adfab6f817178410800000000000000
+      internalID: 1479176398600600993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_16
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 31
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d8dfbc210da69470800000000000000
+      internalID: 8401092375463581910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_17
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 36
+        width: 28
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f46350009fab96c0800000000000000
+      internalID: -4135518799794051847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_18
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 40
+        width: 30
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 478eb3c65b2644eb0800000000000000
+      internalID: -4736552376742451084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_19
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 40
+        width: 31
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6e1bde4d42dec910800000000000000
+      internalID: 1859654925627891310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_20
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 40
+        width: 32
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf2ad97f97d6fb090800000000000000
+      internalID: -8016568441083419909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_21
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 40
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea668eea351d7c3e0800000000000000
+      internalID: -2033426549387532626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_22
+      rect:
+        serializedVersion: 2
+        x: 685
+        y: 40
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8accd0b21e96dd20800000000000000
+      internalID: 3303001179836697227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_23
+      rect:
+        serializedVersion: 2
+        x: 733
+        y: 40
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7db0589a85d46b770800000000000000
+      internalID: 8626167179471293399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_24
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 8
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34531943662a77ef0800000000000000
+      internalID: -110441105994992317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_25
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 7
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f3beea4989b693e0800000000000000
+      internalID: -2047244981274496016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_26
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 7
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b02da5fd589a77420800000000000000
+      internalID: 2627755300036989451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gun-Sprite-Sheet (1)_27
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 8
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cde4be05949495d90800000000000000
+      internalID: -7108569957588578596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Gun-Sprite-Sheet (1)_0: -6111362669698838200
+      Gun-Sprite-Sheet (1)_1: 5650601828779019371
+      Gun-Sprite-Sheet (1)_10: 3741508701911694346
+      Gun-Sprite-Sheet (1)_11: 3796106029096530148
+      Gun-Sprite-Sheet (1)_12: -1840690132299285986
+      Gun-Sprite-Sheet (1)_13: 249668388084055747
+      Gun-Sprite-Sheet (1)_14: 2058997399388960939
+      Gun-Sprite-Sheet (1)_15: 1479176398600600993
+      Gun-Sprite-Sheet (1)_16: 8401092375463581910
+      Gun-Sprite-Sheet (1)_17: -4135518799794051847
+      Gun-Sprite-Sheet (1)_18: -4736552376742451084
+      Gun-Sprite-Sheet (1)_19: 1859654925627891310
+      Gun-Sprite-Sheet (1)_2: -7655979542549630026
+      Gun-Sprite-Sheet (1)_20: -8016568441083419909
+      Gun-Sprite-Sheet (1)_21: -2033426549387532626
+      Gun-Sprite-Sheet (1)_22: 3303001179836697227
+      Gun-Sprite-Sheet (1)_23: 8626167179471293399
+      Gun-Sprite-Sheet (1)_24: -110441105994992317
+      Gun-Sprite-Sheet (1)_25: -2047244981274496016
+      Gun-Sprite-Sheet (1)_26: 2627755300036989451
+      Gun-Sprite-Sheet (1)_27: -7108569957588578596
+      Gun-Sprite-Sheet (1)_3: 4414732014323217199
+      Gun-Sprite-Sheet (1)_4: -2802791405578504526
+      Gun-Sprite-Sheet (1)_5: -2043599656099368230
+      Gun-Sprite-Sheet (1)_6: 8197884418297484545
+      Gun-Sprite-Sheet (1)_7: -7120608444803480671
+      Gun-Sprite-Sheet (1)_8: -7494634578929065459
+      Gun-Sprite-Sheet (1)_9: -2987631452169090206
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

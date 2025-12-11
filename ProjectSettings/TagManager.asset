@@ -2,21 +2,51 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Hit
+  - Ground
+  - Points
+  - Checkpoint
+  - FF
+  - Aldeano
+  - Infected
+  - Enemy
+  - Chasis
+  - Point
+  - Bullet
+  - Modulo
+  - Fathers
+  - Wall
+  - SpawnPoint
+  - Fade
+  - PuntoFinal
+  - Niveles
+  - Player 1
+  - Player 2
+  - Horizontal
+  - PuntoFinalInicial
+  - PuntoFinalP1
+  - PuntoFinalP2
+  - RespawnPoint
+  - Coin
+  - PDash
+  - PJump
+  - Platformer
+  - Start
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Players
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - People
+  - Enemy
+  - Player
+  - Wall
+  - Dangers
   - 
   - 
   - 
@@ -41,3 +71,5 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  m_RenderingLayers:
+  - Default
