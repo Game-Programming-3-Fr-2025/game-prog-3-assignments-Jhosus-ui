@@ -31,7 +31,7 @@ public class Blocks : MonoBehaviour
         if (!isBreaking && !isBroken)
         {
             string collisionTag = collision.gameObject.tag;
-            if (collisionTag == "Player 1" || collisionTag == "Player 2")
+            if (collisionTag == "Player 1" || collisionTag == "Player 2" || collisionTag == "Player")
             {
                 StartBreaking();
             }
